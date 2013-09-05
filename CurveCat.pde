@@ -235,51 +235,35 @@ class CurveCat
     return bestSegment;
   }
 
-  // int findClosestPoint (PVector[] cps, PVector q, PVector r) {
+  int[] getControlPointsBetween(PVector init, PVector pFinal){
+    PVector aux;
 
-  //   int bestSegment = -1;
-  //   float bestDistance = 10000000;
-  //   float bestSegmentDistance = 100000;
-    
-  //   for (int i = 0; i < cps.length-2; i++) {
+    ArrayList<Integer> result = new ArrayList<Integer>();
+    for (int i = 0; i<controlPoints.length; i++){
+      PVector controlPoint = controlPoints[i];
 
-  //     Segment segment = getSegment(cps, i);
-  //     Segment aux = getSegment(cps, i + 1);
+      float dist1 = controlPoint.dist(init);
+      float dist2 = controlPoint.dist(pFinal);
 
-  //     PVector result = new PVector();
-  //     for (int j=0; j<=numberDivisions; j++) 
-  //     {
-  //       float t = (float)(j) / (float)(numberDivisions);
-  //       float x1 = curvePoint(segment.a.x, segment.b.x, segment.c.x, segment.d.x, t);
-  //       float y1 = curvePoint(segment.a.y, segment.b.y, segment.c.y, segment.d.y, t);
+      println("dist1: "+dist1);
+      println("dist2: "+dist2);
 
-  //       float x2 = curvePoint(aux.a.x, aux.b.x, aux.c.x, aux.d.x, t);
-  //       float y2 = curvePoint(aux.a.y, aux.b.y, aux.c.y, aux.d.y, t);
+      println("init.dist(pFinal): "+init.dist(pFinal));
 
-  //       float dist1 = dist (x1, y1, q.x, q.y);
-  //       float dist2 = dist(x2, y2, q.x, q.y);
+      if(pow(dist1,2) + pow(dist2,2) <= pow(init.dist(pFinal),2)){
+        result.add(i);
+      }
+    }
 
-  //       float dist = dist1 < dist2 ? dist1 : dist2;
-  //       bestSegment = dist1 < dist2 ? i: i + 1;
+    int[] r = new int[result.size()];
 
-  //       if (j == 0 || dist < bestSegmentDistance) {
-  //         bestSegmentDistance = dist;
+    for (int i = 0; i<result.size(); i++){
+        r[i] = result.get(i);
+    }
 
-  //         if(dist1 < dist2){
-  //           result.set(x1, y1, 0);
-  //         }else{
-  //           result.set(x2, y2, 0);
-  //         }
-  //       }
-  //     }
-  //     if (bestSegmentDistance < bestDistance) {
-  //       r.set (result.x, result.y, 0);
-  //       bestSegment = i;
-  //       bestDistance = bestSegmentDistance;
-  //     }
-  //   }
-  //   return bestSegment;
-  // }
+    return r;
+  }
+
   /** FIM DOS MÉTODOS DE EDIÇÃO E CRIAÇÃO **/
 
   /** MÉTODOS PARA PARAMETRIZAÇÃO DE UMA CURVA **/
@@ -308,6 +292,7 @@ class CurveCat
     }
     return (float)curveLength;
   }
+
 
 
   /**

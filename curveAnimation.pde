@@ -55,7 +55,6 @@ void mouseWheel(float delta) {
   curveT += delta/10;
   curveT = constrain(curveT, -1.0, 1.0);
 
-  println("curveT: "+curveT);
   curveTightness(curveT); 
 }
 
@@ -95,6 +94,10 @@ public void keyPressed()
 // Mouse press callback
 void mousePressed() 
 {
+
+  mouseInit.set(mouseX, mouseY);
+  mouseFinal.set(mouseX, mouseY);
+
   if (state == DRAWING)
   { 
     curve.insertPoint(new PVector(mouseX, mouseY), curve.getNumberControlPoints());
@@ -106,24 +109,21 @@ void mousePressed()
     closestPoint = new PVector();
     PVector q = new PVector(mouseX, mouseY);
     selectedSegment = curve.findClosestPoint (curve.controlPoints, q, closestPoint);
-    println("selectedSegments: "+selectedSegment);
     float distance = q.dist(closestPoint);
 
     if (mouseEvent.getClickCount()==2){
       curve.insertPoint(q, selectedSegment + 1);
 
       selectedSegment++;
+
+        mouseInit.set(0, 0);
+        mouseFinal.set(0, 0);
     }
 
     if(distance > 50){
       selectedSegment = -1;
     }
   }
-
-
-
-  mouseInit.set(mouseX, mouseY);
-  mouseFinal.set(mouseX, mouseY);
 }
     
 void mouseReleased()
@@ -132,7 +132,13 @@ void mouseReleased()
     curve.decimeCurve(tolerance);
   }
 
+  if(state == EDITING && selectedSegment == -1){
+    int[] selecteds = curve.getControlPointsBetween(mouseInit, mouseFinal);
 
+    for (int i = 0; i<selecteds.length; i++){
+      curve.removeElement(selecteds[i]);
+    }
+  }
 
   mouseInit.set(0,0);
   mouseFinal.set(0,0);
