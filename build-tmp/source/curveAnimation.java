@@ -1,3 +1,242 @@
+import processing.core.*; 
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
+
+import java.awt.event.*; 
+
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
+
+public class curveAnimation extends PApplet {
+
+/**
+ AnimationApp.pde
+ Author: Guilherme Herzog
+ Created on: May 13
+ 
+ **/
+
+ 
+
+// States 
+final int  DRAWING = 1;
+final int  EDITING = 2;
+final int  DEBUG = 3;
+
+int state;
+int selectedSegment; // Selected Segment of curve
+PVector closestPoint;
+float tolerance;
+
+PFont font; // it's a font
+float curveT = 0;
+
+// Curve
+CurveCat curve;
+CurveCat decimedCurve;
+
+// Selection Box
+PVector mouseInit;
+PVector mouseFinal;
+
+public void setup() 
+{
+  size(800, 600);
+  smooth();
+  state = DRAWING; // First state
+  selectedSegment = -1; 
+  font = createFont("", 14);
+  curve = new CurveCat();
+
+  closestPoint = new PVector();
+  tolerance = 5;
+
+  mouseInit = new PVector(0,0);
+  mouseFinal = new PVector(0,0);
+
+  addMouseWheelListener(new MouseWheelListener() { 
+    public void mouseWheelMoved(MouseWheelEvent mwe) { 
+      mouseWheel(mwe.getWheelRotation());
+  }}); 
+
+  curveTightness(curveT);
+}
+
+public void mouseWheel(float delta) {
+  curveT += delta/10;
+  curveT = constrain(curveT, -1.0f, 1.0f);
+
+  println("curveT: "+curveT);
+  curveTightness(curveT); 
+}
+
+// Key Press callback
+public void keyPressed() 
+{ 
+  switch (key){
+    case '1' :
+      state = DRAWING;
+      selectedSegment = -1;
+    break;  
+
+    case '2' :
+        state = EDITING;
+    break;  
+
+    case '3' :
+      state = DEBUG;
+    break;  
+
+    case DELETE :
+      if (state == 1)
+      {
+        curve.clear(); 
+        state = DRAWING; // Set state Draw
+        selectedSegment = -1; // Reset segment selected
+      }
+      else if (state == EDITING && selectedSegment != -1)
+      {
+        curve.removeElement(selectedSegment);
+        selectedSegment--;
+      }
+    break;
+  }
+}
+
+// Mouse press callback
+public void mousePressed() 
+{
+  if (state == DRAWING)
+  { 
+    curve.insertPoint(new PVector(mouseX, mouseY), curve.getNumberControlPoints());
+  }
+  if (state == EDITING)
+  {
+    selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
+
+    closestPoint = new PVector();
+    PVector q = new PVector(mouseX, mouseY);
+    selectedSegment = curve.findClosestPoint (curve.controlPoints, q, closestPoint);
+    println("selectedSegments: "+selectedSegment);
+    float distance = q.dist(closestPoint);
+
+    if (mouseEvent.getClickCount()==2){
+      curve.insertPoint(q, selectedSegment + 1);
+
+      selectedSegment++;
+    }
+
+    if(distance > 50){
+      selectedSegment = -1;
+    }
+  }
+
+
+
+  mouseInit.set(mouseX, mouseY);
+  mouseFinal.set(mouseX, mouseY);
+}
+    
+public void mouseReleased()
+{
+  while(curve.canBeDecimed()){
+    curve.decimeCurve(tolerance);
+  }
+
+
+
+  mouseInit.set(0,0);
+  mouseFinal.set(0,0);
+}
+
+// Mouse drag callback
+public void mouseDragged () 
+{
+  mouseFinal.set(mouseX, mouseY);
+  if (state == DRAWING && mouseButton == LEFT)
+    curve.insertPoint(new PVector(mouseX, mouseY), curve.getNumberControlPoints());
+  if (state == EDITING) // Editing
+  {
+    if (mouseButton == LEFT)
+    {
+      if (selectedSegment != -1)
+      {
+        curve.setPoint(new PVector(mouseX, mouseY), selectedSegment);
+      }
+    }
+  }
+}
+
+
+public void draw() 
+{
+  background (0);
+  noFill();
+
+  if (curve.getNumberControlPoints() >=4) { 
+    curve.draw();
+  }
+  if (state == EDITING || curve.getNumberControlPoints() < 4) { 
+    curve.drawControlPoints();
+  }
+  if (selectedSegment != -1) { 
+    curve.drawControlPoint(selectedSegment);
+  }
+
+
+  drawInterface();
+  fill(255, 0, 0);
+
+  if(state == EDITING && selectedSegment == -1){
+    fill(255,200,200, 50);
+    rect(mouseInit.x, mouseInit.y, mouseFinal.x - mouseInit.x, mouseFinal.y - mouseInit.y);
+  }
+}
+
+public void drawInterface() 
+{
+         
+  fill(96);
+  textFont(font);
+  int textx = 5, texty = height-100;
+  if (curve.getNumberControlPoints() < 4)
+    text("Click 4 times to define control points", textx, texty+=15);
+  text("Key '1' set state to CREATING", textx, texty+=15);
+  text("Key '2' set state to EDITING", textx, texty+=15);
+  text("Key 'DEL' create a new Curve", textx, texty+=15);
+  
+  int posX = width-80;
+  int posY = height-20;
+  switch (state){
+    case DRAWING :
+      fill(200,100,0);
+      rect(posX-10,posY-20,80,30);
+      fill(255);
+      text("Creating", posX, posY);
+    break;  
+    case EDITING :
+      fill(0,100,200);
+      rect(posX-10,posY-20,80,30);
+      fill(255);
+      text("Editing", posX, posY);
+    break;
+    case DEBUG :
+      fill(255);
+      text("Curve Length:"+curve.curveLength()+" px", 10, height-20);
+    break;  
+  }
+
+  text("Curve Length:"+curve.curveLength()+" px", 10, height-20);
+}
+
+
 //
 // Classe que representa uma curva Catmull-Rom
 //
@@ -21,14 +260,14 @@ class CurveCat
     decimable = true;
   }
 
-  void clear()
+  public void clear()
   {
     decimable = true;
     controlPoints = new PVector[0];
   }
 
-  // Remove o elemento que está no index de uma lista pTmp
-  PVector[] removeElementFromArray(PVector[] pTmp, int index)
+  // Remove o elemento que est\u00e1 no index de uma lista pTmp
+  public PVector[] removeElementFromArray(PVector[] pTmp, int index)
   { 
     //assert(index != -1);
     for (int i=0; i < pTmp.length-1; i++)
@@ -38,7 +277,7 @@ class CurveCat
     return pTmp;
   }
 
-  void removeElement(int index){
+  public void removeElement(int index){
     for (int i=0; i < controlPoints.length-1; i++){
       if (i >= index)
         controlPoints[i] = controlPoints[i+1];
@@ -46,7 +285,7 @@ class CurveCat
     controlPoints = (PVector[])shorten(controlPoints);
   }
 
-  Segment getSegment(PVector[] pAux, int i)
+  public Segment getSegment(PVector[] pAux, int i)
   { 
          //printArray(pAux);
          PVector a = i >= 1 ? pAux[i-1] : pAux[0];
@@ -56,7 +295,7 @@ class CurveCat
          return new Segment(a,b,c,d);
   }
 
-  Segment getSegment(int i)
+  public Segment getSegment(int i)
   { 
          //printArray(pAux);
          PVector a = i >= 1 ? controlPoints[i-1] : controlPoints[0];
@@ -65,8 +304,8 @@ class CurveCat
          PVector d = i+2 < controlPoints.length ? controlPoints[i+2] : controlPoints[i+1];
          return new Segment(a,b,c,d);
   }
-  // Remove pontos de controle de uma curva criada pela lista p que possuam distancia menor que a tolerancia em relação aos pontos da nova curva.
-  void decimeCurve(float tolerance)
+  // Remove pontos de controle de uma curva criada pela lista p que possuam distancia menor que a tolerancia em rela\u00e7\u00e3o aos pontos da nova curva.
+  public void decimeCurve(float tolerance)
   {
       PVector a = new PVector();
       PVector b = new PVector();
@@ -99,7 +338,7 @@ class CurveCat
          {
             float t = (float)(j) / (float)(numberDivisions);
             float tAux;
-            if (t < 0.5)
+            if (t < 0.5f)
             {
                  segP = getSegment(controlPoints,i-1);
                  tAux = t*2;     
@@ -132,11 +371,11 @@ class CurveCat
       this.decimable = wasDecimed;
   }
 
-  boolean canBeDecimed(){
+  public boolean canBeDecimed(){
     return this.decimable;
   }
 
-  int getNumberControlPoints () { 
+  public int getNumberControlPoints () { 
     if (controlPoints != null) { 
       return controlPoints.length;
     } 
@@ -146,7 +385,7 @@ class CurveCat
   } 
 
   // Insere o ponto q entre index-1 e index
-  void insertPoint(PVector q, int index){
+  public void insertPoint(PVector q, int index){
     controlPoints = (PVector[]) append(controlPoints, q);
     for (int i = controlPoints.length-1; i > index; i--) {
       controlPoints[i] = controlPoints[i-1];
@@ -156,21 +395,21 @@ class CurveCat
   }
 
   // Altera o valor do elemento index da lista p para q
-  void setPoint(PVector q, int index)
+  public void setPoint(PVector q, int index)
   {
     controlPoints[index].set(q);
   }
 
   // Retorna as coordenadas (X,Y) para de uma lista de PVectors p dado o index.
-  PVector getControlPoint(int index)
+  public PVector getControlPoint(int index)
   {
     return controlPoints[index];
   }
   
-  // Retorna o indice do ponto de controle mais próximo de q. Caso
-  // este não esteja a uma distancia minima especificada por minDistance,
+  // Retorna o indice do ponto de controle mais pr\u00f3ximo de q. Caso
+  // este n\u00e3o esteja a uma distancia minima especificada por minDistance,
   // retorna -1
-  int findControlPoint(PVector q)
+  public int findControlPoint(PVector q)
   {
     int op=-1;
     float bestDist = 100000;
@@ -188,20 +427,20 @@ class CurveCat
 
   // Outra interface para findControlPoint, passando as coordenadas
   // do ponto na lista de argumentos
-  int findControlPoint (float x, float y) {
+  public int findControlPoint (float x, float y) {
     return findControlPoint (new PVector (x, y));
   }
 
   // Outra interface para findControlPoint, passando as coordenadas do mouse
-  int findControlPoint () {
+  public int findControlPoint () {
     return findControlPoint (mouseX, mouseY);
   }
 
   //
   // Retorna o indice do segmento da curva onde o ponto mais proximo de q foi 
-  // encontrado. As coordenadas do ponto mais proximo são guardadas em r
+  // encontrado. As coordenadas do ponto mais proximo s\u00e3o guardadas em r
   // 
-  int findClosestPoint (PVector[] cps, PVector q, PVector r) {
+  public int findClosestPoint (PVector[] cps, PVector q, PVector r) {
 
     int bestSegment = -1;
     float bestDistance = 10000000;
@@ -280,12 +519,12 @@ class CurveCat
   //   }
   //   return bestSegment;
   // }
-  /** FIM DOS MÉTODOS DE EDIÇÃO E CRIAÇÃO **/
+  /** FIM DOS M\u00c9TODOS DE EDI\u00c7\u00c3O E CRIA\u00c7\u00c3O **/
 
-  /** MÉTODOS PARA PARAMETRIZAÇÃO DE UMA CURVA **/
+  /** M\u00c9TODOS PARA PARAMETRIZA\u00c7\u00c3O DE UMA CURVA **/
 
   // Retorna o tamanho de uma curva dados uma lista de pontos de controle
-  float curveLength()
+  public float curveLength()
   {
     float curveLength = 0;
     for (int i = 0; i < getNumberControlPoints()-1; i++) {
@@ -311,10 +550,10 @@ class CurveCat
 
 
   /**
-   MÉTODOS DE DESENHAR
+   M\u00c9TODOS DE DESENHAR
    **/
   // Desenha uma curva de acordo com a lista p de pontos de controle.
-  void draw()
+  public void draw()
   { 
     stroke(255);
     for (int i = 0; i < getNumberControlPoints() - 1; i++) {
@@ -328,7 +567,7 @@ class CurveCat
   }
 
   // Desenha elipses de acordo com os elementos do tipo PVector da lista p
-  void drawControlPoints()
+  public void drawControlPoints()
   {
     fill(255, 0, 0);
     for (int i = 0; i < getNumberControlPoints(); i++) 
@@ -337,14 +576,14 @@ class CurveCat
     }
     fill(255);
   }
-  void drawControlPoint(int index)
+  public void drawControlPoint(int index)
   {
     fill(0, 100, 200);
     stroke(255);
     ellipse(controlPoints[index].x, controlPoints[index].y, 10, 10);
   }
 
-  CurveCat clone(){
+  public CurveCat clone(){
     CurveCat aux = new CurveCat();
     aux.controlPoints = new PVector[controlPoints.length];
     arrayCopy(controlPoints, aux.controlPoints);
@@ -352,3 +591,35 @@ class CurveCat
   }
 }
 
+class Segment{
+   PVector a,b,c,d;
+  
+   Segment(PVector _a, PVector _b, PVector _c, PVector _d){
+      a = _a;
+      b = _b;
+      c = _c;
+      d = _d;
+   } 
+   
+   Segment(){
+   
+   }
+  
+}
+class Utils{
+  
+  public void printArrayPVector(PVector[] p)
+  {
+    for (int i=0;i<p.length-1;i++)
+      println(i+" "+p[i]);
+  }
+}
+  static public void main(String[] passedArgs) {
+    String[] appletArgs = new String[] { "curveAnimation" };
+    if (passedArgs != null) {
+      PApplet.main(concat(appletArgs, passedArgs));
+    } else {
+      PApplet.main(appletArgs);
+    }
+  }
+}
