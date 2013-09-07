@@ -45,7 +45,7 @@ public void setup()
   curve = new CurveCat();
 
   closestPoint = new PVector();
-  tolerance = 5;
+  tolerance = 7;
 
   // PVectors used to create the selection box
   mouseInit = new PVector(0,0);
@@ -60,6 +60,7 @@ public void setup()
   curveTightness(curveT);
 }
 
+// TODO Pensar em como portar isso para o Javascript
 void mouseWheel(float delta) {
   curveT += delta/10;
   curveT = constrain(curveT, -1.0, 1.0);
@@ -67,7 +68,7 @@ void mouseWheel(float delta) {
   curveTightness(curveT); 
 }
 
-// Key Press callback
+// TODO Mudar isso para um interface só usando o mouse
 public void keyPressed() 
 { 
   switch (key){
@@ -117,7 +118,10 @@ void mousePressed()
   {
       if(mouseButton == RIGHT){
 
+            // Verfica se tem nenhum element selecionado
             if(selectedSegments.length == 0){
+
+              // Então seleciona o mais próximo
               selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
 
               closestPoint = new PVector();
@@ -129,12 +133,16 @@ void mousePressed()
               selectedSegments[0] = selectedSegment;
             }
 
+            // Remove todos os segmentos selecionados
             for (int i = selectedSegments.length - 1; i>=0; i--){
               curve.removeElement(selectedSegments[i]);
             }
 
+            // Remove a seleção
             selectedSegments = new int[0];
       }else{
+
+        // Seleciona o segmento em questão se for o mouse LEFT
         selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
 
         closestPoint = new PVector();
@@ -142,6 +150,7 @@ void mousePressed()
         selectedSegment = curve.findClosestPoint (curve.controlPoints, q, closestPoint);
         float distance = q.dist(closestPoint);
 
+        // Se o segmento mais próximo já estiver selecionado saí da função
         for (int i = 0; i<selectedSegments.length; i++){
           if(selectedSegment == selectedSegments[i]){
             if(distance > 20){
@@ -195,9 +204,11 @@ void mouseDragged ()
 
       if (selectedSegments.length != 0)
       {
+        // Pega a variação de x e de y
         float dx = mouseX - pmouseX;
         float dy = mouseY - pmouseY;
 
+        // Soma aos elementos selecionados
         for (int i = 0; i<selectedSegments.length; i++){
           PVector controlPoint = curve.getControlPoint(selectedSegments[i]);
           curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy), selectedSegments[i]);
@@ -229,6 +240,7 @@ void draw()
   drawInterface();
   if(state == EDITING && selectedSegments.length == 0){
 
+    // Desenha caixa de seleção com Alpha 50
     fill(mainColor, 50);
     stroke(mainColor, 50);
     rect(mouseInit.x, mouseInit.y, mouseFinal.x - mouseInit.x, mouseFinal.y - mouseInit.y);
