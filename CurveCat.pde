@@ -312,7 +312,8 @@ class CurveCat
   // Desenha elipses de acordo com os elementos do tipo PVector da lista p
   void drawControlPoints()
   {
-    fill(255, 0, 0);
+    fill(secondaryColor);
+    stroke(secondaryColor);
     for (int i = 0; i < getNumberControlPoints(); i++) 
     {
       ellipse (controlPoints[i].x, controlPoints[i].y, 7, 7);
@@ -321,8 +322,8 @@ class CurveCat
   }
   void drawControlPoint(int index)
   {
-    fill(0, 100, 200);
-    stroke(0,100,200);
+    fill(mainColor);
+    stroke(mainColor);
     ellipse(controlPoints[index].x, controlPoints[index].y, 10, 10);
   }
 

@@ -47,6 +47,10 @@ CurveCat decimedCurve;
 PVector mouseInit;
 PVector mouseFinal;
 
+// Colours
+int mainColor = 0xff0066C8;
+int secondaryColor = 0xffFF9700;
+
 public void setup() 
 {
   size(800, 600);
@@ -84,7 +88,7 @@ public void keyPressed()
   switch (key){
     case '1' :
       state = DRAWING;
-      selectedSegment = -1;
+      selectedSegments = new int[0];
     break;  
 
     case '2' :
@@ -102,10 +106,13 @@ public void keyPressed()
         state = DRAWING; // Set state Draw
         selectedSegment = -1; // Reset segment selected
       }
-      else if (state == EDITING && selectedSegment != -1)
+      else if (state == EDITING && selectedSegments.length != 0)
       {
-        curve.removeElement(selectedSegment);
-        selectedSegment--;
+        for (int i = selectedSegments.length - 1; i>=0; i--){
+              curve.removeElement(selectedSegments[i]);
+        }
+
+        selectedSegments = new int[0];
       }
     break;
   }
@@ -137,7 +144,7 @@ public void mousePressed()
               selectedSegments = new int[1];
               selectedSegments[0] = selectedSegment;
             }
-            
+
             for (int i = selectedSegments.length - 1; i>=0; i--){
               curve.removeElement(selectedSegments[i]);
             }
@@ -236,10 +243,10 @@ public void draw()
   }
 
   drawInterface();
-  fill(255, 0, 0);
-
   if(state == EDITING && selectedSegments.length == 0){
-    fill(255,200,200, 50);
+
+    fill(mainColor, 50);
+    stroke(mainColor, 50);
     rect(mouseInit.x, mouseInit.y, mouseFinal.x - mouseInit.x, mouseFinal.y - mouseInit.y);
   }
 }
@@ -260,15 +267,15 @@ public void drawInterface()
   int posY = height-20;
   switch (state){
     case DRAWING :
-      fill(200,100,0);
-      stroke(200,100,0);
+      fill(mainColor);
+      stroke(mainColor);
       rect(posX-10,posY-20,80,30);
       fill(255);
       text("Creating", posX, posY);
     break;  
     case EDITING :
-      fill(0,100,200);
-      stroke(0,100,200);
+      fill(secondaryColor);
+      stroke(secondaryColor);
       rect(posX-10,posY-20,80,30);
       fill(255);
       text("Editing", posX, posY);
@@ -597,7 +604,8 @@ class CurveCat
   // Desenha elipses de acordo com os elementos do tipo PVector da lista p
   public void drawControlPoints()
   {
-    fill(255, 0, 0);
+    fill(secondaryColor);
+    stroke(secondaryColor);
     for (int i = 0; i < getNumberControlPoints(); i++) 
     {
       ellipse (controlPoints[i].x, controlPoints[i].y, 7, 7);
@@ -606,8 +614,8 @@ class CurveCat
   }
   public void drawControlPoint(int index)
   {
-    fill(0, 100, 200);
-    stroke(0,100,200);
+    fill(mainColor);
+    stroke(mainColor);
     ellipse(controlPoints[index].x, controlPoints[index].y, 10, 10);
   }
 
