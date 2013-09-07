@@ -245,11 +245,6 @@ class CurveCat
       float dist1 = controlPoint.dist(init);
       float dist2 = controlPoint.dist(pFinal);
 
-      println("dist1: "+dist1);
-      println("dist2: "+dist2);
-
-      println("init.dist(pFinal): "+init.dist(pFinal));
-
       if(pow(dist1,2) + pow(dist2,2) <= pow(init.dist(pFinal),2)){
         result.add(i);
       }
@@ -301,7 +296,9 @@ class CurveCat
   // Desenha uma curva de acordo com a lista p de pontos de controle.
   void draw()
   { 
-    stroke(255);
+    stroke(0);
+    strokeWeight(1.5);
+    strokeCap(ROUND);
     for (int i = 0; i < getNumberControlPoints() - 1; i++) {
       PVector a = i >= 1 ? controlPoints[i-1] : controlPoints[0];
       PVector b = controlPoints[i];
@@ -325,7 +322,7 @@ class CurveCat
   void drawControlPoint(int index)
   {
     fill(0, 100, 200);
-    stroke(255);
+    stroke(0,100,200);
     ellipse(controlPoints[index].x, controlPoints[index].y, 10, 10);
   }
 

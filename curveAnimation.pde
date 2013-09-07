@@ -8,12 +8,13 @@
  import java.awt.event.*;
 
 // States 
-final int  DRAWING = 1;
-final int  EDITING = 2;
-final int  DEBUG = 3;
+final int DRAWING = 1;
+final int EDITING = 2;
+final int DEBUG = 3;
 
 int state;
 int selectedSegment; // Selected Segment of curve
+int[] selectedSegments;
 PVector closestPoint;
 float tolerance;
 
@@ -34,6 +35,7 @@ public void setup()
   smooth();
   state = DRAWING; // First state
   selectedSegment = -1; 
+  selectedSegments = new int[0];
   font = createFont("", 14);
   curve = new CurveCat();
 
@@ -76,7 +78,7 @@ public void keyPressed()
     break;  
 
     case DELETE :
-      if (state == 1)
+      if (state == DRAWING)
       {
         curve.clear(); 
         state = DRAWING; // Set state Draw
@@ -104,25 +106,56 @@ void mousePressed()
   }
   if (state == EDITING)
   {
-    selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
+      if(mouseButton == RIGHT){
 
-    closestPoint = new PVector();
-    PVector q = new PVector(mouseX, mouseY);
-    selectedSegment = curve.findClosestPoint (curve.controlPoints, q, closestPoint);
-    float distance = q.dist(closestPoint);
+            if(selectedSegments.length == 0){
+              selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
 
-    if (mouseEvent.getClickCount()==2){
-      curve.insertPoint(q, selectedSegment + 1);
+              closestPoint = new PVector();
+              PVector q = new PVector(mouseX, mouseY);
+              selectedSegment = curve.findClosestPoint (curve.controlPoints, q, closestPoint);
+              float distance = q.dist(closestPoint);
 
-      selectedSegment++;
+              selectedSegments = new int[1];
+              selectedSegments[0] = selectedSegment;
+            }
+            
+            for (int i = selectedSegments.length - 1; i>=0; i--){
+              curve.removeElement(selectedSegments[i]);
+            }
 
-        mouseInit.set(0, 0);
-        mouseFinal.set(0, 0);
-    }
+            selectedSegments = new int[0];
+      }else{
+        selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
 
-    if(distance > 50){
-      selectedSegment = -1;
-    }
+        closestPoint = new PVector();
+        PVector q = new PVector(mouseX, mouseY);
+        selectedSegment = curve.findClosestPoint (curve.controlPoints, q, closestPoint);
+        float distance = q.dist(closestPoint);
+
+        for (int i = 0; i<selectedSegments.length; i++){
+          if(selectedSegment == selectedSegments[i]){
+            if(distance > 20){
+              selectedSegments = new int[0];
+            } 
+            return;
+          }
+        }
+
+        selectedSegments = new int[1];
+        selectedSegments[0] = selectedSegment;
+
+        if (mouseEvent.getClickCount()==2){
+          curve.insertPoint(q, selectedSegment + 1);
+
+          selectedSegments[0]++;
+
+          mouseInit.set(0, 0);
+          mouseFinal.set(0, 0);
+        }else if(distance > 20){
+          selectedSegments = new int[0];
+        } 
+      }
   }
 }
     
@@ -132,12 +165,8 @@ void mouseReleased()
     curve.decimeCurve(tolerance);
   }
 
-  if(state == EDITING && selectedSegment == -1){
-    int[] selecteds = curve.getControlPointsBetween(mouseInit, mouseFinal);
-
-    for (int i = 0; i<selecteds.length; i++){
-      curve.removeElement(selecteds[i]);
-    }
+  if(state == EDITING && selectedSegments.length == 0){
+    selectedSegments = curve.getControlPointsBetween(mouseInit, mouseFinal);
   }
 
   mouseInit.set(0,0);
@@ -154,9 +183,16 @@ void mouseDragged ()
   {
     if (mouseButton == LEFT)
     {
-      if (selectedSegment != -1)
+
+      if (selectedSegments.length != 0)
       {
-        curve.setPoint(new PVector(mouseX, mouseY), selectedSegment);
+        float dx = mouseX - pmouseX;
+        float dy = mouseY - pmouseY;
+
+        for (int i = 0; i<selectedSegments.length; i++){
+          PVector controlPoint = curve.getControlPoint(selectedSegments[i]);
+          curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy), selectedSegments[i]);
+        }
       }
     }
   }
@@ -165,7 +201,7 @@ void mouseDragged ()
 
 void draw() 
 {
-  background (0);
+  background (255);
   noFill();
 
   if (curve.getNumberControlPoints() >=4) { 
@@ -174,15 +210,17 @@ void draw()
   if (state == EDITING || curve.getNumberControlPoints() < 4) { 
     curve.drawControlPoints();
   }
-  if (selectedSegment != -1) { 
-    curve.drawControlPoint(selectedSegment);
-  }
 
+  if(selectedSegments.length > 0){
+    for (int i = 0; i<selectedSegments.length; i++){
+      curve.drawControlPoint(selectedSegments[i]);
+    }
+  }
 
   drawInterface();
   fill(255, 0, 0);
 
-  if(state == EDITING && selectedSegment == -1){
+  if(state == EDITING && selectedSegments.length == 0){
     fill(255,200,200, 50);
     rect(mouseInit.x, mouseInit.y, mouseFinal.x - mouseInit.x, mouseFinal.y - mouseInit.y);
   }
@@ -205,12 +243,14 @@ void drawInterface()
   switch (state){
     case DRAWING :
       fill(200,100,0);
+      stroke(200,100,0);
       rect(posX-10,posY-20,80,30);
       fill(255);
       text("Creating", posX, posY);
     break;  
     case EDITING :
       fill(0,100,200);
+      stroke(0,100,200);
       rect(posX-10,posY-20,80,30);
       fill(255);
       text("Editing", posX, posY);
