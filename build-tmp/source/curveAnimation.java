@@ -168,23 +168,30 @@ public void mousePressed()
         selectedSegment = curve.findClosestPoint (curve.controlPoints, q, closestPoint);
         float distance = q.dist(closestPoint);
 
+        boolean selected = false;
         // Se o segmento mais pr\u00f3ximo j\u00e1 estiver selecionado sa\u00ed da fun\u00e7\u00e3o
-        for (int i = 0; i<selectedSegments.length; i++){
-          if(selectedSegment == selectedSegments[i]){
-            if(distance > 20){
+
+        if(distance > 20){
               selectedSegments = new int[0];
-            } 
-            return;
+        }else{
+          for (int i = 0; i<selectedSegments.length; i++){
+            if(selectedSegment == selectedSegments[i]){
+              selected = true;
+              selectedSegment = i;
+            }
           }
         }
 
-        selectedSegments = new int[1];
-        selectedSegments[0] = selectedSegment;
+        if(!selected){
+          selectedSegments = new int[1];
+          selectedSegments[0] = selectedSegment;
+          selectedSegment = 0;
+        }
 
         if (mouseEvent.getClickCount()==2){
-          curve.insertPoint(q, selectedSegment + 1);
+          curve.insertPoint(q, selectedSegments[selectedSegment] + 1);
 
-          selectedSegments[0]++;
+          selectedSegments[selectedSegment]++;
 
           mouseInit.set(0, 0);
           mouseFinal.set(0, 0);
