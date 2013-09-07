@@ -56,7 +56,8 @@ public void setup()
   size(800, 600);
   smooth();
   state = DRAWING; // First state
-  selectedSegment = -1; 
+
+  // Empty arrau of selectedSegments 
   selectedSegments = new int[0];
   font = createFont("", 14);
   curve = new CurveCat();
@@ -64,9 +65,11 @@ public void setup()
   closestPoint = new PVector();
   tolerance = 5;
 
+  // PVectors used to create the selection box
   mouseInit = new PVector(0,0);
   mouseFinal = new PVector(0,0);
 
+  // Add a listenner to the mouseWheel
   addMouseWheelListener(new MouseWheelListener() { 
     public void mouseWheelMoved(MouseWheelEvent mwe) { 
       mouseWheel(mwe.getWheelRotation());
@@ -104,7 +107,7 @@ public void keyPressed()
       {
         curve.clear(); 
         state = DRAWING; // Set state Draw
-        selectedSegment = -1; // Reset segment selected
+        selectedSegments = new int[0];
       }
       else if (state == EDITING && selectedSegments.length != 0)
       {
