@@ -28,13 +28,16 @@ public class curveAnimation extends PApplet {
 // States 
 final int DRAWING = 1;
 final int EDITING = 2;
-final int DEBUG = 3;
 
+boolean debug = false;
+
+// Variaveis de Curvas
 int state;
 int selectedSegment; // Selected Segment of curve
 int[] selectedSegments;
 PVector closestPoint;
 float tolerance;
+boolean canSketch;
 
 PFont font; // it's a font
 float curveT = 0;
@@ -50,6 +53,7 @@ PVector mouseFinal;
 // Colours
 int mainColor = 0xff0066C8;
 int secondaryColor = 0xffFF9700;
+int thirdColor = 0xff3990E3;
 
 public void setup() 
 {
@@ -57,11 +61,11 @@ public void setup()
   smooth();
   state = DRAWING; // First state
 
-  // Empty arrau of selectedSegments 
+  // Empty array of selectedSegments 
   selectedSegments = new int[0];
   font = createFont("", 14);
   curve = new CurveCat();
-
+  canSketch = true;
   closestPoint = new PVector();
   tolerance = 7;
 
@@ -69,11 +73,11 @@ public void setup()
   mouseInit = new PVector(0,0);
   mouseFinal = new PVector(0,0);
 
-  // Add a listenner to the mouseWheel
-  addMouseWheelListener(new MouseWheelListener() { 
+  // Add a listener to the mouseWheel
+  /*addMouseWheelListener(new MouseWheelListener() { 
     public void mouseWheelMoved(MouseWheelEvent mwe) { 
       mouseWheel(mwe.getWheelRotation());
-  }}); 
+  }});*/ 
 
   curveTightness(curveT);
 }
@@ -99,8 +103,8 @@ public void keyPressed()
         state = EDITING;
     break;  
 
-    case '3' :
-      state = DEBUG;
+    case 'd' :
+      debug = !debug;
     break;  
 
     case DELETE :
@@ -127,10 +131,21 @@ public void mousePressed()
 {
   mouseInit.set(mouseX, mouseY);
   mouseFinal.set(mouseX, mouseY);
-
+  selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
+  
+  if(Utils.mouseOverRect(new PVector(mouseX, mouseY), width-80-130, height-20-20, 110,30)){
+    
+    return;
+  }
+  // Verifica se o local clicado \u00e9 proximo do Inicio ou final da curva;
+  if (selectedSegment == curve.getNumberControlPoints()-1)
+  {
+     canSketch = true;
+  }
   if (state == DRAWING)
   { 
-    curve.insertPoint(new PVector(mouseX, mouseY), curve.getNumberControlPoints());
+    if (canSketch)
+        curve.insertPoint(new PVector(mouseX, mouseY), curve.getNumberControlPoints());
   }
   if (state == EDITING)
   {
@@ -212,6 +227,9 @@ public void mouseReleased()
     selectedSegments = curve.getControlPointsBetween(mouseInit, mouseFinal);
   }
 
+  // Retorna o estado de poder desenhar para FALSE
+  canSketch = false;
+
   mouseInit.set(0,0);
   mouseFinal.set(0,0);
 }
@@ -221,7 +239,10 @@ public void mouseDragged ()
 {
   mouseFinal.set(mouseX, mouseY);
   if (state == DRAWING && mouseButton == LEFT)
-    curve.insertPoint(new PVector(mouseX, mouseY), curve.getNumberControlPoints());
+  {
+    if (canSketch)
+        curve.insertPoint(new PVector(mouseX, mouseY), curve.getNumberControlPoints());
+  }
   if (state == EDITING) // Editing
   {
     if (mouseButton == LEFT)
@@ -300,14 +321,25 @@ public void drawInterface()
       rect(posX-10,posY-20,80,30);
       fill(255);
       text("Editing", posX, posY);
-    break;
-    case DEBUG :
+
+      stroke(thirdColor);
+      fill(thirdColor);
+      rect(posX-130, posY-20, 110, 30);
+
+      stroke(255);
       fill(255);
-      text("Curve Length:"+curve.curveLength()+" px", 10, height-20);
-    break;  
+      text("OverSkecthing", posX-125, posY);
+    break;
   }
 
-  text("Curve Length:"+curve.curveLength()+" px", 10, height-20);
+  // If debug is actived
+  if(debug){
+      fill(255,0,0);
+      stroke(255,0,0);
+      text("Curve Length:"+curve.curveLength()+" px", 10, height-20);
+      text("Curve Tightness:"+curveT, 10, 20);
+      text("Tolerance:"+tolerance, 10, 40);
+  }
 }
 
 
@@ -403,7 +435,7 @@ class CurveCat
 
       for(int i = 1; i < size; i++){
          pAux = new PVector[controlPoints.length];
-         arraycopy(controlPoints, pAux );
+         Utils.pvectorArrayCopy(controlPoints, pAux );
          pAux = removeElementFromArray(pAux, i);
          segAux = getSegment(pAux,i-1);
          remove = true;
@@ -643,7 +675,7 @@ class CurveCat
   public CurveCat clone(){
     CurveCat aux = new CurveCat();
     aux.controlPoints = new PVector[controlPoints.length];
-    arrayCopy(controlPoints, aux.controlPoints);
+    Utils.pvectorArrayCopy(controlPoints, aux.controlPoints);
     return aux;
   }
 }
@@ -669,6 +701,16 @@ static class Utils{
   {
     for (int i=0;i<p.length-1;i++)
       println(i+" "+p[i]);
+  }
+
+  public static boolean mouseOverRect(PVector mouse, int x, int y, int w, int h) {
+  	return (mouse.x >= x && mouse.x <= x+w && mouse.y >= y && mouse.y <= y+h);
+  }
+
+  public static void pvectorArrayCopy(PVector[] src, PVector[] dest){
+  	for (int i = 0; i<src.length; i++){
+  		dest[i] = src[i];
+  	}
   }
 }
   static public void main(String[] passedArgs) {

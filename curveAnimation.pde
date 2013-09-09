@@ -10,13 +10,16 @@
 // States 
 final int DRAWING = 1;
 final int EDITING = 2;
-final int DEBUG = 3;
 
+boolean debug = false;
+
+// Variaveis de Curvas
 int state;
 int selectedSegment; // Selected Segment of curve
 int[] selectedSegments;
 PVector closestPoint;
 float tolerance;
+boolean canSketch;
 
 PFont font; // it's a font
 float curveT = 0;
@@ -32,6 +35,7 @@ PVector mouseFinal;
 // Colours
 color mainColor = #0066C8;
 color secondaryColor = #FF9700;
+color thirdColor = #3990E3;
 
 public void setup() 
 {
@@ -39,11 +43,11 @@ public void setup()
   smooth();
   state = DRAWING; // First state
 
-  // Empty arrau of selectedSegments 
+  // Empty array of selectedSegments 
   selectedSegments = new int[0];
   font = createFont("", 14);
   curve = new CurveCat();
-
+  canSketch = true;
   closestPoint = new PVector();
   tolerance = 7;
 
@@ -51,11 +55,11 @@ public void setup()
   mouseInit = new PVector(0,0);
   mouseFinal = new PVector(0,0);
 
-  // Add a listenner to the mouseWheel
-  addMouseWheelListener(new MouseWheelListener() { 
+  // Add a listener to the mouseWheel
+  /*addMouseWheelListener(new MouseWheelListener() { 
     public void mouseWheelMoved(MouseWheelEvent mwe) { 
       mouseWheel(mwe.getWheelRotation());
-  }}); 
+  }});*/ 
 
   curveTightness(curveT);
 }
@@ -81,8 +85,8 @@ public void keyPressed()
         state = EDITING;
     break;  
 
-    case '3' :
-      state = DEBUG;
+    case 'd' :
+      debug = !debug;
     break;  
 
     case DELETE :
@@ -109,10 +113,21 @@ void mousePressed()
 {
   mouseInit.set(mouseX, mouseY);
   mouseFinal.set(mouseX, mouseY);
-
+  selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
+  
+  if(Utils.mouseOverRect(new PVector(mouseX, mouseY), width-80-130, height-20-20, 110,30)){
+    
+    return;
+  }
+  // Verifica se o local clicado é proximo do final da curva;
+  if (selectedSegment == curve.getNumberControlPoints()-1)
+  {
+     canSketch = true;
+  }
   if (state == DRAWING)
   { 
-    curve.insertPoint(new PVector(mouseX, mouseY), curve.getNumberControlPoints());
+    if (canSketch)
+        curve.insertPoint(new PVector(mouseX, mouseY), curve.getNumberControlPoints());
   }
   if (state == EDITING)
   {
@@ -194,6 +209,9 @@ void mouseReleased()
     selectedSegments = curve.getControlPointsBetween(mouseInit, mouseFinal);
   }
 
+  // Retorna o estado de poder desenhar para FALSE
+  canSketch = false;
+
   mouseInit.set(0,0);
   mouseFinal.set(0,0);
 }
@@ -203,7 +221,10 @@ void mouseDragged ()
 {
   mouseFinal.set(mouseX, mouseY);
   if (state == DRAWING && mouseButton == LEFT)
-    curve.insertPoint(new PVector(mouseX, mouseY), curve.getNumberControlPoints());
+  {
+    if (canSketch)
+        curve.insertPoint(new PVector(mouseX, mouseY), curve.getNumberControlPoints());
+  }
   if (state == EDITING) // Editing
   {
     if (mouseButton == LEFT)
@@ -282,14 +303,25 @@ void drawInterface()
       rect(posX-10,posY-20,80,30);
       fill(255);
       text("Editing", posX, posY);
-    break;
-    case DEBUG :
+
+      stroke(thirdColor);
+      fill(thirdColor);
+      rect(posX-130, posY-20, 110, 30);
+
+      stroke(255);
       fill(255);
-      text("Curve Length:"+curve.curveLength()+" px", 10, height-20);
-    break;  
+      text("OverSkecthing", posX-125, posY);
+    break;
   }
 
-  text("Curve Length:"+curve.curveLength()+" px", 10, height-20);
+  // If debug is actived
+  if(debug){
+      fill(255,0,0);
+      stroke(255,0,0);
+      text("Curve Length:"+curve.curveLength()+" px", 10, height-20);
+      text("Curve Tightness:"+curveT, 10, 20);
+      text("Tolerance:"+tolerance, 10, 40);
+  }
 }
 
 
