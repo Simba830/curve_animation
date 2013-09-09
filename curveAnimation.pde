@@ -123,6 +123,9 @@ void mousePressed()
   if (selectedSegment == curve.getNumberControlPoints()-1)
   {
      canSketch = true;
+  } else if (selectedSegment == -1)
+  {
+      state = EDITING;    
   }
   if (state == DRAWING)
   { 

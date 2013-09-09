@@ -137,10 +137,13 @@ public void mousePressed()
     
     return;
   }
-  // Verifica se o local clicado \u00e9 proximo do Inicio ou final da curva;
+  // Verifica se o local clicado \u00e9 proximo do final da curva;
   if (selectedSegment == curve.getNumberControlPoints()-1)
   {
      canSketch = true;
+  } else if (selectedSegment == -1)
+  {
+      state = EDITING;    
   }
   if (state == DRAWING)
   { 
