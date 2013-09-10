@@ -38,9 +38,12 @@ int[] selectedSegments;
 PVector closestPoint;
 float tolerance;
 boolean canSketch;
+PVector q;
+float distance;
+float distanceToSelect;
 
 PFont font; // it's a font
-float curveT = 0;
+float curveT;
 
 // Curve
 CurveCat curve;
@@ -68,6 +71,8 @@ public void setup()
   canSketch = true;
   closestPoint = new PVector();
   tolerance = 7;
+  curveT = 0;
+  distanceToSelect = 5;
 
   // PVectors used to create the selection box
   mouseInit = new PVector(0,0);
@@ -131,7 +136,12 @@ public void mousePressed()
 {
   mouseInit.set(mouseX, mouseY);
   mouseFinal.set(mouseX, mouseY);
+
+  // Ent\u00e3o seleciona o mais pr\u00f3ximo
   selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
+  closestPoint = new PVector();
+
+  
   
   if(Utils.mouseOverRect(new PVector(mouseX, mouseY), width-80-130, height-20-20, 110,30)){
     
@@ -150,29 +160,39 @@ public void mousePressed()
   if (selectedSegment == curve.getNumberControlPoints()-1)
   {
      canSketch = true;
-  } else if (selectedSegment == -1)
-  {
-      state = EDITING;    
   }
+  else // Caso nao seja, verifica se foi proximo da curva, caso tenha sido, alterna para o modo EDITING;
+  {
+    q = new PVector(mouseX, mouseY);
+    selectedSegment = curve.findClosestPoint (curve.controlPoints, q, closestPoint);
+    distance = q.dist(closestPoint);
+    if (distance <= distanceToSelect)
+    {
+        state = EDITING;
+        canSketch = false;  
+    }
+  }
+
   if (state == DRAWING)
   { 
     if (canSketch)
         curve.insertPoint(new PVector(mouseX, mouseY), curve.getNumberControlPoints());
   }
+
   if (state == EDITING)
   {
       if(mouseButton == RIGHT){
 
             // Verfica se tem nenhum element selecionado
-            if(selectedSegments.length == 0){
+            if(selectedSegments.length == 0)
+            {
 
               // Ent\u00e3o seleciona o mais pr\u00f3ximo
               selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
-
               closestPoint = new PVector();
-              PVector q = new PVector(mouseX, mouseY);
+              q = new PVector(mouseX, mouseY);
               selectedSegment = curve.findClosestPoint (curve.controlPoints, q, closestPoint);
-              float distance = q.dist(closestPoint);
+              distance = q.dist(closestPoint);
 
               selectedSegments = new int[1];
               selectedSegments[0] = selectedSegment;
@@ -185,20 +205,22 @@ public void mousePressed()
 
             // Remove a sele\u00e7\u00e3o
             selectedSegments = new int[0];
-      }else{
+      }
+      else
+      {
 
         // Seleciona o segmento em quest\u00e3o se for o mouse LEFT
         selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
 
         closestPoint = new PVector();
-        PVector q = new PVector(mouseX, mouseY);
+        q = new PVector(mouseX, mouseY);
         selectedSegment = curve.findClosestPoint (curve.controlPoints, q, closestPoint);
-        float distance = q.dist(closestPoint);
+        distance = q.dist(closestPoint);
 
         boolean selected = false;
         // Se o segmento mais pr\u00f3ximo j\u00e1 estiver selecionado sa\u00ed da fun\u00e7\u00e3o
 
-        if(distance > 20){
+        if(distance > distanceToSelect){
               selectedSegments = new int[0];
         }else{
           for (int i = 0; i<selectedSegments.length; i++){
@@ -222,7 +244,7 @@ public void mousePressed()
 
           mouseInit.set(0, 0);
           mouseFinal.set(0, 0);
-        }else if(distance > 20){
+        }else if(distance > distanceToSelect){
           selectedSegments = new int[0];
         } 
       }
@@ -238,6 +260,8 @@ public void mouseReleased()
   if(state == EDITING && selectedSegments.length == 0){
     selectedSegments = curve.getControlPointsBetween(mouseInit, mouseFinal);
   }
+  if (selectedSegments.length == 0)
+    state = DRAWING;
 
   // Retorna o estado de poder desenhar para FALSE
   canSketch = false;
