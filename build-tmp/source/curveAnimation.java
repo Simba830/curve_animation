@@ -137,6 +137,15 @@ public void mousePressed()
     
     return;
   }
+
+  if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width/2 + 60,height-40, 110, 30)){
+    curve.clear();
+    state = DRAWING;
+    selectedSegments = new int[0];
+    selectedSegment = -1;
+    return;
+  }
+
   // Verifica se o local clicado \u00e9 proximo do final da curva;
   if (selectedSegment == curve.getNumberControlPoints()-1)
   {
@@ -298,7 +307,6 @@ public void draw()
 
 public void drawInterface() 
 {
-         
   fill(96);
   textFont(font);
   int textx = 5, texty = height-100;
@@ -324,14 +332,6 @@ public void drawInterface()
       rect(posX-10,posY-20,80,30);
       fill(255);
       text("Editing", posX, posY);
-
-      stroke(thirdColor);
-      fill(thirdColor);
-      rect(posX-130, posY-20, 110, 30);
-
-      stroke(255);
-      fill(255);
-      text("OverSkecthing", posX-125, posY);
     break;
   }
 
@@ -343,6 +343,22 @@ public void drawInterface()
       text("Curve Tightness:"+curveT, 10, 20);
       text("Tolerance:"+tolerance, 10, 40);
   }
+
+  stroke(thirdColor);
+  fill(thirdColor);
+  rect(posX-130, posY-20, 110, 30);
+
+  stroke(255);
+  fill(255);
+  text("OverSkecthing", posX-125, posY);
+
+  stroke(thirdColor);
+  fill(thirdColor);
+  rect(width/2 + 60, height-40, 110, 30);
+
+  stroke(255);
+  fill(255);
+  text("Clear", width/2 + 70, height-20);
 }
 
 
