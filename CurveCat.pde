@@ -4,7 +4,7 @@
 class CurveCat
 {
   // Control points
-  PVector[] controlPoints;
+  ArrayList<PVector> controlPoints;
 
   // If it can be decimed
   boolean decimable;
@@ -17,54 +17,35 @@ class CurveCat
 
   CurveCat() 
   {
-    controlPoints = new PVector [0];
+    controlPoints = new ArrayList<PVector>();
     decimable = true;
   }
 
   void clear()
   {
     decimable = true;
-    controlPoints = new PVector[0];
-  }
-
-  // Remove o elemento que está no index de uma lista pTmp
-  PVector[] removeElementFromArray(PVector[] pTmp, int index)
-  { 
-    //assert(index != -1);
-    for (int i=0; i < pTmp.length-1; i++)
-      if (i >= index)
-        pTmp[i] = pTmp[i+1];
-    pTmp = (PVector[])shorten(pTmp);
-    return pTmp;
+    controlPoints = new ArrayList<PVector>();
   }
 
   void removeElement(int index){
-    for (int i=0; i < controlPoints.length-1; i++){
-      if (i >= index)
-        controlPoints[i] = controlPoints[i+1];
-    }
-    controlPoints = (PVector[])shorten(controlPoints);
+    controlPoints.remove(index);
   }
 
-  Segment getSegment(PVector[] pAux, int i)
+  Segment getSegment(ArrayList<PVector> pAux, int i)
   { 
          //printArray(pAux);
-         PVector a = i >= 1 ? pAux[i-1] : pAux[0];
-         PVector b = pAux[i];
-         PVector c = pAux[i+1];
-         PVector d = i+2 < pAux.length ? pAux[i+2] : pAux[i+1];
+         PVector a = i >= 1 ? pAux.get(i-1) : pAux.get(0);
+         PVector b = pAux.get(i);
+         PVector c = pAux.get(i+1);
+         PVector d = i+2 < pAux.size() ? pAux.get(i+2) : pAux.get(i+1);
          return new Segment(a,b,c,d);
   }
 
   Segment getSegment(int i)
   { 
-         //printArray(pAux);
-         PVector a = i >= 1 ? controlPoints[i-1] : controlPoints[0];
-         PVector b = controlPoints[i];
-         PVector c = controlPoints[i+1];
-         PVector d = i+2 < controlPoints.length ? controlPoints[i+2] : controlPoints[i+1];
-         return new Segment(a,b,c,d);
+         return getSegment(controlPoints,i);
   }
+
   // Remove pontos de controle de uma curva criada pela lista p que possuam distancia menor que a tolerancia em relação aos pontos da nova curva.
   void decimeCurve(float tolerance)
   {
@@ -80,18 +61,18 @@ class CurveCat
       
       boolean remove;
      
-      int size = controlPoints.length -1;
+      int size = controlPoints.size() -1;
       
       Segment segAux;
       Segment segP;
-      PVector[] pAux;
+      ArrayList<PVector> pAux;
 
       boolean wasDecimed = false;
 
       for(int i = 1; i < size; i++){
-         pAux = new PVector[controlPoints.length];
-         Utils.pvectorArrayCopy(controlPoints, pAux );
-         pAux = removeElementFromArray(pAux, i);
+         pAux = new ArrayList<PVector>(controlPoints.size());
+         pAux = (ArrayList<PVector>) controlPoints.clone();
+         pAux.remove(i);
          segAux = getSegment(pAux,i-1);
          remove = true;
          
@@ -137,34 +118,32 @@ class CurveCat
   }
 
   int getNumberControlPoints () { 
-    if (controlPoints != null) { 
-      return controlPoints.length;
-    } 
-    else { 
-      return 0;
-    }
+      return controlPoints.size();
   } 
 
   // Insere o ponto q entre index-1 e index
   void insertPoint(PVector q, int index){
-    controlPoints = (PVector[]) append(controlPoints, q);
-    for (int i = controlPoints.length-1; i > index; i--) {
-      controlPoints[i] = controlPoints[i-1];
-    }
-    controlPoints [index] = q;
+    controlPoints.add(index,q);
     this.decimable = true;
   }
 
   // Altera o valor do elemento index da lista p para q
   void setPoint(PVector q, int index)
   {
-    controlPoints[index].set(q);
+    try {
+      controlPoints.set(index,q);    
+    } catch (Exception e) {
+        print("Erro ao setar ponto de controle");
+    }
   }
 
   // Retorna as coordenadas (X,Y) para de uma lista de PVectors p dado o index.
   PVector getControlPoint(int index)
   {
-    return controlPoints[index];
+    if (controlPoints.size() > index)
+      return controlPoints.get(index);
+    else
+      return new PVector(0,0);
   }
   
   // Retorna o indice do ponto de controle mais próximo de q. Caso
@@ -176,7 +155,7 @@ class CurveCat
     float bestDist = 100000;
     for (int i = 0; i < getNumberControlPoints(); i++) 
     {
-      float d = controlPoints[i].dist(q);
+      float d = controlPoints.get(i).dist(q);
       if (d < minDistance && d < bestDist) 
       { 
         bestDist = d;
@@ -201,24 +180,21 @@ class CurveCat
   // Retorna o indice do segmento da curva onde o ponto mais proximo de q foi 
   // encontrado. As coordenadas do ponto mais proximo são guardadas em r
   // 
-  int findClosestPoint (PVector[] cps, PVector q, PVector r) {
+  int findClosestPoint (ArrayList<PVector> cps, PVector q, PVector r) {
 
     int bestSegment = -1;
     float bestDistance = 10000000;
     float bestSegmentDistance = 100000;
     
-    for (int i = 0; i < cps.length-1; i++) {
-      PVector a = i >= 1 ? cps[i-1] : cps[0];
-      PVector b = cps[i];
-      PVector c = cps[i+1];
-      PVector d = i+2 < cps.length ? cps[i+2] : cps[i+1];
+    for (int i = 0; i < cps.size()-1; i++) {
+      Segment seg = getSegment(i);
 
       PVector result = new PVector();
       for (int j=0; j<=numberDivisions/2; j++) 
       {
         float t = (float)(j) / (float)(numberDivisions);
-        float x = curvePoint(a.x, b.x, c.x, d.x, t);
-        float y = curvePoint(a.y, b.y, c.y, d.y, t);
+        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
+        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
         float dist = dist (x, y, q.x, q.y);
 
         if (j == 0 || dist < bestSegmentDistance) {
@@ -239,8 +215,8 @@ class CurveCat
     PVector aux;
 
     ArrayList<Integer> result = new ArrayList<Integer>();
-    for (int i = 0; i<controlPoints.length; i++){
-      PVector controlPoint = controlPoints[i];
+    for (int i = 0; i<controlPoints.size() ; i++){
+      PVector controlPoint = controlPoints.get(i);
 
       float dist1 = controlPoint.dist(init);
       float dist2 = controlPoint.dist(pFinal);
@@ -268,19 +244,16 @@ class CurveCat
   {
     float curveLength = 0;
     for (int i = 0; i < getNumberControlPoints()-1; i++) {
-      PVector a = i >= 1 ? controlPoints[i-1] : controlPoints[0];
-      PVector b = controlPoints[i];
-      PVector c = controlPoints[i+1];
-      PVector d = i+2 < getNumberControlPoints() ? controlPoints[i+2] : controlPoints[i+1];
+      Segment seg = getSegment(i);
 
       for (int j=0; j<=numberDivisions; j++) 
       {
         float t = (float)(j) / (float)(numberDivisions);
-        float x = curvePoint(a.x, b.x, c.x, d.x, t);
-        float y = curvePoint(a.y, b.y, c.y, d.y, t);
+        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
+        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
         t = (float)(j+1) / (float)(numberDivisions);
-        float x2 = curvePoint(a.x, b.x, c.x, d.x, t);
-        float y2 = curvePoint(a.y, b.y, c.y, d.y, t);
+        float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
+        float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
         float dist = dist (x, y, x2, y2);
         curveLength += dist;
       }
@@ -300,11 +273,8 @@ class CurveCat
     strokeWeight(1.5);
     strokeCap(ROUND);
     for (int i = 0; i < getNumberControlPoints() - 1; i++) {
-      PVector a = i >= 1 ? controlPoints[i-1] : controlPoints[0];
-      PVector b = controlPoints[i];
-      PVector c = controlPoints[i+1];
-      PVector d = i+2 < getNumberControlPoints() ? controlPoints[i+2] : controlPoints[i+1];
-      curve (a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y);
+      Segment seg = getSegment(i);
+      curve (seg.a.x, seg.a.y, seg.b.x, seg.b.y, seg.c.x, seg.c.y, seg.d.x, seg.d.y);
     }
     stroke(0);
   }
@@ -316,21 +286,21 @@ class CurveCat
     stroke(secondaryColor);
     for (int i = 0; i < getNumberControlPoints(); i++) 
     {
-      ellipse (controlPoints[i].x, controlPoints[i].y, 7, 7);
+      ellipse (controlPoints.get(i).x, controlPoints.get(i).y, 7, 7);
     }
     fill(255);
   }
-  void drawControlPoint(int index)
+  void drawControlPoint(int i)
   {
     fill(mainColor);
     stroke(mainColor);
-    ellipse(controlPoints[index].x, controlPoints[index].y, 10, 10);
+    if (controlPoints.size() > i)
+      ellipse(controlPoints.get(i).x, controlPoints.get(i).y, 10, 10);
   }
 
   CurveCat clone(){
     CurveCat aux = new CurveCat();
-    aux.controlPoints = new PVector[controlPoints.length];
-    Utils.pvectorArrayCopy(controlPoints, aux.controlPoints);
+    aux.controlPoints = (ArrayList<PVector>) controlPoints.clone();
     return aux;
   }
 }

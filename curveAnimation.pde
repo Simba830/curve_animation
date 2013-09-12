@@ -35,6 +35,9 @@ CurveCat decimedCurve;
 PVector mouseInit;
 PVector mouseFinal;
 
+// State Context
+final StateContext stateContext = new StateContext();
+
 // Colours
 color mainColor = #0066C8;
 color secondaryColor = #FF9700;
@@ -44,7 +47,9 @@ public void setup()
 {
   size(800, 600);
   smooth();
+
   state = DRAWING; // First state
+
 
   // Empty array of selectedSegments 
   selectedSegments = new int[0];
@@ -67,6 +72,10 @@ public void setup()
   }});*/ 
 
   curveTightness(curveT);
+
+  // State context;
+
+
 }
 
 // TODO Pensar em como portar isso para o Javascript
@@ -82,23 +91,24 @@ public void keyPressed()
 { 
   switch (key){
     case '1' :
-      state = DRAWING;
       selectedSegments = new int[0];
+      stateContext.setState(new DrawningState());
     break;  
 
     case '2' :
-        state = EDITING;
+        stateContext.setState(new EditingState());
     break;  
 
     case 'd' :
       debug = !debug;
     break;  
 
+    // Essa tecla é específica para cada estado, entao devemos implementá-la nas classes de State
     case DELETE :
       if (state == DRAWING)
       {
         curve.clear(); 
-        state = DRAWING; // Set state Draw
+        stateContext.setState(new DrawningState());
         selectedSegments = new int[0];
       }
       else if (state == EDITING && selectedSegments.length != 0)
@@ -116,14 +126,15 @@ public void keyPressed()
 // Mouse press callback
 void mousePressed() 
 {
+  
+  stateContext.mousePressed(new PVector(mouseX,mouseY));
+
   mouseInit.set(mouseX, mouseY);
   mouseFinal.set(mouseX, mouseY);
 
   // Então seleciona o mais próximo
   selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
   closestPoint = new PVector();
-
-  
   
   if(Utils.mouseOverRect(new PVector(mouseX, mouseY), width-80-130, height-20-20, 110,30)){
     
@@ -132,7 +143,7 @@ void mousePressed()
 
   if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width/2 + 60,height-40, 110, 30)){
     curve.clear();
-    state = DRAWING;
+    stateContext.setState(new DrawningState());
     selectedSegments = new int[0];
     selectedSegment = -1;
     return;
@@ -150,104 +161,27 @@ void mousePressed()
     distance = q.dist(closestPoint);
     if (distance <= distanceToSelect)
     {
-        state = EDITING;
-        canSketch = false;  
+        stateContext.setState(new EditingState());
+        canSketch = false;
     }
-  }
-
-  if (state == DRAWING)
-  { 
-    if (canSketch)
-        curve.insertPoint(new PVector(mouseX, mouseY), curve.getNumberControlPoints());
-  }
-
-  if (state == EDITING)
-  {
-      if(mouseButton == RIGHT){
-
-            // Verfica se tem nenhum element selecionado
-            if(selectedSegments.length == 0)
-            {
-
-              // Então seleciona o mais próximo
-              selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
-              closestPoint = new PVector();
-              q = new PVector(mouseX, mouseY);
-              selectedSegment = curve.findClosestPoint (curve.controlPoints, q, closestPoint);
-              distance = q.dist(closestPoint);
-
-              selectedSegments = new int[1];
-              selectedSegments[0] = selectedSegment;
-            }
-
-            // Remove todos os segmentos selecionados
-            for (int i = selectedSegments.length - 1; i>=0; i--){
-              curve.removeElement(selectedSegments[i]);
-            }
-
-            // Remove a seleção
-            selectedSegments = new int[0];
-      }
-      else
-      {
-
-        // Seleciona o segmento em questão se for o mouse LEFT
-        selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
-
-        closestPoint = new PVector();
-        q = new PVector(mouseX, mouseY);
-        selectedSegment = curve.findClosestPoint (curve.controlPoints, q, closestPoint);
-        distance = q.dist(closestPoint);
-
-        boolean selected = false;
-        // Se o segmento mais próximo já estiver selecionado saí da função
-
-        if(distance > distanceToSelect){
-              selectedSegments = new int[0];
-        }else{
-          for (int i = 0; i<selectedSegments.length; i++){
-            if(selectedSegment == selectedSegments[i]){
-              selected = true;
-              selectedSegment = i;
-            }
-          }
-        }
-
-        if(!selected){
-          selectedSegments = new int[1];
-          selectedSegments[0] = selectedSegment;
-          selectedSegment = 0;
-        }
-
-        if (mouseEvent.getClickCount()==2){
-          curve.insertPoint(q, selectedSegments[selectedSegment] + 1);
-
-          selectedSegments[selectedSegment]++;
-
-          mouseInit.set(0, 0);
-          mouseFinal.set(0, 0);
-        }else if(distance > distanceToSelect){
-          selectedSegments = new int[0];
-        } 
-      }
   }
 }
     
 void mouseReleased()
 {
+  
+  stateContext.mouseReleased(new PVector(mouseX,mouseY));
+  
+
   while(curve.canBeDecimed()){
     curve.decimeCurve(tolerance);
   }
 
-  if(state == EDITING && selectedSegments.length == 0){
-    selectedSegments = curve.getControlPointsBetween(mouseInit, mouseFinal);
-  }
-  if (selectedSegments.length == 0)
-    state = DRAWING;
-
+  
   // Retorna o estado de poder desenhar para FALSE
   canSketch = false;
 
+  // Resets dragged rectangle
   mouseInit.set(0,0);
   mouseFinal.set(0,0);
 }
@@ -255,91 +189,33 @@ void mouseReleased()
 // Mouse drag callback
 void mouseDragged () 
 {
+  stateContext.mouseDragged(new PVector(mouseX,mouseY),mouseFinal);
   mouseFinal.set(mouseX, mouseY);
-  if (state == DRAWING && mouseButton == LEFT)
-  {
-    if (canSketch)
-        curve.insertPoint(new PVector(mouseX, mouseY), curve.getNumberControlPoints());
-  }
-  if (state == EDITING) // Editing
-  {
-    if (mouseButton == LEFT)
-    {
-
-      if (selectedSegments.length != 0)
-      {
-        // Pega a variação de x e de y
-        float dx = mouseX - pmouseX;
-        float dy = mouseY - pmouseY;
-
-        // Soma aos elementos selecionados
-        for (int i = 0; i<selectedSegments.length; i++){
-          PVector controlPoint = curve.getControlPoint(selectedSegments[i]);
-          curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy), selectedSegments[i]);
-        }
-      }
-    }
-  }
 }
 
 
 void draw() 
 {
-  background (255);
-  noFill();
-
-  if (curve.getNumberControlPoints() >=4) { 
-    curve.draw();
-  }
-  if (state == EDITING || curve.getNumberControlPoints() < 4) { 
-    curve.drawControlPoints();
-  }
-
-  if(selectedSegments.length > 0){
-    for (int i = 0; i<selectedSegments.length; i++){
-      curve.drawControlPoint(selectedSegments[i]);
-    }
-  }
-
+  stateContext.draw();
   drawInterface();
-  if(state == EDITING && selectedSegments.length == 0){
-
-    // Desenha caixa de seleção com Alpha 50
-    fill(mainColor, 50);
-    stroke(mainColor, 50);
-    rect(mouseInit.x, mouseInit.y, mouseFinal.x - mouseInit.x, mouseFinal.y - mouseInit.y);
-  }
 }
 
 void drawInterface() 
 {
+
+  stateContext.drawInterface();
+
+
+  // Todo esse código pode ser colocado no método generalizado da classe StateContext. 
   fill(96);
   textFont(font);
+
   int textx = 5, texty = height-100;
   if (curve.getNumberControlPoints() < 4)
     text("Click 4 times to define control points", textx, texty+=15);
   text("Key '1' set state to CREATING", textx, texty+=15);
   text("Key '2' set state to EDITING", textx, texty+=15);
   text("Key 'DEL' create a new Curve", textx, texty+=15);
-  
-  int posX = width-80;
-  int posY = height-20;
-  switch (state){
-    case DRAWING :
-      fill(mainColor);
-      stroke(mainColor);
-      rect(posX-10,posY-20,80,30);
-      fill(255);
-      text("Creating", posX, posY);
-    break;  
-    case EDITING :
-      fill(secondaryColor);
-      stroke(secondaryColor);
-      rect(posX-10,posY-20,80,30);
-      fill(255);
-      text("Editing", posX, posY);
-    break;
-  }
 
   // If debug is actived
   if(debug){
@@ -349,7 +225,9 @@ void drawInterface()
       text("Curve Tightness:"+curveT, 10, 20);
       text("Tolerance:"+tolerance, 10, 40);
   }
-
+  
+  int posX = width-80;
+  int posY = height-20;
   stroke(thirdColor);
   fill(thirdColor);
   rect(posX-130, posY-20, 110, 30);
