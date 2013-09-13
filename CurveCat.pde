@@ -127,6 +127,11 @@ class CurveCat
     this.decimable = true;
   }
 
+  void insertPoint(PVector q){
+    controlPoints.add(q);
+    this.decimable = true;
+  }
+
   // Altera o valor do elemento index da lista p para q
   void setPoint(PVector q, int index)
   {

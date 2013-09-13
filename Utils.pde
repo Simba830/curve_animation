@@ -15,4 +15,10 @@ static class Utils{
   		dest[i] = src[i];
   	}
   }
+
+  static void print_r(int[] array){
+    for (int i = 0; i<array.length; i++){
+      println(array[i]);
+    }
+  }
 }
