@@ -25,19 +25,6 @@ public class curveAnimation extends PApplet {
 
  
 
-// States 
-final int DRAWING = 1;
-final int EDITING = 2;
-
-// Variaveis de Curvas
-int selectedSegment;
-PVector closestPoint;
-float tolerance;
-boolean canSketch;
-PVector q;
-float distance;
-float distanceToSelect;
-
 PFont font; // it's a font
 float curveT;
 
@@ -67,11 +54,8 @@ public void setup()
 
   font = createFont("", 14);
   curve = new CurveCat();
-  canSketch = true;
-  closestPoint = new PVector();
-  tolerance = 7;
   curveT = 0;
-  distanceToSelect = 5;
+  
 
   // PVectors used to create the selection box
   mouseInit = new PVector(0,0);
@@ -113,40 +97,12 @@ public void mousePressed()
 {
   mouseInit.set(mouseX, mouseY);
   mouseFinal.set(mouseX, mouseY);
-
-  // Ent\u00e3o seleciona o mais pr\u00f3ximo
-  selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
-  closestPoint = new PVector();
-
-  // Verifica se o local clicado \u00e9 proximo do final da curva;
-  if (selectedSegment == curve.getNumberControlPoints()-1)
-  {
-     canSketch = true;
-  }
-  else // Caso nao seja, verifica se foi proximo da curva, caso tenha sido, alterna para o modo EDITING;
-  {
-    q = new PVector(mouseX, mouseY);
-    selectedSegment = curve.findClosestPoint (curve.controlPoints, q, closestPoint);
-    distance = q.dist(closestPoint);
-    if (distance <= distanceToSelect)
-    {
-        stateContext.setState(new EditingState(context));
-        canSketch = false;
-    }
-  }
-
   update();
   stateContext.mousePressed();
 }
     
 public void mouseReleased()
 {
-  while(curve.canBeDecimed()){
-    curve.decimeCurve(tolerance);
-  }
-  
-  // Retorna o estado de poder desenhar para FALSE
-  canSketch = false;
 
   update();
   stateContext.mouseReleased();
@@ -204,9 +160,11 @@ class Context{
 	PVector mouseFinal;
 	int[] selectedSegments;
 	int mouseCount;
+	float tolerance;
 
 	Context(){
 		selectedSegments = new int[0];
+		tolerance = 7;
 	}
 
 	public void updateContext(CurveCat _curve, PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
@@ -558,22 +516,36 @@ class CurveCat
 
 class DrawningState extends State {
 
+
+    float distanceToSelect = 5;
+    private boolean canSketch;
+
     DrawningState(Context _context){
       super(_context);
     }
 
     public void mousePressed() 
     {
-      this.context.curve.insertPoint(this.context.mouse);
+      // Ent\u00e3o seleciona o mais pr\u00f3ximo
+      int selectedSegment = curve.findControlPoint(context.mouse);
+      // Verifica se o local clicado \u00e9 proximo do final da curva;
+      if (selectedSegment == curve.getNumberControlPoints()-1){ canSketch = true; }
+      else { canSketch = false; }
+        
+      if (canSketch)
+        this.context.curve.insertPoint(this.context.mouse);
+      
     }
     
     public void mouseReleased(PVector mouse) 
     {
-    	
+    	  // Retorna o estado de poder desenhar para FALSE
+        canSketch = false;
     }
     public void mouseDragged()
     {	
-  		context.curve.insertPoint(context.mouse, context.curve.getNumberControlPoints());
+      if (canSketch)
+  		  context.curve.insertPoint(context.mouse, context.curve.getNumberControlPoints());
     }
 
     public void keyPressed(){
@@ -599,10 +571,11 @@ class DrawningState extends State {
  
 }
 class EditingState extends State {
-    float distanceToSelect = 5;
+    
 
     EditingState(Context context){
       super(context);
+
     }
 
     public void mousePressed() 
@@ -614,10 +587,11 @@ class EditingState extends State {
             {
 
               // Ent\u00e3o seleciona o mais pr\u00f3ximo
-              closestPoint = new PVector();
-              q = new PVector(context.mouse.x, context.mouse.y);
-              selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
-              distance = q.dist(closestPoint);
+              PVector closestPoint = new PVector();
+              PVector q = new PVector(context.mouse.x, context.mouse.y);
+              int selectedSegment = context.curve.findClosestPoint(context.curve.controlPoints, q, closestPoint);
+              print(selectedSegment);
+              float distance = q.dist(closestPoint);
 
               context.selectedSegments = new int[1];
               context.selectedSegments[0] = selectedSegment;
@@ -645,7 +619,7 @@ class EditingState extends State {
         boolean selected = false;
         // Se o segmento mais pr\u00f3ximo j\u00e1 estiver selecionado sa\u00ed da fun\u00e7\u00e3o
 
-        if(distance > this.distanceToSelect){
+        if(distance > distanceToSelect){
               context.diselect();
         }else{
           for (int i = 0; i<context.selectedSegments.length; i++){
@@ -772,6 +746,14 @@ class Segment{
 class State
 {
 	Context context;
+    // Constants
+    final float distanceToSelect = 5;
+
+     // Variaveis de Curvas
+    int selectedSegment;
+    PVector closestPoint;
+    PVector q;
+
 
 	State(Context _context){
 		context = _context;
@@ -779,12 +761,22 @@ class State
 
 	State(){
 		context = new Context();
-	}
+  	}
 
-	public void mousePressed(){};
-	public void mouseDragged(){};
-	public void mouseReleased(){};
-	public void keyPressed(){};
+	public void mousePressed(){
+
+	};
+	public void mouseDragged(){
+
+	};
+	public void mouseReleased(){
+		while(curve.canBeDecimed()){
+		    curve.decimeCurve(context.tolerance);
+		}
+	};
+	public void keyPressed(){
+
+	};
 	public void draw(){};
 	public void drawInterface(){};
 }
@@ -794,6 +786,7 @@ public class StateContext {
     private State myState;
     private Context context;
     private boolean debug;
+
         /**
          * Standard constructor
          */
@@ -801,6 +794,7 @@ public class StateContext {
     {
         debug = false;
         setState(new DrawningState(_context));
+        
     }
 
     public void setContext(Context _context){
@@ -828,6 +822,7 @@ public class StateContext {
      */
     public void mousePressed()
     {
+        // Verifica se clicou no bot\u00e3o "Clear";
         if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width/2 + 60,height-40, 110, 30)){
             context.curve.clear();
             this.setState(new DrawningState(context));
@@ -901,7 +896,7 @@ public class StateContext {
           stroke(255,0,0);
           text("Curve Length:"+curve.curveLength()+" px", 10, height-20);
           text("Curve Tightness:"+curveT, 10, 20);
-          text("Tolerance:"+tolerance, 10, 40);
+          text("Tolerance:"+context.tolerance, 10, 40);
         }
     }
 }
@@ -929,6 +924,7 @@ static class Utils{
     }
   }
 }
+
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "curveAnimation" };
     if (passedArgs != null) {

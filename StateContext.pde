@@ -3,6 +3,7 @@ public class StateContext {
     private State myState;
     private Context context;
     private boolean debug;
+
         /**
          * Standard constructor
          */
@@ -10,6 +11,7 @@ public class StateContext {
     {
         debug = false;
         setState(new DrawningState(_context));
+        
     }
 
     public void setContext(Context _context){
@@ -37,6 +39,7 @@ public class StateContext {
      */
     void mousePressed()
     {
+        // Verifica se clicou no botão "Clear";
         if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width/2 + 60,height-40, 110, 30)){
             context.curve.clear();
             this.setState(new DrawningState(context));
@@ -110,7 +113,7 @@ public class StateContext {
           stroke(255,0,0);
           text("Curve Length:"+curve.curveLength()+" px", 10, height-20);
           text("Curve Tightness:"+curveT, 10, 20);
-          text("Tolerance:"+tolerance, 10, 40);
+          text("Tolerance:"+context.tolerance, 10, 40);
         }
     }
 }

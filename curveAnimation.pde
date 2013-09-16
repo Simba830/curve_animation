@@ -7,19 +7,6 @@
 
  import java.awt.event.*;
 
-// States 
-final int DRAWING = 1;
-final int EDITING = 2;
-
-// Variaveis de Curvas
-int selectedSegment;
-PVector closestPoint;
-float tolerance;
-boolean canSketch;
-PVector q;
-float distance;
-float distanceToSelect;
-
 PFont font; // it's a font
 float curveT;
 
@@ -49,11 +36,8 @@ public void setup()
 
   font = createFont("", 14);
   curve = new CurveCat();
-  canSketch = true;
-  closestPoint = new PVector();
-  tolerance = 7;
   curveT = 0;
-  distanceToSelect = 5;
+  
 
   // PVectors used to create the selection box
   mouseInit = new PVector(0,0);
@@ -84,7 +68,7 @@ void mouseWheel(float delta) {
 }
 
 // TODO Mudar isso para um interface só usando o mouse
-public void keyPressed() 
+void keyPressed() 
 { 
   update();
   stateContext.keyPressed();
@@ -95,40 +79,12 @@ void mousePressed()
 {
   mouseInit.set(mouseX, mouseY);
   mouseFinal.set(mouseX, mouseY);
-
-  // Então seleciona o mais próximo
-  selectedSegment = curve.findControlPoint(new PVector(mouseX, mouseY));
-  closestPoint = new PVector();
-
-  // Verifica se o local clicado é proximo do final da curva;
-  if (selectedSegment == curve.getNumberControlPoints()-1)
-  {
-     canSketch = true;
-  }
-  else // Caso nao seja, verifica se foi proximo da curva, caso tenha sido, alterna para o modo EDITING;
-  {
-    q = new PVector(mouseX, mouseY);
-    selectedSegment = curve.findClosestPoint (curve.controlPoints, q, closestPoint);
-    distance = q.dist(closestPoint);
-    if (distance <= distanceToSelect)
-    {
-        stateContext.setState(new EditingState(context));
-        canSketch = false;
-    }
-  }
-
   update();
   stateContext.mousePressed();
 }
     
 void mouseReleased()
 {
-  while(curve.canBeDecimed()){
-    curve.decimeCurve(tolerance);
-  }
-  
-  // Retorna o estado de poder desenhar para FALSE
-  canSketch = false;
 
   update();
   stateContext.mouseReleased();

@@ -1,21 +1,35 @@
 class DrawningState extends State {
 
+
+    float distanceToSelect = 5;
+    private boolean canSketch;
+
     DrawningState(Context _context){
       super(_context);
     }
 
     public void mousePressed() 
     {
-      this.context.curve.insertPoint(this.context.mouse);
+      // Então seleciona o mais próximo
+      int selectedSegment = curve.findControlPoint(context.mouse);
+      // Verifica se o local clicado é proximo do final da curva;
+      if (selectedSegment == curve.getNumberControlPoints()-1){ canSketch = true; }
+      else { canSketch = false; }
+        
+      if (canSketch)
+        this.context.curve.insertPoint(this.context.mouse);
+      
     }
     
     public void mouseReleased(PVector mouse) 
     {
-    	
+    	  // Retorna o estado de poder desenhar para FALSE
+        canSketch = false;
     }
     public void mouseDragged()
     {	
-  		context.curve.insertPoint(context.mouse, context.curve.getNumberControlPoints());
+      if (canSketch)
+  		  context.curve.insertPoint(context.mouse, context.curve.getNumberControlPoints());
     }
 
     public void keyPressed(){

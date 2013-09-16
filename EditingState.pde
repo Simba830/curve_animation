@@ -1,8 +1,9 @@
 class EditingState extends State {
-    float distanceToSelect = 5;
+    
 
     EditingState(Context context){
       super(context);
+
     }
 
     public void mousePressed() 
@@ -14,10 +15,10 @@ class EditingState extends State {
             {
 
               // Então seleciona o mais próximo
-              closestPoint = new PVector();
-              q = new PVector(context.mouse.x, context.mouse.y);
-              selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
-              distance = q.dist(closestPoint);
+              PVector closestPoint = new PVector();
+              PVector q = new PVector(context.mouse.x, context.mouse.y);
+              int selectedSegment = context.curve.findClosestPoint(context.curve.controlPoints, q, closestPoint);
+              float distance = q.dist(closestPoint);
 
               context.selectedSegments = new int[1];
               context.selectedSegments[0] = selectedSegment;
@@ -45,7 +46,7 @@ class EditingState extends State {
         boolean selected = false;
         // Se o segmento mais próximo já estiver selecionado saí da função
 
-        if(distance > this.distanceToSelect){
+        if(distance > distanceToSelect){
               context.diselect();
         }else{
           for (int i = 0; i<context.selectedSegments.length; i++){
