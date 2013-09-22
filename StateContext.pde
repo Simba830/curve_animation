@@ -47,6 +47,12 @@ public class StateContext {
             return;
         }
 
+        if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width-80-130, height-20-20, 110, 30)){
+            this.setState(new OverSketchState(context));
+            context.selectedSegments = new int[0];
+            return;
+        }
+
         myState.mousePressed();
     }
     void mouseDragged()
@@ -92,7 +98,7 @@ public class StateContext {
         int posY = height-20;
         stroke(thirdColor);
         fill(thirdColor);
-        rect(posX-130, posY-20, 110, 30);
+        rect(width-80-130, height-20-20, 110, 30);
 
         stroke(255);
         fill(255);
