@@ -48,6 +48,12 @@ public class StateContext {
         }
 
         if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width-80-130, height-20-20, 110, 30)){
+
+            if(this.myState instanceof OverSketchState){
+                this.setState(new EditingState(context));
+                return;
+            }
+
             this.setState(new OverSketchState(context));
             context.selectedSegments = new int[0];
             return;

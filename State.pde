@@ -25,8 +25,8 @@ class State
 
 	};
 	void mouseReleased(){
-		while(curve.canBeDecimed()){
-		    curve.decimeCurve(context.tolerance);
+		while(context.curve.canBeDecimed()){
+		    context.curve.decimeCurve(context.tolerance);
 		}
 	};
 	void keyPressed(){

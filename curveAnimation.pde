@@ -35,7 +35,6 @@ public void setup()
   smooth();
 
   font = createFont("", 14);
-  curve = new CurveCat();
   curveT = 0;
   
 
@@ -113,7 +112,6 @@ void draw()
 
 void update(){
   context.updateContext(
-    curve, 
     new PVector(mouseX, mouseY),
     new PVector(pmouseX, pmouseY), 
     mouseButton,

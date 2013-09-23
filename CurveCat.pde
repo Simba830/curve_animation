@@ -308,5 +308,16 @@ class CurveCat
     aux.controlPoints = (ArrayList<PVector>) controlPoints.clone();
     return aux;
   }
+
+  String toString(){
+    String curve = "Curve: { ControlPoints: [";
+    for (int i = 0; i<this.getNumberControlPoints(); i++){
+      PVector aux = this.getControlPoint(i);
+      curve += "("+aux.x+", "+aux.y+"),";
+    }
+    curve += "]";
+    curve += "}";
+    return curve;
+  }
 }
 

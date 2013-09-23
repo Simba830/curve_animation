@@ -11,9 +11,9 @@ class DrawningState extends State {
     public void mousePressed() 
     {
       // Então seleciona o mais próximo
-      int selectedSegment = curve.findControlPoint(context.mouse);
+      int selectedSegment = context.curve.findControlPoint(context.mouse);
       // Verifica se o local clicado é proximo do final da curva;
-      if (selectedSegment == curve.getNumberControlPoints()-1){ canSketch = true; }
+      if (selectedSegment == context.curve.getNumberControlPoints()-1){ canSketch = true; }
       else { canSketch = false; }
         
       if (canSketch)

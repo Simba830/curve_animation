@@ -15,15 +15,15 @@ class Context{
 	Context(){
 		selectedSegments = new int[0];
 		tolerance = 7;
+		this.curve = new CurveCat();
 	}
 
-	void updateContext(CurveCat _curve, PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
+	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
 		PVector _mouseInit, PVector _mouseFinal){
 		this.mouse = mouse;
 		this.pMouse = pmouse;
 		this.keyCode = keyCode;
 		this.key = key;
-		this.curve = _curve;
 		this.mouseButton = _mouseButton;
 		this.mouseInit = _mouseInit;
 		this.mouseFinal = _mouseFinal;
