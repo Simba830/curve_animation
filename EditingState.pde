@@ -34,7 +34,6 @@ class EditingState extends State {
       }
       else
       {
-
         // Seleciona o segmento em questão se for o mouse LEFT
         int selectedSegment = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
 
@@ -90,8 +89,8 @@ class EditingState extends State {
     {
         if (context.mouseButton == LEFT)
         {
-
-          if (context.selectedSegments.length != 0)
+          // Se tiver selecionado vários mantém a mesma movimentação
+          if (context.selectedSegments.length > 1)
           {
             // Pega a variação de x e de y
             float dx = context.mouse.x - context.pMouse.x;
@@ -102,6 +101,27 @@ class EditingState extends State {
               PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[i]);
               context.curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy), context.selectedSegments[i]);
             }
+          }else if(context.selectedSegments.length != 0){
+            // Pega a variação de x e de y
+            float dx = context.mouse.x - context.pMouse.x;
+            float dy = context.mouse.y - context.pMouse.y;
+
+            // Soma aos elementos selecionados
+            for (int i = -2; i< 2; i++){
+              float tdx;
+              float tdy;
+              if( i != 0){
+                tdx = dx/(2*abs(i));
+                tdy = dy/(2*abs(i));
+              }else{
+                tdx = dx;
+                tdy = dy;
+              }
+
+              PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[0] + i);
+              context.curve.setPoint(new PVector(controlPoint.x + tdx, controlPoint.y + tdy), context.selectedSegments[0] + i);
+            }
+
           }
         }
     }

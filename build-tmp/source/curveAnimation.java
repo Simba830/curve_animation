@@ -615,7 +615,6 @@ class EditingState extends State {
       }
       else
       {
-
         // Seleciona o segmento em quest\u00e3o se for o mouse LEFT
         int selectedSegment = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
 
@@ -671,8 +670,8 @@ class EditingState extends State {
     {
         if (context.mouseButton == LEFT)
         {
-
-          if (context.selectedSegments.length != 0)
+          // Se tiver selecionado v\u00e1rios mant\u00e9m a mesma movimenta\u00e7\u00e3o
+          if (context.selectedSegments.length > 1)
           {
             // Pega a varia\u00e7\u00e3o de x e de y
             float dx = context.mouse.x - context.pMouse.x;
@@ -683,6 +682,27 @@ class EditingState extends State {
               PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[i]);
               context.curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy), context.selectedSegments[i]);
             }
+          }else if(context.selectedSegments.length != 0){
+            // Pega a varia\u00e7\u00e3o de x e de y
+            float dx = context.mouse.x - context.pMouse.x;
+            float dy = context.mouse.y - context.pMouse.y;
+
+            // Soma aos elementos selecionados
+            for (int i = -2; i< 2; i++){
+              float tdx;
+              float tdy;
+              if( i != 0){
+                tdx = dx/(2*abs(i));
+                tdy = dy/(2*abs(i));
+              }else{
+                tdx = dx;
+                tdy = dy;
+              }
+
+              PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[0] + i);
+              context.curve.setPoint(new PVector(controlPoint.x + tdx, controlPoint.y + tdy), context.selectedSegments[0] + i);
+            }
+
           }
         }
     }
@@ -1073,7 +1093,6 @@ static class Utils{
     }
   }
 }
-
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "curveAnimation" };
     if (passedArgs != null) {
