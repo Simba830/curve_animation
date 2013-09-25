@@ -6,6 +6,7 @@ class EditingState extends State {
 
     }
 
+
     public void mousePressed() 
     {
         if(context.mouseButton == RIGHT){
@@ -19,11 +20,12 @@ class EditingState extends State {
               PVector q = new PVector(context.mouse.x, context.mouse.y);
               int selectedSegment = context.curve.findClosestPoint(context.curve.controlPoints, q, closestPoint);
               float distance = q.dist(closestPoint);
-
-              context.selectedSegments = new int[1];
-              context.selectedSegments[0] = selectedSegment;
+              if (distance < distanceToSelect)
+              {
+               context.selectedSegments = new int[1];
+               context.selectedSegments[0] = selectedSegment;
+              }
             }
-
             // Remove todos os segmentos selecionados
             for (int i = context.selectedSegments.length - 1; i>=0; i--){
               context.curve.removeElement(context.selectedSegments[i]);
@@ -35,19 +37,22 @@ class EditingState extends State {
       else
       {
         // Seleciona o segmento em questão se for o mouse LEFT
-        int selectedSegment = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
-
+        
         PVector closestPoint = new PVector();
         PVector q = new PVector(context.mouse.x, context.mouse.y);
-        selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
+        int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
+        selectedSegment = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
+        println(selectedSegment);
         float distance = q.dist(closestPoint);
 
         boolean selected = false;
-        // Se o segmento mais próximo já estiver selecionado saí da função
 
+        // Se o segmento mais próximo já estiver selecionado saí da função
         if(distance > distanceToSelect){
               context.diselect();
-        }else{
+        }
+        else
+        {
           for (int i = 0; i<context.selectedSegments.length; i++){
             if(selectedSegment == context.selectedSegments[i]){
               selected = true;
@@ -146,9 +151,9 @@ class EditingState extends State {
             fill(mainColor, 50);
             stroke(mainColor, 50);
             rect(context.mouseInit.x, 
-              context.mouseInit.y, 
-              context.mouseFinal.x - context.mouseInit.x, 
-              context.mouseFinal.y - context.mouseInit.y);
+            context.mouseInit.y, 
+            context.mouseFinal.x - context.mouseInit.x, 
+            context.mouseFinal.y - context.mouseInit.y);
         }
 
         // Draw control points;

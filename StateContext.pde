@@ -123,7 +123,7 @@ public class StateContext {
         if(debug){
           fill(255,0,0);
           stroke(255,0,0);
-          text("Curve Length:"+curve.curveLength()+" px", 10, height-20);
+          text("Curve Length:"+context.curve.curveLength()+" px", 10, height-20);
           text("Curve Tightness:"+curveT, 10, 20);
           text("Tolerance:"+context.tolerance, 10, 40);
         }

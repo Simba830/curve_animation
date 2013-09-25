@@ -10,7 +10,7 @@ class CurveCat
   boolean decimable;
 
   // Number of points that the curve can be show
-  int numberDivisions = 2000; 
+  int numberDivisions = 100; 
 
   // Min Ditance wich can be in the curve
   float minDistance = 5;
@@ -28,7 +28,8 @@ class CurveCat
   }
 
   void removeElement(int index){
-    controlPoints.remove(index);
+    if (controlPoints.size()>1)
+      controlPoints.remove(index);
   }
 
   Segment getSegment(ArrayList<PVector> pAux, int i)
@@ -138,14 +139,15 @@ class CurveCat
     try {
       controlPoints.set(index,q);    
     } catch (Exception e) {
-        print("Erro ao setar ponto de controle");
+        println(index);
+        //print("Erro ao setar ponto de controle");
     }
   }
 
   // Retorna as coordenadas (X,Y) para de uma lista de PVectors p dado o index.
   PVector getControlPoint(int index)
   {
-    if (controlPoints.size() > index)
+    if (controlPoints.size() > index && index >-1)
       return controlPoints.get(index);
     else
       return new PVector(0,0);
@@ -299,7 +301,7 @@ class CurveCat
   {
     fill(mainColor);
     stroke(mainColor);
-    if (controlPoints.size() > i)
+    if (controlPoints.size() > i && i>-1)
       ellipse(controlPoints.get(i).x, controlPoints.get(i).y, 10, 10);
   }
 

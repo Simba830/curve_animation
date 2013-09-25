@@ -212,7 +212,7 @@ class CurveCat
   boolean decimable;
 
   // Number of points that the curve can be show
-  int numberDivisions = 2000; 
+  int numberDivisions = 100; 
 
   // Min Ditance wich can be in the curve
   float minDistance = 5;
@@ -230,7 +230,8 @@ class CurveCat
   }
 
   public void removeElement(int index){
-    controlPoints.remove(index);
+    if (controlPoints.size()>1)
+      controlPoints.remove(index);
   }
 
   public Segment getSegment(ArrayList<PVector> pAux, int i)
@@ -340,14 +341,15 @@ class CurveCat
     try {
       controlPoints.set(index,q);    
     } catch (Exception e) {
-        print("Erro ao setar ponto de controle");
+        println(index);
+        //print("Erro ao setar ponto de controle");
     }
   }
 
   // Retorna as coordenadas (X,Y) para de uma lista de PVectors p dado o index.
   public PVector getControlPoint(int index)
   {
-    if (controlPoints.size() > index)
+    if (controlPoints.size() > index && index >-1)
       return controlPoints.get(index);
     else
       return new PVector(0,0);
@@ -501,7 +503,7 @@ class CurveCat
   {
     fill(mainColor);
     stroke(mainColor);
-    if (controlPoints.size() > i)
+    if (controlPoints.size() > i && i>-1)
       ellipse(controlPoints.get(i).x, controlPoints.get(i).y, 10, 10);
   }
 
@@ -587,6 +589,7 @@ class EditingState extends State {
 
     }
 
+
     public void mousePressed() 
     {
         if(context.mouseButton == RIGHT){
@@ -600,11 +603,12 @@ class EditingState extends State {
               PVector q = new PVector(context.mouse.x, context.mouse.y);
               int selectedSegment = context.curve.findClosestPoint(context.curve.controlPoints, q, closestPoint);
               float distance = q.dist(closestPoint);
-
-              context.selectedSegments = new int[1];
-              context.selectedSegments[0] = selectedSegment;
+              if (distance < distanceToSelect)
+              {
+               context.selectedSegments = new int[1];
+               context.selectedSegments[0] = selectedSegment;
+              }
             }
-
             // Remove todos os segmentos selecionados
             for (int i = context.selectedSegments.length - 1; i>=0; i--){
               context.curve.removeElement(context.selectedSegments[i]);
@@ -616,19 +620,22 @@ class EditingState extends State {
       else
       {
         // Seleciona o segmento em quest\u00e3o se for o mouse LEFT
-        int selectedSegment = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
-
+        
         PVector closestPoint = new PVector();
         PVector q = new PVector(context.mouse.x, context.mouse.y);
-        selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
+        int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
+        selectedSegment = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
+        println(selectedSegment);
         float distance = q.dist(closestPoint);
 
         boolean selected = false;
-        // Se o segmento mais pr\u00f3ximo j\u00e1 estiver selecionado sa\u00ed da fun\u00e7\u00e3o
 
+        // Se o segmento mais pr\u00f3ximo j\u00e1 estiver selecionado sa\u00ed da fun\u00e7\u00e3o
         if(distance > distanceToSelect){
               context.diselect();
-        }else{
+        }
+        else
+        {
           for (int i = 0; i<context.selectedSegments.length; i++){
             if(selectedSegment == context.selectedSegments[i]){
               selected = true;
@@ -727,9 +734,9 @@ class EditingState extends State {
             fill(mainColor, 50);
             stroke(mainColor, 50);
             rect(context.mouseInit.x, 
-              context.mouseInit.y, 
-              context.mouseFinal.x - context.mouseInit.x, 
-              context.mouseFinal.y - context.mouseInit.y);
+            context.mouseInit.y, 
+            context.mouseFinal.x - context.mouseInit.x, 
+            context.mouseFinal.y - context.mouseInit.y);
         }
 
         // Draw control points;
