@@ -1,6 +1,5 @@
 class DrawningState extends State {
 
-
     float distanceToSelect = 5;
     private boolean canSketch;
 
@@ -16,8 +15,9 @@ class DrawningState extends State {
       if (selectedSegment == context.curve.getNumberControlPoints()-1){ canSketch = true; }
       else { canSketch = false; }
         
-      if (canSketch)
+      if (canSketch){
         this.context.curve.insertPoint(this.context.mouse);
+      }
       
     }
     

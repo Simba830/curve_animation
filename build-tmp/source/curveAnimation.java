@@ -210,17 +210,22 @@ class CurveCat
 
   // If it can be decimed
   boolean decimable;
+  float tolerance;
 
   // Number of points that the curve can be show
-  int numberDivisions = 100; 
+  int numberDivisions = 10; 
 
   // Min Ditance wich can be in the curve
   float minDistance = 5;
+  int strokeColor = color(0);
+
+
 
   CurveCat() 
   {
     controlPoints = new ArrayList<PVector>();
     decimable = true;
+    tolerance = 7;
   }
 
   public void clear()
@@ -341,7 +346,6 @@ class CurveCat
     try {
       controlPoints.set(index,q);    
     } catch (Exception e) {
-        println(index);
         //print("Erro ao setar ponto de controle");
     }
   }
@@ -470,7 +474,30 @@ class CurveCat
     return (float)curveLength;
   }
 
+  public void reAmostragem()
+  {
+    CurveCat aux = new CurveCat();
+    int index = 0;
+    for (int i = 0; i < getNumberControlPoints()-1; i++) {
+      Segment seg = getSegment(i);
 
+      for (int j=0; j<=numberDivisions; j++) 
+      {
+        float t = (float)(j) / (float)(numberDivisions);
+        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
+        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+
+        aux.insertPoint(new PVector(x,y), index);
+        index++;
+      }
+    }
+
+    this.controlPoints = aux.controlPoints;
+  }
+
+  public void decimeCurve(){
+    this.decimeCurve(this.tolerance);
+  }
 
   /**
    M\u00c9TODOS DE DESENHAR
@@ -478,14 +505,13 @@ class CurveCat
   // Desenha uma curva de acordo com a lista p de pontos de controle.
   public void draw()
   { 
-    stroke(0);
+    stroke(this.strokeColor);
     strokeWeight(1.5f);
     strokeCap(ROUND);
     for (int i = 0; i < getNumberControlPoints() - 1; i++) {
       Segment seg = getSegment(i);
       curve (seg.a.x, seg.a.y, seg.b.x, seg.b.y, seg.c.x, seg.c.y, seg.d.x, seg.d.y);
     }
-    stroke(0);
   }
 
   // Desenha elipses de acordo com os elementos do tipo PVector da lista p
@@ -527,7 +553,6 @@ class CurveCat
 
 class DrawningState extends State {
 
-
     float distanceToSelect = 5;
     private boolean canSketch;
 
@@ -543,8 +568,9 @@ class DrawningState extends State {
       if (selectedSegment == context.curve.getNumberControlPoints()-1){ canSketch = true; }
       else { canSketch = false; }
         
-      if (canSketch)
+      if (canSketch){
         this.context.curve.insertPoint(this.context.mouse);
+      }
       
     }
     
@@ -582,9 +608,15 @@ class DrawningState extends State {
  
 }
 class EditingState extends State {
+
+    int cpsMovimenteds = 5;
+
+    PVector originalPositionDragged;
     
     EditingState(Context context){
       super(context);
+
+      context.curve.reAmostragem();
     }
 
     public void mousePressed() 
@@ -594,7 +626,6 @@ class EditingState extends State {
             // Verfica se tem nenhum element selecionado
             if(context.selectedSegments.length == 0)
             {
-
               // Ent\u00e3o seleciona o mais pr\u00f3ximo
               PVector closestPoint = new PVector();
               PVector q = new PVector(context.mouse.x, context.mouse.y);
@@ -625,9 +656,6 @@ class EditingState extends State {
 
         float distanceControlPoint = q.dist(closestControlPoint);
         float distance = q.dist(closestPoint);
-
-        println("distance: "+distance);
-        println("closestControlPoint: "+closestControlPoint);
 
         // Verifica se a distancia \u00e9 maior do que o limite para selecionar
         if(distance > distanceToSelect)
@@ -662,7 +690,6 @@ class EditingState extends State {
     @Override
     public void mouseReleased() 
     {
-        super.mouseReleased();
         if(context.selectedSegments.length == 0)
         {
             context.selectedSegments = context.curve.getControlPointsBetween(context.mouseInit, context.mouseFinal);
@@ -686,17 +713,18 @@ class EditingState extends State {
               context.curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy), context.selectedSegments[i]);
             }
           }else if(context.selectedSegments.length != 0){
+
             // Pega a varia\u00e7\u00e3o de x e de y
             float dx = context.mouse.x - context.pMouse.x;
             float dy = context.mouse.y - context.pMouse.y;
 
             // Soma aos elementos selecionados
-            for (int i = -2; i< 2; i++){
+            for (int i = -this.cpsMovimenteds; i< this.cpsMovimenteds; i++){
               float tdx;
               float tdy;
               if( i != 0){
-                tdx = dx/(2*abs(i));
-                tdy = dy/(2*abs(i));
+                tdx = dx/(1.5f*abs(i));
+                tdy = dy/(1.5f*abs(i));
               }else{
                 tdx = dx;
                 tdy = dy;
@@ -743,7 +771,6 @@ class EditingState extends State {
                 context.curve.drawControlPoint(context.selectedSegments[i]);
             }
         }
-
     }
     @Override
     public void drawInterface()
@@ -790,6 +817,7 @@ class OverSketchState extends State {
             context.selectedSegments[0] = selectedSegment;
 
             this.aux = new CurveCat();
+            this.aux.strokeColor = color(0,0,0,50);
 
             for (int i = 0; i<selectedSegment; i++){
                 q = context.curve.getControlPoint(i);
@@ -831,6 +859,8 @@ class OverSketchState extends State {
 
         context.curve = null;
         context.curve = aux;
+
+        context.curve.strokeColor = color(0);
 
         super.mouseReleased();
     }
@@ -914,7 +944,6 @@ class State
     PVector closestPoint;
     PVector q;
 
-
 	State(Context _context){
 		context = _context;
 	}
@@ -931,9 +960,10 @@ class State
 	};
 	public void mouseReleased(){
 		while(context.curve.canBeDecimed()){
-		    context.curve.decimeCurve(context.tolerance);
-		}
+          context.curve.decimeCurve(context.tolerance);
+        }
 	};
+
 	public void keyPressed(){
 
 	};
@@ -1002,6 +1032,23 @@ public class StateContext {
             return;
         }
 
+        // Seleciona o segmento em quest\u00e3o se for o mouse LEFT
+        PVector closestPoint = new PVector();
+        PVector q = new PVector(context.mouse.x, context.mouse.y);
+        int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
+        //int closestControlPointIndex  = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
+        PVector closestControlPoint = context.curve.getControlPoint(selectedSegment);
+
+        float distance = q.dist(closestPoint);
+
+        if(distance < 10 && !(myState instanceof OverSketchState) && !(myState instanceof EditingState)){
+          myState = new EditingState(this.context);
+        }
+
+        if(selectedSegment == context.curve.getNumberControlPoints() - 2 && distance < 10){
+            myState = new DrawningState(this.context);
+        }
+
         myState.mousePressed();
     }
     public void mouseDragged()
@@ -1026,6 +1073,14 @@ public class StateContext {
             case 'd' :
               this.debug();
             break;  
+
+            case 'r' :
+                this.context.curve.reAmostragem();
+            break;    
+
+            case 's' :
+                this.context.curve.decimeCurve();
+            break;    
 
             // Essa tecla \u00e9 espec\u00edfica para cada estado, entao devemos implement\u00e1-la nas classes de State
             case DELETE :

@@ -29,6 +29,7 @@ class OverSketchState extends State {
             context.selectedSegments[0] = selectedSegment;
 
             this.aux = new CurveCat();
+            this.aux.strokeColor = color(0,0,0,50);
 
             for (int i = 0; i<selectedSegment; i++){
                 q = context.curve.getControlPoint(i);
@@ -70,6 +71,8 @@ class OverSketchState extends State {
 
         context.curve = null;
         context.curve = aux;
+
+        context.curve.strokeColor = color(0);
 
         super.mouseReleased();
     }

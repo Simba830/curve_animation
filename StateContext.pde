@@ -59,6 +59,23 @@ public class StateContext {
             return;
         }
 
+        // Seleciona o segmento em questão se for o mouse LEFT
+        PVector closestPoint = new PVector();
+        PVector q = new PVector(context.mouse.x, context.mouse.y);
+        int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
+        //int closestControlPointIndex  = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
+        PVector closestControlPoint = context.curve.getControlPoint(selectedSegment);
+
+        float distance = q.dist(closestPoint);
+
+        if(distance < 10 && !(myState instanceof OverSketchState) && !(myState instanceof EditingState)){
+          myState = new EditingState(this.context);
+        }
+
+        if(selectedSegment == context.curve.getNumberControlPoints() - 2 && distance < 10){
+            myState = new DrawningState(this.context);
+        }
+
         myState.mousePressed();
     }
     void mouseDragged()
@@ -83,6 +100,14 @@ public class StateContext {
             case 'd' :
               this.debug();
             break;  
+
+            case 'r' :
+                this.context.curve.reAmostragem();
+            break;    
+
+            case 's' :
+                this.context.curve.decimeCurve();
+            break;    
 
             // Essa tecla é específica para cada estado, entao devemos implementá-la nas classes de State
             case DELETE :

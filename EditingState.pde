@@ -1,7 +1,13 @@
 class EditingState extends State {
+
+    int cpsMovimenteds = 5;
+
+    PVector originalPositionDragged;
     
     EditingState(Context context){
       super(context);
+
+      context.curve.reAmostragem();
     }
 
     public void mousePressed() 
@@ -11,7 +17,6 @@ class EditingState extends State {
             // Verfica se tem nenhum element selecionado
             if(context.selectedSegments.length == 0)
             {
-
               // Então seleciona o mais próximo
               PVector closestPoint = new PVector();
               PVector q = new PVector(context.mouse.x, context.mouse.y);
@@ -76,7 +81,6 @@ class EditingState extends State {
     @Override
     public void mouseReleased() 
     {
-        super.mouseReleased();
         if(context.selectedSegments.length == 0)
         {
             context.selectedSegments = context.curve.getControlPointsBetween(context.mouseInit, context.mouseFinal);
@@ -100,17 +104,18 @@ class EditingState extends State {
               context.curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy), context.selectedSegments[i]);
             }
           }else if(context.selectedSegments.length != 0){
+
             // Pega a variação de x e de y
             float dx = context.mouse.x - context.pMouse.x;
             float dy = context.mouse.y - context.pMouse.y;
 
             // Soma aos elementos selecionados
-            for (int i = -2; i< 2; i++){
+            for (int i = -this.cpsMovimenteds; i< this.cpsMovimenteds; i++){
               float tdx;
               float tdy;
               if( i != 0){
-                tdx = dx/(2*abs(i));
-                tdy = dy/(2*abs(i));
+                tdx = dx/(1.5*abs(i));
+                tdy = dy/(1.5*abs(i));
               }else{
                 tdx = dx;
                 tdy = dy;
@@ -157,7 +162,6 @@ class EditingState extends State {
                 context.curve.drawControlPoint(context.selectedSegments[i]);
             }
         }
-
     }
     @Override
     public void drawInterface()

@@ -9,7 +9,6 @@ class State
     PVector closestPoint;
     PVector q;
 
-
 	State(Context _context){
 		context = _context;
 	}
@@ -26,9 +25,10 @@ class State
 	};
 	void mouseReleased(){
 		while(context.curve.canBeDecimed()){
-		    context.curve.decimeCurve(context.tolerance);
-		}
+          context.curve.decimeCurve(context.tolerance);
+        }
 	};
+
 	void keyPressed(){
 
 	};
