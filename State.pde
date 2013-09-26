@@ -2,7 +2,7 @@ class State
 {
 	Context context;
     // Constants
-    final float distanceToSelect = 5;
+    final float distanceToSelect = 30;
 
      // Variaveis de Curvas
     int selectedSegment;
