@@ -17,8 +17,6 @@ class CurveCat
   float minDistance = 5;
   color strokeColor = color(0);
 
-
-
   CurveCat() 
   {
     controlPoints = new ArrayList<PVector>();
@@ -118,6 +116,17 @@ class CurveCat
 
       this.decimable = wasDecimed;
   }
+
+  void decimeAll(){
+    while(this.canBeDecimed()){
+      this.decimeCurve(this.tolerance);
+    }  
+  }
+
+  void setTolerance(float t){
+    this.tolerance = t;
+  }
+  
 
   boolean canBeDecimed(){
     return this.decimable;
@@ -291,6 +300,8 @@ class CurveCat
     }
 
     this.controlPoints = aux.controlPoints;
+
+    this.decimable = true;
   }
 
   void decimeCurve(){

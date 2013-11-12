@@ -5,7 +5,7 @@
  
  **/
 
- import java.awt.event.*;
+ // import java.awt.event.*;
 
 PFont font; // it's a font
 float curveT;
@@ -43,10 +43,10 @@ public void setup()
   mouseFinal = new PVector(0,0);
 
   // Add a listener to the mouseWheel
-  addMouseWheelListener(new MouseWheelListener() { 
-    public void mouseWheelMoved(MouseWheelEvent mwe) { 
-      mouseWheel(mwe.getWheelRotation());
-  }}); 
+  // addMouseWheelListener(new MouseWheelListener() { 
+  //   public void mouseWheelMoved(MouseWheelEvent mwe) { 
+  //     mouseWheel(mwe.getWheelRotation());
+  // }}); 
 
   curveTightness(curveT);
 
@@ -58,13 +58,13 @@ public void setup()
   stateContext.setContext(context);
 }
 
-// TODO Pensar em como portar isso para o Javascript
-void mouseWheel(float delta) {
-  curveT += delta/10;
-  curveT = constrain(curveT, -1.0, 1.0);
+// // TODO Pensar em como portar isso para o Javascript
+// void mouseWheel(float delta) {
+//   curveT += delta/10;
+//   curveT = constrain(curveT, -1.0, 1.0);
 
-  curveTightness(curveT); 
-}
+//   curveTightness(curveT); 
+// }
 
 // TODO Mudar isso para um interface só usando o mouse
 void keyPressed() 

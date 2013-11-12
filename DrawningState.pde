@@ -5,6 +5,8 @@ class DrawningState extends State {
 
     DrawningState(Context _context){
       super(_context);
+
+      context.curve.decimeAll();
     }
 
     public void mousePressed() 
@@ -18,11 +20,11 @@ class DrawningState extends State {
       if (canSketch){
         this.context.curve.insertPoint(this.context.mouse);
       }
-      
     }
     
     public void mouseReleased(PVector mouse) 
     {
+        super.mouseReleased();
     	  // Retorna o estado de poder desenhar para FALSE
         canSketch = false;
     }

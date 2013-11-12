@@ -3,8 +3,6 @@ import processing.data.*;
 import processing.event.*; 
 import processing.opengl.*; 
 
-import java.awt.event.*; 
-
 import java.util.HashMap; 
 import java.util.ArrayList; 
 import java.io.File; 
@@ -23,7 +21,7 @@ public class curveAnimation extends PApplet {
  
  **/
 
- 
+ // import java.awt.event.*;
 
 PFont font; // it's a font
 float curveT;
@@ -61,10 +59,10 @@ public void setup()
   mouseFinal = new PVector(0,0);
 
   // Add a listener to the mouseWheel
-  addMouseWheelListener(new MouseWheelListener() { 
-    public void mouseWheelMoved(MouseWheelEvent mwe) { 
-      mouseWheel(mwe.getWheelRotation());
-  }}); 
+  // addMouseWheelListener(new MouseWheelListener() { 
+  //   public void mouseWheelMoved(MouseWheelEvent mwe) { 
+  //     mouseWheel(mwe.getWheelRotation());
+  // }}); 
 
   curveTightness(curveT);
 
@@ -76,13 +74,13 @@ public void setup()
   stateContext.setContext(context);
 }
 
-// TODO Pensar em como portar isso para o Javascript
-public void mouseWheel(float delta) {
-  curveT += delta/10;
-  curveT = constrain(curveT, -1.0f, 1.0f);
+// // TODO Pensar em como portar isso para o Javascript
+// void mouseWheel(float delta) {
+//   curveT += delta/10;
+//   curveT = constrain(curveT, -1.0, 1.0);
 
-  curveTightness(curveT); 
-}
+//   curveTightness(curveT); 
+// }
 
 // TODO Mudar isso para um interface s\u00f3 usando o mouse
 public void keyPressed() 
@@ -158,12 +156,11 @@ class Context{
 	PVector mouseFinal;
 	int[] selectedSegments;
 	int mouseCount;
-	float tolerance;
 
 	Context(){
 		selectedSegments = new int[0];
-		tolerance = 7;
 		this.curve = new CurveCat();
+		this.curve.setTolerance(7);
 	}
 
 	public void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
@@ -218,8 +215,6 @@ class CurveCat
   // Min Ditance wich can be in the curve
   float minDistance = 5;
   int strokeColor = color(0);
-
-
 
   CurveCat() 
   {
@@ -320,6 +315,17 @@ class CurveCat
 
       this.decimable = wasDecimed;
   }
+
+  public void decimeAll(){
+    while(this.canBeDecimed()){
+      this.decimeCurve(this.tolerance);
+    }  
+  }
+
+  public void setTolerance(float t){
+    this.tolerance = t;
+  }
+  
 
   public boolean canBeDecimed(){
     return this.decimable;
@@ -493,6 +499,8 @@ class CurveCat
     }
 
     this.controlPoints = aux.controlPoints;
+
+    this.decimable = true;
   }
 
   public void decimeCurve(){
@@ -558,6 +566,8 @@ class DrawningState extends State {
 
     DrawningState(Context _context){
       super(_context);
+
+      context.curve.decimeAll();
     }
 
     public void mousePressed() 
@@ -571,11 +581,11 @@ class DrawningState extends State {
       if (canSketch){
         this.context.curve.insertPoint(this.context.mouse);
       }
-      
     }
     
     public void mouseReleased(PVector mouse) 
     {
+        super.mouseReleased();
     	  // Retorna o estado de poder desenhar para FALSE
         canSketch = false;
     }
@@ -687,7 +697,7 @@ class EditingState extends State {
         }  
       }
     }
-    @Override
+
     public void mouseReleased() 
     {
         if(context.selectedSegments.length == 0)
@@ -695,7 +705,7 @@ class EditingState extends State {
             context.selectedSegments = context.curve.getControlPointsBetween(context.mouseInit, context.mouseFinal);
         }
     }
-    @Override
+
     public void mouseDragged()
     {
         if (context.mouseButton == LEFT)
@@ -748,7 +758,6 @@ class EditingState extends State {
       }
     }
 
-    @Override
     public void draw()
     {
         context.curve.drawControlPoints();
@@ -772,7 +781,7 @@ class EditingState extends State {
             }
         }
     }
-    @Override
+
     public void drawInterface()
     {
         int posX = width-80;
@@ -959,9 +968,7 @@ class State
 
 	};
 	public void mouseReleased(){
-		while(context.curve.canBeDecimed()){
-          context.curve.decimeCurve(context.tolerance);
-        }
+		context.curve.decimeAll();
 	};
 
 	public void keyPressed(){
@@ -1123,7 +1130,7 @@ public class StateContext {
           stroke(255,0,0);
           text("Curve Length:"+context.curve.curveLength()+" px", 10, height-20);
           text("Curve Tightness:"+curveT, 10, 20);
-          text("Tolerance:"+context.tolerance, 10, 40);
+          text("Tolerance:"+context.curve.tolerance, 10, 40);
         }
     }
 }

@@ -78,7 +78,7 @@ class EditingState extends State {
         }  
       }
     }
-    @Override
+
     public void mouseReleased() 
     {
         if(context.selectedSegments.length == 0)
@@ -86,7 +86,7 @@ class EditingState extends State {
             context.selectedSegments = context.curve.getControlPointsBetween(context.mouseInit, context.mouseFinal);
         }
     }
-    @Override
+
     public void mouseDragged()
     {
         if (context.mouseButton == LEFT)
@@ -139,7 +139,6 @@ class EditingState extends State {
       }
     }
 
-    @Override
     public void draw()
     {
         context.curve.drawControlPoints();
@@ -163,7 +162,7 @@ class EditingState extends State {
             }
         }
     }
-    @Override
+
     public void drawInterface()
     {
         int posX = width-80;

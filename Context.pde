@@ -10,12 +10,11 @@ class Context{
 	PVector mouseFinal;
 	int[] selectedSegments;
 	int mouseCount;
-	float tolerance;
 
 	Context(){
 		selectedSegments = new int[0];
-		tolerance = 7;
 		this.curve = new CurveCat();
+		this.curve.setTolerance(7);
 	}
 
 	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
