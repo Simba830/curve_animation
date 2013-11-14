@@ -1,5 +1,4 @@
 class Context{
-
 	PVector mouse;
 	PVector pMouse;
 	int mouseButton;
@@ -10,11 +9,17 @@ class Context{
 	PVector mouseFinal;
 	int[] selectedSegments;
 	int mouseCount;
+	SmoothPositionInterpolator pos;
+	boolean play;
 
 	Context(){
 		selectedSegments = new int[0];
 		this.curve = new CurveCat();
 		this.curve.setTolerance(7);
+
+		pos = new SmoothPositionInterpolator();
+
+		play = false;
 	}
 
 	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
@@ -48,6 +53,28 @@ class Context{
 
 	void diselect(){
 		this.selectedSegments = new int[0];
+	}
+
+	boolean isPlayed(){
+		return play;
+	}
+
+	void play(){
+		frameCount = 0;
+		float t = 0;
+		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
+			PVector p = curve.getControlPoint(i);
+			PVector pNext = curve.getControlPoint(i + 1);
+
+			t += p.dist(pNext);
+			pos.set(t, p);
+		}
+
+		play = true;
+	}
+
+	void stop(){
+		play = false;
 	}
 
 }

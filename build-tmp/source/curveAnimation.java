@@ -18,7 +18,6 @@ public class curveAnimation extends PApplet {
  AnimationApp.pde
  Author: Guilherme Herzog
  Created on: May 13
- 
  **/
 
  // import java.awt.event.*;
@@ -45,6 +44,9 @@ int mainColor = 0xff0066C8;
 int secondaryColor = 0xffFF9700;
 int thirdColor = 0xff3990E3;
 
+// Images
+PImage img;
+
 public void setup() 
 {
   size(800, 600);
@@ -52,7 +54,7 @@ public void setup()
 
   font = createFont("", 14);
   curveT = 0;
-  
+  img = loadImage("play.png");
 
   // PVectors used to create the selection box
   mouseInit = new PVector(0,0);
@@ -145,7 +147,6 @@ public void update(){
 
 
 class Context{
-
 	PVector mouse;
 	PVector pMouse;
 	int mouseButton;
@@ -156,11 +157,17 @@ class Context{
 	PVector mouseFinal;
 	int[] selectedSegments;
 	int mouseCount;
+	SmoothPositionInterpolator pos;
+	boolean play;
 
 	Context(){
 		selectedSegments = new int[0];
 		this.curve = new CurveCat();
 		this.curve.setTolerance(7);
+
+		pos = new SmoothPositionInterpolator();
+
+		play = false;
 	}
 
 	public void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
@@ -194,6 +201,28 @@ class Context{
 
 	public void diselect(){
 		this.selectedSegments = new int[0];
+	}
+
+	public boolean isPlayed(){
+		return play;
+	}
+
+	public void play(){
+		frameCount = 0;
+		float t = 0;
+		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
+			PVector p = curve.getControlPoint(i);
+			PVector pNext = curve.getControlPoint(i + 1);
+
+			t += p.dist(pNext);
+			pos.set(t, p);
+		}
+
+		play = true;
+	}
+
+	public void stop(){
+		play = false;
 	}
 
 }
@@ -625,8 +654,6 @@ class EditingState extends State {
     
     EditingState(Context context){
       super(context);
-
-      context.curve.reAmostragem();
     }
 
     public void mousePressed() 
@@ -733,8 +760,8 @@ class EditingState extends State {
               float tdx;
               float tdy;
               if( i != 0){
-                tdx = dx/(1.5f*abs(i));
-                tdy = dy/(1.5f*abs(i));
+                tdx = dx/(5*abs(i));
+                tdy = dy/(5*abs(i));
               }else{
                 tdx = dx;
                 tdy = dy;
@@ -760,7 +787,7 @@ class EditingState extends State {
 
     public void draw()
     {
-        context.curve.drawControlPoints();
+        //context.curve.drawControlPoints();
         if(context.selectedSegments.length == 0)
         {
             // Desenha caixa de sele\u00e7\u00e3o com Alpha 50
@@ -777,7 +804,7 @@ class EditingState extends State {
         {
             for (int i = 0; i<context.selectedSegments.length; i++)
             {
-                context.curve.drawControlPoint(context.selectedSegments[i]);
+                //context.curve.drawControlPoint(context.selectedSegments[i]);
             }
         }
     }
@@ -795,6 +822,85 @@ class EditingState extends State {
     }
  
 }
+// Linearly interpolates properties for a specific
+// time, given values of these properties at 
+// known times (keyframes)
+class Interpolator {
+  ArrayList<Float> time;
+  ArrayList<Property> prop;
+ 
+  // Constructor
+  Interpolator() {
+    time = new ArrayList<Float>();
+    prop = new ArrayList<Property>();
+  }
+  
+  // Returns the number of keyframes
+  public int nKeys () {
+    return time.size();
+  }
+
+  // Return the time for keyframe i
+  public float keyTime(int i) {
+    return time.get(i);
+  }
+
+  // Return the property for keyframe i
+  public Property keyProp (int i) {
+    return prop.get(i);
+  }
+
+  // Returns the greatest index of time which contains a 
+  // value smaller or equal to t. If no such value exists, 
+  // returns -1.
+  public int locateTime(float t) {
+    int i = -1;
+    while (i+1 < time.size() && time.get(i+1) <= t) i++;
+    return i;
+  }
+
+  // Sets the property p for time t
+  public void set (float t, Property p) {
+    int i = locateTime(t);
+    if (i >=0 && time.get(i) == t) {
+      prop.set(i,p);
+    }
+    else {
+      time.add(i+1,t);
+      prop.add(i+1,p);
+    }
+  }
+
+  // Gets the (linearly) interpolated property for time t 
+  public Property get(float t) {
+    int i = locateTime(t);
+    if (i >=0) {
+      if (time.get(i) == t) {
+        return prop.get(i);
+      }
+      else if (i+1 < time.size()) {
+        float s = norm (t, time.get(i), time.get(i+1));
+        Property p = new Property(), a = prop.get(i), b = prop.get(i+1);
+        int n = max (a.size(), b.size());
+        for (int k = 0; k < n; k++) {
+          p.set(k, lerp(a.get(k), b.get(k), s));
+        }
+        return p;
+      }
+      else return prop.get(i);
+    }
+    else {
+      assert (time.size() > 0);
+      return prop.get(0);
+    }
+  }
+
+  public void clear(){
+    time = new ArrayList<Float>();
+    prop = new ArrayList<Property>();    
+  }
+};
+
 class OverSketchState extends State {
 
     CurveCat aux;
@@ -838,7 +944,6 @@ class OverSketchState extends State {
         }
     }
 
-    @Override
     public void mouseReleased() 
     {
         if(this.aux.getNumberControlPoints() == 0){
@@ -874,7 +979,6 @@ class OverSketchState extends State {
         super.mouseReleased();
     }
 
-    @Override
     public void mouseDragged()
     {
         if(context.mouseButton == LEFT){
@@ -886,13 +990,12 @@ class OverSketchState extends State {
 
     }
 
-    @Override
     public void draw()
     {
         if (this.aux.getNumberControlPoints() >=4) 
             this.aux.draw();
 
-        context.curve.drawControlPoints();
+        //context.curve.drawControlPoints();
         if(context.selectedSegments.length == 0)
         {
             // Desenha caixa de sele\u00e7\u00e3o com Alpha 50
@@ -909,7 +1012,7 @@ class OverSketchState extends State {
         {
             for (int i = 0; i<context.selectedSegments.length; i++)
             {
-                context.curve.drawControlPoint(context.selectedSegments[i]);
+                //context.curve.drawControlPoint(context.selectedSegments[i]);
             }
         }
     }
@@ -927,6 +1030,52 @@ class OverSketchState extends State {
     }
  
 }
+// A property is an array of floats representing a
+// multidimensional point
+class Property extends ArrayList<Float> {
+  
+  // An empty property
+  Property() {
+    super();
+  }
+
+  // A one-float property
+  Property (float a) {
+    super();
+    set (0,a);
+  }
+
+  // A two-float property
+  Property (float a, float b) {
+    super();
+    set (0,a);
+    set (1,b);
+  }
+
+  // A three-float property
+  Property (float a, float b, float c) {
+    super();
+    set (0,a);
+    set (1,b);
+    set (2,c);
+  }
+
+  // Sets the i'th dimension of the property
+  // to value v
+  public void set(int i, float v) {
+     assert(i>=0);
+     while (i >= size()) add(0.0f);
+     super.set(i,v);
+  }
+
+  // Returns the i'th dimension of the property.
+  // Returns 0.0 if that dimension was never set
+  public Float get(int i) {
+    assert (i>=0);
+    if (i >= size()) return 0.0f;
+    return super.get(i);
+  }
+};
 class Segment{
    PVector a,b,c,d;
   
@@ -942,6 +1091,123 @@ class Segment{
    }
   
 }
+// Smooth (Cubic) interpolation of properties
+class SmoothInterpolator extends Interpolator {
+
+  // Gets the Catmull-Rom interpolated property for time t 
+  public Property get(float t) {
+    int i = locateTime(t);
+    if (i >= 0) {
+      if (time.get(i) == t) return prop.get(i);
+      if (i+1 < time.size()) {
+        // Compute the 4 points that will be used
+        // to interpolate the property 
+        Property a,b,c,d;
+        a = b = prop.get(i); 
+        c = d = prop.get(i+1); 
+        if (i > 0) a = prop.get(i-1); 
+        if (i+2 < time.size()) d = prop.get(i+2);
+        // Interpolate the parameter
+        float s = norm (t, time.get(i), time.get(i+1)); 
+        // Now interpolate the property dimensions
+        Property p = new Property(); 
+        int n = max (a.size(), b.size());
+        for (int k = 0; k < n; k++) {
+          p.set(k, curvePoint(a.get(k), b.get(k), c.get(k), d.get(k), s));
+        }
+        return p;
+      }
+      else return prop.get(i);
+    }
+    else {
+      assert (time.size() > 0);
+      return prop.get(0);
+    }
+  }
+
+};
+
+// Wraps a interpolator class so that 
+// methods return PVectors representing positions rather 
+// than generic properties
+class SmoothPositionInterpolator {
+  
+  // The interpolator being wrapped
+  SmoothInterpolator interp;
+  
+  // Constructor
+  SmoothPositionInterpolator () {
+    this.interp = new SmoothInterpolator();
+  }
+
+  // Converts a property to a PVector
+  public PVector toPVector (Property p) {
+    return new PVector (p.get(0), p.get(1), p.get(2));
+  }
+  
+  // Returns the number of keyframes
+  public int nKeys () {
+    return interp.time.size();
+  }
+
+  // Return the time for keyframe i
+  public float keyTime(int i) {
+    return interp.time.get(i);
+  }
+
+  // Return the property for keyframe i
+  public PVector keyPos (int i) {
+    return toPVector(interp.prop.get(i));
+  }
+
+  // Sets the position for time t
+  public void set (float t, PVector p) { 
+    interp.set(t, new Property (p.x, p.y, p.z));
+  }
+  
+  // Gets the position at time t
+  public PVector get (float t) {
+    return toPVector (interp.get(t));
+  }
+  
+  // Returns the estimated tangent (a unit vector) at point t
+  public PVector getTangent (float t) {
+    PVector tan = (t < 0.01f) ?
+                   PVector.sub(get(t+0.01f),get(t)) :
+                   PVector.sub(get(t),get(t-0.01f));
+    tan.normalize();
+    return tan;
+  }
+  
+  // Draws key frames as circles and the curve 
+  // as n segments equally spaced in time
+  public void draw(int n) {
+    pushStyle();
+    noFill();
+    float tickSize = 5;
+    float tMax = keyTime(nKeys()-1);
+    PVector p0 = get(0);
+    for (int i = 0; i < n; i++) {
+      float t = (float) i * tMax / (n-1);
+      PVector p = get(t);
+      PVector tan = getTangent(t);
+      tan.mult(tickSize);
+      line(p0.x,p0.y,p.x,p.y);
+      line(p.x-tan.y, p.y+tan.x,p.x+tan.y, p.y-tan.x);
+      p0 = p;
+    }
+    popStyle();
+    for (int i = 0; i < interp.nKeys(); i++) {
+      Property p = interp.keyProp(i);
+      ellipse(p.get(0), p.get(1), 10, 10);
+    }
+  }
+
+  public void clear(){
+    interp.clear();
+  }
+}
+
 class State
 {
 	Context context;
@@ -1022,6 +1288,8 @@ public class StateContext {
         // Verifica se clicou no bot\u00e3o "Clear";
         if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width/2 + 60,height-40, 110, 30)){
             context.curve.clear();
+            context.pos.clear();
+            context.stop();
             this.setState(new DrawningState(context));
             context.selectedSegments = new int[0];
             return;
@@ -1036,6 +1304,15 @@ public class StateContext {
 
             this.setState(new OverSketchState(context));
             context.selectedSegments = new int[0];
+            return;
+        }
+
+        if(Utils.mouseOverRect(new PVector(mouseX, mouseY),20, height-50, 50, 50)){
+            if(context.isPlayed())
+                context.stop();
+            else
+                context.play(); 
+
             return;
         }
 
@@ -1087,7 +1364,14 @@ public class StateContext {
 
             case 's' :
                 this.context.curve.decimeCurve();
-            break;    
+            break;   
+
+            case 'p' :
+                if(context.isPlayed())
+                    context.stop();
+                else
+                    context.play();
+             break;     
 
             // Essa tecla \u00e9 espec\u00edfica para cada estado, entao devemos implement\u00e1-la nas classes de State
             case DELETE :
@@ -1099,9 +1383,27 @@ public class StateContext {
     {
         background (255);
         noFill();
-        if (context.curve.getNumberControlPoints() >=4) 
+        if (context.curve.getNumberControlPoints() >=4 && !context.isPlayed()) 
             context.curve.draw();
         myState.draw();
+
+          if(context.isPlayed()){
+            float lastTime = context.pos.keyTime(context.pos.nKeys()-1);
+            float t = frameCount%PApplet.parseInt(lastTime);
+            PVector p = context.pos.get(t);
+            PVector tan = context.pos.getTangent(t);
+            stroke(100,100,100);
+            context.pos.draw (100);
+            float ang = atan2(tan.y,tan.x);
+
+            pushMatrix();
+            translate (p.x,p.y);
+            rotate (ang);
+            noStroke();
+            fill(mainColor);
+            ellipse(0,0, 20, 20);
+            popMatrix();
+          }
     }
     public void drawInterface()
     {
@@ -1132,6 +1434,11 @@ public class StateContext {
           text("Curve Tightness:"+curveT, 10, 20);
           text("Tolerance:"+context.curve.tolerance, 10, 40);
         }
+
+        pushMatrix();
+        translate(20, height-50);
+        image(img, 0, 0);
+        popMatrix();
     }
 }
 static class Utils{

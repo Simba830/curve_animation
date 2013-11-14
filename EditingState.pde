@@ -6,8 +6,6 @@ class EditingState extends State {
     
     EditingState(Context context){
       super(context);
-
-      context.curve.reAmostragem();
     }
 
     public void mousePressed() 
@@ -114,8 +112,8 @@ class EditingState extends State {
               float tdx;
               float tdy;
               if( i != 0){
-                tdx = dx/(1.5*abs(i));
-                tdy = dy/(1.5*abs(i));
+                tdx = dx/(5*abs(i));
+                tdy = dy/(5*abs(i));
               }else{
                 tdx = dx;
                 tdy = dy;
@@ -141,7 +139,7 @@ class EditingState extends State {
 
     public void draw()
     {
-        context.curve.drawControlPoints();
+        //context.curve.drawControlPoints();
         if(context.selectedSegments.length == 0)
         {
             // Desenha caixa de seleção com Alpha 50
@@ -158,7 +156,7 @@ class EditingState extends State {
         {
             for (int i = 0; i<context.selectedSegments.length; i++)
             {
-                context.curve.drawControlPoint(context.selectedSegments[i]);
+                //context.curve.drawControlPoint(context.selectedSegments[i]);
             }
         }
     }

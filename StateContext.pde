@@ -42,6 +42,8 @@ public class StateContext {
         // Verifica se clicou no botão "Clear";
         if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width/2 + 60,height-40, 110, 30)){
             context.curve.clear();
+            context.pos.clear();
+            context.stop();
             this.setState(new DrawningState(context));
             context.selectedSegments = new int[0];
             return;
@@ -56,6 +58,15 @@ public class StateContext {
 
             this.setState(new OverSketchState(context));
             context.selectedSegments = new int[0];
+            return;
+        }
+
+        if(Utils.mouseOverRect(new PVector(mouseX, mouseY),20, height-50, 50, 50)){
+            if(context.isPlayed())
+                context.stop();
+            else
+                context.play(); 
+
             return;
         }
 
@@ -107,7 +118,14 @@ public class StateContext {
 
             case 's' :
                 this.context.curve.decimeCurve();
-            break;    
+            break;   
+
+            case 'p' :
+                if(context.isPlayed())
+                    context.stop();
+                else
+                    context.play();
+             break;     
 
             // Essa tecla é específica para cada estado, entao devemos implementá-la nas classes de State
             case DELETE :
@@ -119,9 +137,27 @@ public class StateContext {
     {
         background (255);
         noFill();
-        if (context.curve.getNumberControlPoints() >=4) 
+        if (context.curve.getNumberControlPoints() >=4 && !context.isPlayed()) 
             context.curve.draw();
         myState.draw();
+
+          if(context.isPlayed()){
+            float lastTime = context.pos.keyTime(context.pos.nKeys()-1);
+            float t = frameCount%int(lastTime);
+            PVector p = context.pos.get(t);
+            PVector tan = context.pos.getTangent(t);
+            stroke(100,100,100);
+            context.pos.draw (100);
+            float ang = atan2(tan.y,tan.x);
+
+            pushMatrix();
+            translate (p.x,p.y);
+            rotate (ang);
+            noStroke();
+            fill(mainColor);
+            ellipse(0,0, 20, 20);
+            popMatrix();
+          }
     }
     void drawInterface()
     {
@@ -152,5 +188,10 @@ public class StateContext {
           text("Curve Tightness:"+curveT, 10, 20);
           text("Tolerance:"+context.curve.tolerance, 10, 40);
         }
+
+        pushMatrix();
+        translate(20, height-50);
+        image(img, 0, 0);
+        popMatrix();
     }
 }

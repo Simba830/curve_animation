@@ -41,7 +41,6 @@ class OverSketchState extends State {
         }
     }
 
-    @Override
     public void mouseReleased() 
     {
         if(this.aux.getNumberControlPoints() == 0){
@@ -77,7 +76,6 @@ class OverSketchState extends State {
         super.mouseReleased();
     }
 
-    @Override
     public void mouseDragged()
     {
         if(context.mouseButton == LEFT){
@@ -89,13 +87,12 @@ class OverSketchState extends State {
 
     }
 
-    @Override
     public void draw()
     {
         if (this.aux.getNumberControlPoints() >=4) 
             this.aux.draw();
 
-        context.curve.drawControlPoints();
+        //context.curve.drawControlPoints();
         if(context.selectedSegments.length == 0)
         {
             // Desenha caixa de seleção com Alpha 50
@@ -112,7 +109,7 @@ class OverSketchState extends State {
         {
             for (int i = 0; i<context.selectedSegments.length; i++)
             {
-                context.curve.drawControlPoint(context.selectedSegments[i]);
+                //context.curve.drawControlPoint(context.selectedSegments[i]);
             }
         }
     }

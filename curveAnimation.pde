@@ -2,7 +2,6 @@
  AnimationApp.pde
  Author: Guilherme Herzog
  Created on: May 13
- 
  **/
 
  // import java.awt.event.*;
@@ -29,6 +28,9 @@ color mainColor = #0066C8;
 color secondaryColor = #FF9700;
 color thirdColor = #3990E3;
 
+// Images
+PImage img;
+
 public void setup() 
 {
   size(800, 600);
@@ -36,7 +38,7 @@ public void setup()
 
   font = createFont("", 14);
   curveT = 0;
-  
+  img = loadImage("play.png");
 
   // PVectors used to create the selection box
   mouseInit = new PVector(0,0);
