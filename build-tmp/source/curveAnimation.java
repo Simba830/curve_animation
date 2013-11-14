@@ -20,8 +20,6 @@ public class curveAnimation extends PApplet {
  Created on: May 13
  **/
 
- // import java.awt.event.*;
-
 PFont font; // it's a font
 float curveT;
 
@@ -60,12 +58,6 @@ public void setup()
   mouseInit = new PVector(0,0);
   mouseFinal = new PVector(0,0);
 
-  // Add a listener to the mouseWheel
-  // addMouseWheelListener(new MouseWheelListener() { 
-  //   public void mouseWheelMoved(MouseWheelEvent mwe) { 
-  //     mouseWheel(mwe.getWheelRotation());
-  // }}); 
-
   curveTightness(curveT);
 
   context = new Context();
@@ -75,14 +67,6 @@ public void setup()
   stateContext = new StateContext(context);
   stateContext.setContext(context);
 }
-
-// // TODO Pensar em como portar isso para o Javascript
-// void mouseWheel(float delta) {
-//   curveT += delta/10;
-//   curveT = constrain(curveT, -1.0, 1.0);
-
-//   curveTightness(curveT); 
-// }
 
 // TODO Mudar isso para um interface s\u00f3 usando o mouse
 public void keyPressed() 
@@ -166,7 +150,6 @@ class Context{
 		this.curve.setTolerance(7);
 
 		pos = new SmoothPositionInterpolator();
-
 		play = false;
 	}
 
@@ -209,12 +192,37 @@ class Context{
 
 	public void play(){
 		frameCount = 0;
-		float t = 0;
-		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
+		pos.clear();
+
+		float length = curve.curveLength(), distance = 0, t = 0;
+		float speed = length/200;
+
+		for (int i = 0; i<curve.getNumberControlPoints(); i++){
 			PVector p = curve.getControlPoint(i);
 			PVector pNext = curve.getControlPoint(i + 1);
 
-			t += p.dist(pNext);
+			distance = p.dist(pNext);
+			t += distance/speed;
+
+			pos.set(t, p);
+		}
+
+		play = true;
+	}
+
+	public void refreshInterpolator(){
+		pos.clear();
+
+		float length = curve.curveLength(), distance = 0, t = 0;
+		float speed = length/200;
+
+		for (int i = 0; i<curve.getNumberControlPoints(); i++){
+			PVector p = curve.getControlPoint(i);
+			PVector pNext = curve.getControlPoint(i + 1);
+
+			distance = p.dist(pNext);
+			t += distance/speed;
+
 			pos.set(t, p);
 		}
 
@@ -731,6 +739,8 @@ class EditingState extends State {
         {
             context.selectedSegments = context.curve.getControlPointsBetween(context.mouseInit, context.mouseFinal);
         }
+
+        context.refreshInterpolator();
     }
 
     public void mouseDragged()
@@ -773,6 +783,8 @@ class EditingState extends State {
 
           }
         }
+
+        context.refreshInterpolator();
     }
 
     public void keyPressed(){
@@ -1383,7 +1395,7 @@ public class StateContext {
     {
         background (255);
         noFill();
-        if (context.curve.getNumberControlPoints() >=4 && !context.isPlayed()) 
+        if (context.curve.getNumberControlPoints() >=4) 
             context.curve.draw();
         myState.draw();
 

@@ -83,6 +83,8 @@ class EditingState extends State {
         {
             context.selectedSegments = context.curve.getControlPointsBetween(context.mouseInit, context.mouseFinal);
         }
+
+        context.refreshInterpolator();
     }
 
     public void mouseDragged()
@@ -125,6 +127,8 @@ class EditingState extends State {
 
           }
         }
+
+        context.refreshInterpolator();
     }
 
     public void keyPressed(){

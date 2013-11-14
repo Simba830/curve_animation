@@ -137,7 +137,7 @@ public class StateContext {
     {
         background (255);
         noFill();
-        if (context.curve.getNumberControlPoints() >=4 && !context.isPlayed()) 
+        if (context.curve.getNumberControlPoints() >=4) 
             context.curve.draw();
         myState.draw();
 
