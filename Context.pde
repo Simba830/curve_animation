@@ -63,13 +63,12 @@ class Context{
 		pos.clear();
 
 		float length = curve.curveLength(), distance = 0, t = 0;
-		float speed = length/200;
+		float speed = length/500;
 
-		for (int i = 0; i<curve.getNumberControlPoints(); i++){
+		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
 			PVector p = curve.getControlPoint(i);
-			PVector pNext = curve.getControlPoint(i + 1);
 
-			distance = p.dist(pNext);
+			distance = curve.curveLengthBetweenControlPoints(i, i + 1);
 			t += distance/speed;
 
 			pos.set(t, p);
@@ -79,16 +78,20 @@ class Context{
 	}
 
 	void refreshInterpolator(){
+
+		if(!this.isPlayed()){
+			return;
+		}
+
 		pos.clear();
 
 		float length = curve.curveLength(), distance = 0, t = 0;
 		float speed = length/200;
 
-		for (int i = 0; i<curve.getNumberControlPoints(); i++){
+		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
 			PVector p = curve.getControlPoint(i);
-			PVector pNext = curve.getControlPoint(i + 1);
-
-			distance = p.dist(pNext);
+			
+			distance = curve.curveLengthBetweenControlPoints(i, i + 1);
 			t += distance/speed;
 
 			pos.set(t, p);

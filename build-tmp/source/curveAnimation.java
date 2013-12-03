@@ -195,13 +195,12 @@ class Context{
 		pos.clear();
 
 		float length = curve.curveLength(), distance = 0, t = 0;
-		float speed = length/200;
+		float speed = length/500;
 
-		for (int i = 0; i<curve.getNumberControlPoints(); i++){
+		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
 			PVector p = curve.getControlPoint(i);
-			PVector pNext = curve.getControlPoint(i + 1);
 
-			distance = p.dist(pNext);
+			distance = curve.curveLengthBetweenControlPoints(i, i + 1);
 			t += distance/speed;
 
 			pos.set(t, p);
@@ -211,16 +210,20 @@ class Context{
 	}
 
 	public void refreshInterpolator(){
+
+		if(!this.isPlayed()){
+			return;
+		}
+
 		pos.clear();
 
 		float length = curve.curveLength(), distance = 0, t = 0;
 		float speed = length/200;
 
-		for (int i = 0; i<curve.getNumberControlPoints(); i++){
+		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
 			PVector p = curve.getControlPoint(i);
-			PVector pNext = curve.getControlPoint(i + 1);
-
-			distance = p.dist(pNext);
+			
+			distance = curve.curveLengthBetweenControlPoints(i, i + 1);
 			t += distance/speed;
 
 			pos.set(t, p);
@@ -517,6 +520,27 @@ class CurveCat
     return (float)curveLength;
   }
 
+  public float curveLengthBetweenControlPoints(int pBegin, int pEnd)
+  {
+    float curveLength = 0;
+    for (int i = pBegin; i < pEnd; i++) {
+      Segment seg = getSegment(i);
+
+      for (int j=0; j<=numberDivisions; j++) 
+      {
+        float t = (float)(j) / (float)(numberDivisions);
+        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
+        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+        t = (float)(j+1) / (float)(numberDivisions);
+        float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
+        float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+        float dist = dist (x, y, x2, y2);
+        curveLength += dist;
+      }
+    }
+    return (float)curveLength;
+  }
+
   public void reAmostragem()
   {
     CurveCat aux = new CurveCat();
@@ -745,6 +769,8 @@ class EditingState extends State {
 
     public void mouseDragged()
     {
+        context.stop();
+
         if (context.mouseButton == LEFT)
         {
           // Se tiver selecionado v\u00e1rios mant\u00e9m a mesma movimenta\u00e7\u00e3o
@@ -799,7 +825,7 @@ class EditingState extends State {
 
     public void draw()
     {
-        //context.curve.drawControlPoints();
+        context.curve.drawControlPoints();
         if(context.selectedSegments.length == 0)
         {
             // Desenha caixa de sele\u00e7\u00e3o com Alpha 50
@@ -816,7 +842,7 @@ class EditingState extends State {
         {
             for (int i = 0; i<context.selectedSegments.length; i++)
             {
-                //context.curve.drawControlPoint(context.selectedSegments[i]);
+                context.curve.drawControlPoint(context.selectedSegments[i]);
             }
         }
     }

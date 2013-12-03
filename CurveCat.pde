@@ -281,6 +281,27 @@ class CurveCat
     return (float)curveLength;
   }
 
+  float curveLengthBetweenControlPoints(int pBegin, int pEnd)
+  {
+    float curveLength = 0;
+    for (int i = pBegin; i < pEnd; i++) {
+      Segment seg = getSegment(i);
+
+      for (int j=0; j<=numberDivisions; j++) 
+      {
+        float t = (float)(j) / (float)(numberDivisions);
+        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
+        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+        t = (float)(j+1) / (float)(numberDivisions);
+        float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
+        float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+        float dist = dist (x, y, x2, y2);
+        curveLength += dist;
+      }
+    }
+    return (float)curveLength;
+  }
+
   void reAmostragem()
   {
     CurveCat aux = new CurveCat();

@@ -89,6 +89,8 @@ class EditingState extends State {
 
     public void mouseDragged()
     {
+        context.stop();
+
         if (context.mouseButton == LEFT)
         {
           // Se tiver selecionado vários mantém a mesma movimentação
@@ -143,7 +145,7 @@ class EditingState extends State {
 
     public void draw()
     {
-        //context.curve.drawControlPoints();
+        context.curve.drawControlPoints();
         if(context.selectedSegments.length == 0)
         {
             // Desenha caixa de seleção com Alpha 50
@@ -160,7 +162,7 @@ class EditingState extends State {
         {
             for (int i = 0; i<context.selectedSegments.length; i++)
             {
-                //context.curve.drawControlPoint(context.selectedSegments[i]);
+                context.curve.drawControlPoint(context.selectedSegments[i]);
             }
         }
     }
