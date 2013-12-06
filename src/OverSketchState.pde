@@ -29,6 +29,7 @@ class OverSketchState extends State {
             context.selectedSegments[0] = selectedSegment;
 
             this.aux = new CurveCat();
+            this.aux.strokeColor = color(0,0,0,50);
 
             for (int i = 0; i<selectedSegment; i++){
                 q = context.curve.getControlPoint(i);
@@ -40,7 +41,6 @@ class OverSketchState extends State {
         }
     }
 
-    @Override
     public void mouseReleased() 
     {
         if(this.aux.getNumberControlPoints() == 0){
@@ -71,10 +71,11 @@ class OverSketchState extends State {
         context.curve = null;
         context.curve = aux;
 
+        context.curve.strokeColor = color(0);
+
         super.mouseReleased();
     }
 
-    @Override
     public void mouseDragged()
     {
         if(context.mouseButton == LEFT){
@@ -86,13 +87,12 @@ class OverSketchState extends State {
 
     }
 
-    @Override
     public void draw()
     {
         if (this.aux.getNumberControlPoints() >=4) 
             this.aux.draw();
 
-        context.curve.drawControlPoints();
+        //context.curve.drawControlPoints();
         if(context.selectedSegments.length == 0)
         {
             // Desenha caixa de seleção com Alpha 50
@@ -109,7 +109,7 @@ class OverSketchState extends State {
         {
             for (int i = 0; i<context.selectedSegments.length; i++)
             {
-                context.curve.drawControlPoint(context.selectedSegments[i]);
+                //context.curve.drawControlPoint(context.selectedSegments[i]);
             }
         }
     }

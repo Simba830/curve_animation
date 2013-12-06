@@ -1,11 +1,12 @@
 class DrawningState extends State {
 
-
     float distanceToSelect = 5;
     private boolean canSketch;
 
     DrawningState(Context _context){
       super(_context);
+
+      context.curve.decimeAll();
     }
 
     public void mousePressed() 
@@ -16,13 +17,14 @@ class DrawningState extends State {
       if (selectedSegment == context.curve.getNumberControlPoints()-1){ canSketch = true; }
       else { canSketch = false; }
         
-      if (canSketch)
+      if (canSketch){
         this.context.curve.insertPoint(this.context.mouse);
-      
+      }
     }
     
     public void mouseReleased(PVector mouse) 
     {
+        super.mouseReleased();
     	  // Retorna o estado de poder desenhar para FALSE
         canSketch = false;
     }

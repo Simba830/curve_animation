@@ -8,17 +8,20 @@ class CurveCat
 
   // If it can be decimed
   boolean decimable;
+  float tolerance;
 
   // Number of points that the curve can be show
-  int numberDivisions = 2000; 
+  int numberDivisions = 10; 
 
   // Min Ditance wich can be in the curve
   float minDistance = 5;
+  color strokeColor = color(0);
 
   CurveCat() 
   {
     controlPoints = new ArrayList<PVector>();
     decimable = true;
+    tolerance = 7;
   }
 
   void clear()
@@ -28,7 +31,8 @@ class CurveCat
   }
 
   void removeElement(int index){
-    controlPoints.remove(index);
+    if (controlPoints.size()>1)
+      controlPoints.remove(index);
   }
 
   Segment getSegment(ArrayList<PVector> pAux, int i)
@@ -113,6 +117,17 @@ class CurveCat
       this.decimable = wasDecimed;
   }
 
+  void decimeAll(){
+    while(this.canBeDecimed()){
+      this.decimeCurve(this.tolerance);
+    }  
+  }
+
+  void setTolerance(float t){
+    this.tolerance = t;
+  }
+  
+
   boolean canBeDecimed(){
     return this.decimable;
   }
@@ -138,14 +153,14 @@ class CurveCat
     try {
       controlPoints.set(index,q);    
     } catch (Exception e) {
-        print("Erro ao setar ponto de controle");
+        //print("Erro ao setar ponto de controle");
     }
   }
 
   // Retorna as coordenadas (X,Y) para de uma lista de PVectors p dado o index.
   PVector getControlPoint(int index)
   {
-    if (controlPoints.size() > index)
+    if (controlPoints.size() > index && index >-1)
       return controlPoints.get(index);
     else
       return new PVector(0,0);
@@ -266,7 +281,53 @@ class CurveCat
     return (float)curveLength;
   }
 
+  float curveLengthBetweenControlPoints(int pBegin, int pEnd)
+  {
+    float curveLength = 0;
+    for (int i = pBegin; i < pEnd; i++) {
+      Segment seg = getSegment(i);
 
+      for (int j=0; j<=numberDivisions; j++) 
+      {
+        float t = (float)(j) / (float)(numberDivisions);
+        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
+        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+        t = (float)(j+1) / (float)(numberDivisions);
+        float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
+        float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+        float dist = dist (x, y, x2, y2);
+        curveLength += dist;
+      }
+    }
+    return (float)curveLength;
+  }
+
+  void reAmostragem()
+  {
+    CurveCat aux = new CurveCat();
+    int index = 0;
+    for (int i = 0; i < getNumberControlPoints()-1; i++) {
+      Segment seg = getSegment(i);
+
+      for (int j=0; j<=numberDivisions; j++) 
+      {
+        float t = (float)(j) / (float)(numberDivisions);
+        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
+        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+
+        aux.insertPoint(new PVector(x,y), index);
+        index++;
+      }
+    }
+
+    this.controlPoints = aux.controlPoints;
+
+    this.decimable = true;
+  }
+
+  void decimeCurve(){
+    this.decimeCurve(this.tolerance);
+  }
 
   /**
    MÉTODOS DE DESENHAR
@@ -274,14 +335,13 @@ class CurveCat
   // Desenha uma curva de acordo com a lista p de pontos de controle.
   void draw()
   { 
-    stroke(0);
+    stroke(this.strokeColor);
     strokeWeight(1.5);
     strokeCap(ROUND);
     for (int i = 0; i < getNumberControlPoints() - 1; i++) {
       Segment seg = getSegment(i);
       curve (seg.a.x, seg.a.y, seg.b.x, seg.b.y, seg.c.x, seg.c.y, seg.d.x, seg.d.y);
     }
-    stroke(0);
   }
 
   // Desenha elipses de acordo com os elementos do tipo PVector da lista p
@@ -299,7 +359,7 @@ class CurveCat
   {
     fill(mainColor);
     stroke(mainColor);
-    if (controlPoints.size() > i)
+    if (controlPoints.size() > i && i>-1)
       ellipse(controlPoints.get(i).x, controlPoints.get(i).y, 10, 10);
   }
 

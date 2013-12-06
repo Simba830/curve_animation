@@ -1,0 +1,7 @@
+{
+    "selector": "source.pde",
+    "cmd": ["cat src/*.pde > $file_path/../curveAnimation.pde && processing-java --sketch=$folder --output=$folder/build-tmp --run --force"],
+    "working_dir": "$file_path/../",
+    "file_regex": "^(...*?):([0-9]*)",
+    "shell": true
+}

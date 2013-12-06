@@ -2,13 +2,12 @@ class State
 {
 	Context context;
     // Constants
-    final float distanceToSelect = 5;
+    final float distanceToSelect = 30;
 
      // Variaveis de Curvas
     int selectedSegment;
     PVector closestPoint;
     PVector q;
-
 
 	State(Context _context){
 		context = _context;
@@ -25,10 +24,9 @@ class State
 
 	};
 	void mouseReleased(){
-		while(context.curve.canBeDecimed()){
-		    context.curve.decimeCurve(context.tolerance);
-		}
+		context.curve.decimeAll();
 	};
+
 	void keyPressed(){
 
 	};
