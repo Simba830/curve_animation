@@ -1,0 +1,4 @@
+{
+	"cmd": ["cat curveAnimation.pde *.pde > $file_path/../web-export/curveAnimation.pde"],
+	"shell": true
+}
