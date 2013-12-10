@@ -14,6 +14,122 @@ import java.io.IOException;
 
 public class curveAnimation extends PApplet {
 
+/**
+ AnimationApp.pde
+ Author: Guilherme Herzog
+ Created on: May 13
+ **/
+
+PFont font; // it's a font
+float curveT;
+
+// Curve
+CurveCat curve;
+CurveCat decimedCurve;
+
+// Selection Box
+PVector mouseInit;
+PVector mouseFinal;
+
+// State Context
+StateContext stateContext;
+
+// Context
+Context context;
+
+// Colours
+int mainColor = 0xff0066C8;
+int secondaryColor = 0xffFF9700;
+int thirdColor = 0xff3990E3;
+
+// Images
+PImage img;
+
+public void setup() 
+{
+  size(800, 600);
+  smooth();
+
+  font = createFont("", 14);
+  curveT = 0;
+  img = loadImage("play.png");
+
+  // PVectors used to create the selection box
+  mouseInit = new PVector(0,0);
+  mouseFinal = new PVector(0,0);
+
+  curveTightness(curveT);
+
+  context = new Context();
+  update();
+  context.setSelectionBox(mouseInit, mouseFinal);
+
+  stateContext = new StateContext(context);
+  stateContext.setContext(context);
+}
+
+// TODO Mudar isso para um interface s\u00f3 usando o mouse
+public void keyPressed() 
+{ 
+  update();
+  stateContext.keyPressed();
+}
+
+// Mouse press callback
+public void mousePressed() 
+{
+  mouseInit.set(mouseX, mouseY);
+  mouseFinal.set(mouseX, mouseY);
+  update();
+  stateContext.mousePressed();
+}
+    
+public void mouseReleased()
+{
+
+  update();
+  stateContext.mouseReleased();
+
+  // Resets dragged rectangle
+  mouseInit.set(0,0);
+  mouseFinal.set(0,0);
+  update();
+}
+
+// Mouse drag callback
+public void mouseDragged () 
+{
+  update();
+  mouseFinal.set(mouseX, mouseY);
+  stateContext.mouseDragged();
+}
+
+
+public void draw() 
+{
+  update();
+  stateContext.draw();
+  stateContext.drawInterface();
+}
+
+public void update(){
+  context.updateContext(
+    new PVector(mouseX, mouseY),
+    new PVector(pmouseX, pmouseY), 
+    mouseButton,
+    keyCode, 
+    key,
+    mouseInit,
+    mouseFinal);
+
+    try{
+      context.setMouseCount(mouseEvent.getClickCount());
+    }catch(NullPointerException e){
+      context.setMouseCount(0);
+    }
+}
+
+
 class Context{
 	PVector mouse;
 	PVector pMouse;
@@ -120,7 +236,8 @@ class Context{
 		play = false;
 	}
 
-}//
+}
+//
 // Classe que representa uma curva Catmull-Rom
 //
 class CurveCat
@@ -560,7 +677,8 @@ class DrawningState extends State {
       text("Creating", posX, posY);
     }
  
-}class EditingState extends State {
+}
+class EditingState extends State {
 
     int cpsMovimenteds = 5;
 
@@ -741,7 +859,8 @@ class DrawningState extends State {
         text("Editing", posX, posY);
     }
  
-}// Linearly interpolates properties for a specific
+}
+// Linearly interpolates properties for a specific
 // time, given values of these properties at 
 // known times (keyframes)
 class Interpolator {
@@ -948,7 +1067,8 @@ class OverSketchState extends State {
         text("OverSketch", posX, posY);
     }
  
-}// A property is an array of floats representing a
+}
+// A property is an array of floats representing a
 // multidimensional point
 class Property extends ArrayList<Float> {
   
@@ -1161,7 +1281,8 @@ class State
 	public void draw(){};
 	public void drawInterface(){};
 }
-	public class StateContext {
+	
+public class StateContext {
 
     private State myState;
     private Context context;
@@ -1357,7 +1478,8 @@ class State
         image(img, 0, 0);
         popMatrix();
     }
-}static class Utils{
+}
+static class Utils{
   
   public static void printArrayPVector(PVector[] p)
   {
