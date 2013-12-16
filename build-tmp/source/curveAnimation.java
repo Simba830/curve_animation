@@ -250,7 +250,7 @@ class CurveCat
   float tolerance;
 
   // Number of points that the curve can be show
-  int numberDivisions = 10; 
+  int numberDivisions = 1000; 
 
   // Min Ditance wich can be in the curve
   float minDistance = 5;
@@ -276,7 +276,6 @@ class CurveCat
 
   public Segment getSegment(ArrayList<PVector> pAux, int i)
   { 
-         //printArray(pAux);
          PVector a = i >= 1 ? pAux.get(i-1) : pAux.get(0);
          PVector b = pAux.get(i);
          PVector c = pAux.get(i+1);
@@ -289,6 +288,7 @@ class CurveCat
          return getSegment(controlPoints,i);
   }
 
+  // M\u00e9todo que retorna os principais controlPoints que s\u00e3o essenciais para a curva
   public ArrayList<PVector> DouglasPeuckerReducing(ArrayList<PVector> cpoints, float epsilon){
     float maxDistance = 0, distance = 0;
     int index = 0;
@@ -305,18 +305,22 @@ class CurveCat
 
     if(maxDistance > epsilon){
       ArrayList<PVector> results1, results2;
+
+      // Fiz isso aqui porque n\u00e3o posso modificar o cpoints
       ArrayList<PVector> tmp = new ArrayList<PVector>();
       for (int i = index; i < end - 1; ++i) {
           tmp.add(cpoints.get(i));
       }
       results1 = DouglasPeuckerReducing(tmp, epsilon);
 
+      // Fiz isso aqui porque n\u00e3o posso modificar o cpoints
       tmp = new ArrayList<PVector>();
       for (int i = 1; i < index; ++i) {
           tmp.add(cpoints.get(i));
       }
       results2 = DouglasPeuckerReducing(tmp, epsilon);
 
+      // Concatenando dois arrays, por que tinha que ser t\u00e3o dif\u00edcil ? Custava retornar o array novo ?
       results1.addAll(results2);
       result = (ArrayList<PVector>) results1.clone();
     }else{
@@ -326,6 +330,7 @@ class CurveCat
     return result;
   }
 
+  // M\u00e9todo para percorrer um segmento de reta que come\u00e7a em segBegin e terminar em segEnd vendo qual menor distancia para o vetor cpoint
   public float shortestDistanceToSegment(PVector cpoint, PVector segBegin, PVector segEnd){
     PVector tmp = (PVector) segEnd.get();
     tmp.sub(segBegin);
@@ -370,18 +375,24 @@ class CurveCat
 
       boolean wasDecimed = false;
 
+      // Pego os vetores essenciais para a curva
       ArrayList<PVector> essentials = DouglasPeuckerReducing(controlPoints, 0.5f);
+
+      // Array que vai conter os vetores a serem testados
       ArrayList<PVector> testableControlPoints = (ArrayList<PVector>) controlPoints.clone();
 
+      // Removendo os pontos essenciais dos test\u00e1veis
       for (int i = 0; i < essentials.size(); ++i) {
         testableControlPoints.remove(essentials.get(i));
       }
 
+      // Percorre os test\u00e1veis removendo e verificando com a toler\u00e2ncia.
       for(int i = 1; i < testableControlPoints.size() - 1; i++){
 
          pAux = new ArrayList<PVector>(controlPoints.size());
          pAux = (ArrayList<PVector>) controlPoints.clone();
 
+         // Pega o vetor e procura qual o indice dele nos controlPoints
          int index = controlPoints.indexOf( testableControlPoints.get(i) );
          pAux.remove(index);
          segAux = getSegment(pAux,index-1);
@@ -423,10 +434,14 @@ class CurveCat
   }
 
   public void decimeAll(){
+    // Testando velocidade do novo jeito de simplificar a curva, tempo inicial
     long tBegin = System.currentTimeMillis();
+
     while(this.canBeDecimed()){
       this.decimeCurve(this.tolerance);
     }  
+
+    // Tempo final e depois exibe quanto tempo passou
     long tEnd = System.currentTimeMillis();
     long time = tEnd - tBegin;
     println("time: "+ time + "ms");
