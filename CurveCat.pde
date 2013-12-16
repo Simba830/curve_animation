@@ -37,7 +37,6 @@ class CurveCat
 
   Segment getSegment(ArrayList<PVector> pAux, int i)
   { 
-         //printArray(pAux);
          PVector a = i >= 1 ? pAux.get(i-1) : pAux.get(0);
          PVector b = pAux.get(i);
          PVector c = pAux.get(i+1);
@@ -50,6 +49,7 @@ class CurveCat
          return getSegment(controlPoints,i);
   }
 
+  // Método que retorna os principais controlPoints que são essenciais para a curva
   ArrayList<PVector> DouglasPeuckerReducing(ArrayList<PVector> cpoints, float epsilon){
     float maxDistance = 0, distance = 0;
     int index = 0;
@@ -66,18 +66,22 @@ class CurveCat
 
     if(maxDistance > epsilon){
       ArrayList<PVector> results1, results2;
+
+      // Fiz isso aqui porque não posso modificar o cpoints
       ArrayList<PVector> tmp = new ArrayList<PVector>();
       for (int i = index; i < end - 1; ++i) {
           tmp.add(cpoints.get(i));
       }
       results1 = DouglasPeuckerReducing(tmp, epsilon);
 
+      // Fiz isso aqui porque não posso modificar o cpoints
       tmp = new ArrayList<PVector>();
       for (int i = 1; i < index; ++i) {
           tmp.add(cpoints.get(i));
       }
       results2 = DouglasPeuckerReducing(tmp, epsilon);
 
+      // Concatenando dois arrays, por que tinha que ser tão difícil ? Custava retornar o array novo ?
       results1.addAll(results2);
       result = (ArrayList<PVector>) results1.clone();
     }else{
@@ -87,6 +91,7 @@ class CurveCat
     return result;
   }
 
+  // Método para percorrer um segmento de reta que começa em segBegin e terminar em segEnd vendo qual menor distancia para o vetor cpoint
   float shortestDistanceToSegment(PVector cpoint, PVector segBegin, PVector segEnd){
     PVector tmp = (PVector) segEnd.get();
     tmp.sub(segBegin);
@@ -131,18 +136,24 @@ class CurveCat
 
       boolean wasDecimed = false;
 
+      // Pego os vetores essenciais para a curva
       ArrayList<PVector> essentials = DouglasPeuckerReducing(controlPoints, 0.5);
+
+      // Array que vai conter os vetores a serem testados
       ArrayList<PVector> testableControlPoints = (ArrayList<PVector>) controlPoints.clone();
 
+      // Removendo os pontos essenciais dos testáveis
       for (int i = 0; i < essentials.size(); ++i) {
         testableControlPoints.remove(essentials.get(i));
       }
 
+      // Percorre os testáveis removendo e verificando com a tolerância.
       for(int i = 1; i < testableControlPoints.size() - 1; i++){
 
          pAux = new ArrayList<PVector>(controlPoints.size());
          pAux = (ArrayList<PVector>) controlPoints.clone();
 
+         // Pega o vetor e procura qual o indice dele nos controlPoints
          int index = controlPoints.indexOf( testableControlPoints.get(i) );
          pAux.remove(index);
          segAux = getSegment(pAux,index-1);
@@ -184,10 +195,14 @@ class CurveCat
   }
 
   void decimeAll(){
+    // Testando velocidade do novo jeito de simplificar a curva, tempo inicial
     long tBegin = System.currentTimeMillis();
+
     while(this.canBeDecimed()){
       this.decimeCurve(this.tolerance);
     }  
+
+    // Tempo final e depois exibe quanto tempo passou
     long tEnd = System.currentTimeMillis();
     long time = tEnd - tBegin;
     println("time: "+ time + "ms");
