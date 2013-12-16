@@ -50,6 +50,64 @@ class CurveCat
          return getSegment(controlPoints,i);
   }
 
+  ArrayList<PVector> DouglasPeuckerReducing(ArrayList<PVector> cpoints, float epsilon){
+    float maxDistance = 0, distance = 0;
+    int index = 0;
+    int end = cpoints.size();
+    ArrayList<PVector> result;
+
+    for (int i = 2; i < end - 1; ++i) {
+      distance = shortestDistanceToSegment(cpoints.get(i), cpoints.get(1), cpoints.get(end - 1));
+      if( distance > maxDistance){
+        maxDistance = distance;
+        index = i;
+      }
+    }
+
+    if(maxDistance > epsilon){
+      ArrayList<PVector> results1, results2;
+      ArrayList<PVector> tmp = new ArrayList<PVector>();
+      for (int i = index; i < end - 1; ++i) {
+          tmp.add(cpoints.get(i));
+      }
+      results1 = DouglasPeuckerReducing(tmp, epsilon);
+
+      tmp = new ArrayList<PVector>();
+      for (int i = 1; i < index; ++i) {
+          tmp.add(cpoints.get(i));
+      }
+      results2 = DouglasPeuckerReducing(tmp, epsilon);
+
+      results1.addAll(results2);
+      result = (ArrayList<PVector>) results1.clone();
+    }else{
+      result = cpoints;
+    }
+
+    return result;
+  }
+
+  float shortestDistanceToSegment(PVector cpoint, PVector segBegin, PVector segEnd){
+    PVector tmp = (PVector) segEnd.get();
+    tmp.sub(segBegin);
+
+    int numberDivisions = 100;
+    float dX = tmp.mag()/numberDivisions;
+
+    float distance = 99999;
+
+    for (int i = 0; i < numberDivisions; ++i) {
+        tmp = segEnd.get();
+        tmp.mult(i*dX);
+        tmp = PVector.add(segBegin, tmp);
+        if(tmp.dist(cpoint) < distance){
+          distance = tmp.dist(cpoint);
+        }
+    }
+
+    return distance;
+  }
+
   // Remove pontos de controle de uma curva criada pela lista p que possuam distancia menor que a tolerancia em relação aos pontos da nova curva.
   void decimeCurve(float tolerance)
   {
@@ -65,7 +123,7 @@ class CurveCat
       
       boolean remove;
      
-      int size = controlPoints.size() -1;
+      int size = controlPoints.size() - 1;
       
       Segment segAux;
       Segment segP;
@@ -73,11 +131,21 @@ class CurveCat
 
       boolean wasDecimed = false;
 
-      for(int i = 1; i < size; i++){
+      ArrayList<PVector> essentials = DouglasPeuckerReducing(controlPoints, 0.5);
+      ArrayList<PVector> testableControlPoints = (ArrayList<PVector>) controlPoints.clone();
+
+      for (int i = 0; i < essentials.size(); ++i) {
+        testableControlPoints.remove(essentials.get(i));
+      }
+
+      for(int i = 1; i < testableControlPoints.size() - 1; i++){
+
          pAux = new ArrayList<PVector>(controlPoints.size());
          pAux = (ArrayList<PVector>) controlPoints.clone();
-         pAux.remove(i);
-         segAux = getSegment(pAux,i-1);
+
+         int index = controlPoints.indexOf( testableControlPoints.get(i) );
+         pAux.remove(index);
+         segAux = getSegment(pAux,index-1);
          remove = true;
          
          for (int j=0; j<=numberDivisions; j++) 
@@ -86,12 +154,12 @@ class CurveCat
             float tAux;
             if (t < 0.5)
             {
-                 segP = getSegment(controlPoints,i-1);
+                 segP = getSegment(controlPoints,index-1);
                  tAux = t*2;     
             } 
             else 
             {
-                segP = getSegment(controlPoints,i);
+                segP = getSegment(controlPoints,index);
                 tAux = t*2 - 1;
             }
             
@@ -106,10 +174,8 @@ class CurveCat
          }
          
          if(remove){
-           this.removeElement(i);
+           this.controlPoints.remove(index);
            wasDecimed = true;
-           i--;
-           size--;
          }
          
       }
@@ -118,9 +184,13 @@ class CurveCat
   }
 
   void decimeAll(){
+    long tBegin = System.currentTimeMillis();
     while(this.canBeDecimed()){
       this.decimeCurve(this.tolerance);
     }  
+    long tEnd = System.currentTimeMillis();
+    long time = tEnd - tBegin;
+    println("time: "+ time + "ms");
   }
 
   void setTolerance(float t){
