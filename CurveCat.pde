@@ -176,9 +176,13 @@ class CurveCat
             
             float x = curvePoint(segAux.a.x, segAux.b.x, segAux.c.x, segAux.d.x, t);
             float y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, t);
+            PVector v1 = new PVector(x,y);
+
             float x2 = curvePoint(segP.a.x, segP.b.x, segP.c.x, segP.d.x, tAux);
             float y2 = curvePoint(segP.a.y, segP.b.y, segP.c.y, segP.d.y, tAux);
-            float dist = dist (x, y, x2, y2);
+            PVector v2 = new PVector(x2,y2);
+
+            float dist = v1.dist(v2);
             if(dist >= tolerance){
                remove = false;
             }
@@ -195,17 +199,9 @@ class CurveCat
   }
 
   void decimeAll(){
-    // Testando velocidade do novo jeito de simplificar a curva, tempo inicial
-    long tBegin = System.currentTimeMillis();
-
     while(this.canBeDecimed()){
       this.decimeCurve(this.tolerance);
     }  
-
-    // Tempo final e depois exibe quanto tempo passou
-    long tEnd = System.currentTimeMillis();
-    long time = tEnd - tBegin;
-    println("time: "+ time + "ms");
   }
 
   void setTolerance(float t){

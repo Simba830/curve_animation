@@ -194,16 +194,11 @@ class Context{
 		frameCount = 0;
 		pos.clear();
 
-		float length = curve.curveLength(), distance = 0, t = 0;
-		float speed = length/500;
 
 		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
 			PVector p = curve.getControlPoint(i);
 
-			distance = curve.curveLengthBetweenControlPoints(i, i + 1);
-			t += distance/speed;
-
-			pos.set(t, p);
+			pos.set(p.z, p);
 		}
 
 		play = true;
@@ -217,16 +212,12 @@ class Context{
 
 		pos.clear();
 
-		float length = curve.curveLength(), distance = 0, t = 0;
-		float speed = length/200;
+		float length = curve.curveLength();
 
 		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
 			PVector p = curve.getControlPoint(i);
-			
-			distance = curve.curveLengthBetweenControlPoints(i, i + 1);
-			t += distance/speed;
 
-			pos.set(t, p);
+			pos.set(p.z, p);
 		}
 
 		play = true;
@@ -415,9 +406,13 @@ class CurveCat
             
             float x = curvePoint(segAux.a.x, segAux.b.x, segAux.c.x, segAux.d.x, t);
             float y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, t);
+            PVector v1 = new PVector(x,y);
+
             float x2 = curvePoint(segP.a.x, segP.b.x, segP.c.x, segP.d.x, tAux);
             float y2 = curvePoint(segP.a.y, segP.b.y, segP.c.y, segP.d.y, tAux);
-            float dist = dist (x, y, x2, y2);
+            PVector v2 = new PVector(x2,y2);
+
+            float dist = v1.dist(v2);
             if(dist >= tolerance){
                remove = false;
             }
@@ -434,17 +429,9 @@ class CurveCat
   }
 
   public void decimeAll(){
-    // Testando velocidade do novo jeito de simplificar a curva, tempo inicial
-    long tBegin = System.currentTimeMillis();
-
     while(this.canBeDecimed()){
       this.decimeCurve(this.tolerance);
     }  
-
-    // Tempo final e depois exibe quanto tempo passou
-    long tEnd = System.currentTimeMillis();
-    long time = tEnd - tBegin;
-    println("time: "+ time + "ms");
   }
 
   public void setTolerance(float t){
@@ -709,6 +696,7 @@ class DrawningState extends State {
 
     float distanceToSelect = 5;
     private boolean canSketch;
+    float t, ms;
 
     DrawningState(Context _context){
       super(_context);
@@ -718,6 +706,8 @@ class DrawningState extends State {
 
     public void mousePressed() 
     {
+      t = 0;
+      ms = frameCount;
       // Ent\u00e3o seleciona o mais pr\u00f3ximo
       int selectedSegment = context.curve.findControlPoint(context.mouse);
       // Verifica se o local clicado \u00e9 proximo do final da curva;
@@ -737,8 +727,17 @@ class DrawningState extends State {
     }
     public void mouseDragged()
     {	
-      if (canSketch)
+      float elapsed = 0;
+      if(frameCount != ms){
+        elapsed = frameCount - ms;
+      }
+      ms = frameCount;
+      t = t + elapsed;
+
+      if (canSketch){
+        context.mouse.add(new PVector(0,0,t));
   		  context.curve.insertPoint(context.mouse, context.curve.getNumberControlPoints());
+      }
     }
 
     public void keyPressed(){
@@ -1510,10 +1509,16 @@ public class StateContext {
             context.curve.draw();
         myState.draw();
 
-          if(context.isPlayed()){
+        if(context.isPlayed()){
             float lastTime = context.pos.keyTime(context.pos.nKeys()-1);
             float t = frameCount%PApplet.parseInt(lastTime);
+
+            // Essa parte faria parar no final da anima\u00e7\u00e3o
+            // if(t == 0)
+            //     context.stop();
+            
             PVector p = context.pos.get(t);
+
             PVector tan = context.pos.getTangent(t);
             stroke(100,100,100);
             context.pos.draw (100);
@@ -1526,7 +1531,9 @@ public class StateContext {
             fill(mainColor);
             ellipse(0,0, 20, 20);
             popMatrix();
-          }
+        }
+
+
     }
     public void drawInterface()
     {
@@ -1588,6 +1595,7 @@ static class Utils{
     }
   }
 }
+
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "curveAnimation" };
     if (passedArgs != null) {

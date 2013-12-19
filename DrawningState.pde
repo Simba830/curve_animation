@@ -2,6 +2,7 @@ class DrawningState extends State {
 
     float distanceToSelect = 5;
     private boolean canSketch;
+    float t, ms;
 
     DrawningState(Context _context){
       super(_context);
@@ -11,6 +12,8 @@ class DrawningState extends State {
 
     public void mousePressed() 
     {
+      t = 0;
+      ms = frameCount;
       // Então seleciona o mais próximo
       int selectedSegment = context.curve.findControlPoint(context.mouse);
       // Verifica se o local clicado é proximo do final da curva;
@@ -30,8 +33,17 @@ class DrawningState extends State {
     }
     public void mouseDragged()
     {	
-      if (canSketch)
+      float elapsed = 0;
+      if(frameCount != ms){
+        elapsed = frameCount - ms;
+      }
+      ms = frameCount;
+      t = t + elapsed;
+
+      if (canSketch){
+        context.mouse.add(new PVector(0,0,t));
   		  context.curve.insertPoint(context.mouse, context.curve.getNumberControlPoints());
+      }
     }
 
     public void keyPressed(){

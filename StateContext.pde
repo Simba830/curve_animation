@@ -141,10 +141,16 @@ public class StateContext {
             context.curve.draw();
         myState.draw();
 
-          if(context.isPlayed()){
+        if(context.isPlayed()){
             float lastTime = context.pos.keyTime(context.pos.nKeys()-1);
             float t = frameCount%int(lastTime);
+
+            // Essa parte faria parar no final da animação
+            // if(t == 0)
+            //     context.stop();
+            
             PVector p = context.pos.get(t);
+
             PVector tan = context.pos.getTangent(t);
             stroke(100,100,100);
             context.pos.draw (100);
@@ -157,7 +163,9 @@ public class StateContext {
             fill(mainColor);
             ellipse(0,0, 20, 20);
             popMatrix();
-          }
+        }
+
+
     }
     void drawInterface()
     {
