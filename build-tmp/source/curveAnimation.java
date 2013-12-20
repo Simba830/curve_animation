@@ -326,14 +326,14 @@ class CurveCat
     PVector tmp = (PVector) segEnd.get();
     tmp.sub(segBegin);
 
-    int numberDivisions = 100;
-    float dX = tmp.mag()/numberDivisions;
+    int numberDivisions = 1000;
+    float delta = tmp.mag()/numberDivisions;
 
     float distance = 99999;
 
     for (int i = 0; i < numberDivisions; ++i) {
         tmp = segEnd.get();
-        tmp.mult(i*dX);
+        tmp.mult(i*delta);
         tmp = PVector.add(segBegin, tmp);
         if(tmp.dist(cpoint) < distance){
           distance = tmp.dist(cpoint);
@@ -651,7 +651,35 @@ class CurveCat
     strokeCap(ROUND);
     for (int i = 0; i < getNumberControlPoints() - 1; i++) {
       Segment seg = getSegment(i);
-      curve (seg.a.x, seg.a.y, seg.b.x, seg.b.y, seg.c.x, seg.c.y, seg.d.x, seg.d.y);
+        
+      beginShape();
+      curveVertex(seg.a.x, seg.a.y);
+      curveVertex(seg.b.x, seg.b.y);
+      curveVertex(seg.c.x, seg.c.y);
+      curveVertex(seg.d.x, seg.d.y);
+      endShape();
+      // curve (seg.a.x, seg.a.y, seg.b.x, seg.b.y, seg.c.x, seg.c.y, seg.d.x, seg.d.y);
+
+      // for (int j=0; j<=1000; j++) 
+      // {
+      //   float t = (float)(j) / (float)(numberDivisions);
+      //   float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
+      //   float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+      //   t = (float)(j+1) / (float)(numberDivisions);
+      //   float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
+      //   float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+
+      //   PVector r0 = new PVector(x, y), r1 = new PVector(x2,y2);
+      //   r1.sub(r0);
+
+      //   pushMatrix();
+      //   PVector orthogonal = new PVector((-1)*r1.y, r1.x);
+      //   translate( x + (x - x2)/2, y + (y - y2)/2);
+
+      //   int escalar = 50;
+      //   line(0, 0, orthogonal.x*escalar, orthogonal.y*escalar);
+      //   popMatrix();
+      // }
     }
   }
 
@@ -663,7 +691,8 @@ class CurveCat
     for (int i = 0; i < getNumberControlPoints(); i++) 
     {
       ellipse (controlPoints.get(i).x, controlPoints.get(i).y, 7, 7);
-    }
+      text("t: "+controlPoints.get(i).z, controlPoints.get(i).x + 10, controlPoints.get(i).y - 10);
+    } 
     fill(255);
   }
   public void drawControlPoint(int i)
@@ -867,7 +896,7 @@ class EditingState extends State {
             // Soma aos elementos selecionados
             for (int i = 0; i<context.selectedSegments.length; i++){
               PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[i]);
-              context.curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy), context.selectedSegments[i]);
+              context.curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy, controlPoint.z), context.selectedSegments[i]);
             }
           }else if(context.selectedSegments.length != 0){
 
@@ -888,7 +917,7 @@ class EditingState extends State {
               }
 
               PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[0] + i);
-              context.curve.setPoint(new PVector(controlPoint.x + tdx, controlPoint.y + tdy), context.selectedSegments[0] + i);
+              context.curve.setPoint(new PVector(controlPoint.x + tdx, controlPoint.y + tdy, controlPoint.z), context.selectedSegments[0] + i);
             }
 
           }
@@ -1507,6 +1536,7 @@ public class StateContext {
         noFill();
         if (context.curve.getNumberControlPoints() >=4) 
             context.curve.draw();
+        
         myState.draw();
 
         if(context.isPlayed()){
@@ -1595,7 +1625,6 @@ static class Utils{
     }
   }
 }
-
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "curveAnimation" };
     if (passedArgs != null) {

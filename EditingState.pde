@@ -103,7 +103,7 @@ class EditingState extends State {
             // Soma aos elementos selecionados
             for (int i = 0; i<context.selectedSegments.length; i++){
               PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[i]);
-              context.curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy), context.selectedSegments[i]);
+              context.curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy, controlPoint.z), context.selectedSegments[i]);
             }
           }else if(context.selectedSegments.length != 0){
 
@@ -124,7 +124,7 @@ class EditingState extends State {
               }
 
               PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[0] + i);
-              context.curve.setPoint(new PVector(controlPoint.x + tdx, controlPoint.y + tdy), context.selectedSegments[0] + i);
+              context.curve.setPoint(new PVector(controlPoint.x + tdx, controlPoint.y + tdy, controlPoint.z), context.selectedSegments[0] + i);
             }
 
           }
