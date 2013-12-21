@@ -194,6 +194,10 @@ class Context{
 		frameCount = 0;
 		pos.clear();
 
+		if(curve.getNumberControlPoints() == 0){
+			return;
+		}
+
 
 		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
 			PVector p = curve.getControlPoint(i);
