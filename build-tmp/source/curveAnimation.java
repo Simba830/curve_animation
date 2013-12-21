@@ -236,6 +236,10 @@ class CurveCat
   // Control points
   ArrayList<PVector> controlPoints;
 
+  // History of the curve
+  ArrayList<ArrayList<PVector>> history;
+  int historyIndex = -1;
+
   // If it can be decimed
   boolean decimable;
   float tolerance;
@@ -252,15 +256,19 @@ class CurveCat
     controlPoints = new ArrayList<PVector>();
     decimable = true;
     tolerance = 7;
+
+    history = new ArrayList<ArrayList<PVector>>();
   }
 
   public void clear()
   {
+    saveCurve();
     decimable = true;
     controlPoints = new ArrayList<PVector>();
   }
 
   public void removeElement(int index){
+    saveCurve();
     if (controlPoints.size()>1)
       controlPoints.remove(index);
   }
@@ -429,6 +437,7 @@ class CurveCat
   }
 
   public void decimeAll(){
+    saveCurve();
     while(this.canBeDecimed()){
       this.decimeCurve(this.tolerance);
     }  
@@ -449,11 +458,13 @@ class CurveCat
 
   // Insere o ponto q entre index-1 e index
   public void insertPoint(PVector q, int index){
+    saveCurve();
     controlPoints.add(index,q);
     this.decimable = true;
   }
 
   public void insertPoint(PVector q){
+    saveCurve();
     controlPoints.add(q);
     this.decimable = true;
   }
@@ -640,6 +651,37 @@ class CurveCat
     this.decimeCurve(this.tolerance);
   }
 
+  public void saveCurve(){
+    if(history.size() > 0){
+      if(history.get(history.size() - 1).equals(controlPoints))
+        return;
+    }
+    ArrayList<PVector> branch = (ArrayList<PVector>) controlPoints.clone();
+    history.add(branch);
+    historyIndex++;
+  }
+
+  public void undo(){
+    if(historyIndex == history.size() - 1){
+      saveCurve();
+    }
+    historyIndex--;
+    update();
+  }
+
+  public void redo(){
+    if(historyIndex + 1 < history.size() && historyIndex != -1){
+      historyIndex++;
+      update();
+    }
+  }
+
+  public void update(){
+    if(historyIndex != -1 && historyIndex < history.size()){
+      controlPoints = history.get(historyIndex);
+    }
+  }
+
   /**
    M\u00c9TODOS DE DESENHAR
    **/
@@ -651,7 +693,7 @@ class CurveCat
     strokeCap(ROUND);
     for (int i = 0; i < getNumberControlPoints() - 1; i++) {
       Segment seg = getSegment(i);
-        
+
       beginShape();
       curveVertex(seg.a.x, seg.a.y);
       curveVertex(seg.b.x, seg.b.y);
@@ -1509,10 +1551,6 @@ public class StateContext {
               this.debug();
             break;  
 
-            case 'r' :
-                this.context.curve.reAmostragem();
-            break;    
-
             case 's' :
                 this.context.curve.decimeCurve();
             break;   
@@ -1522,7 +1560,15 @@ public class StateContext {
                     context.stop();
                 else
                     context.play();
-             break;     
+            break;
+
+            case 'z' :
+                this.context.curve.undo();
+            break;         
+
+            case 'r' :
+                this.context.curve.redo();
+            break;    
 
             // Essa tecla \u00e9 espec\u00edfica para cada estado, entao devemos implement\u00e1-la nas classes de State
             case DELETE :

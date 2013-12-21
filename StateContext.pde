@@ -112,10 +112,6 @@ public class StateContext {
               this.debug();
             break;  
 
-            case 'r' :
-                this.context.curve.reAmostragem();
-            break;    
-
             case 's' :
                 this.context.curve.decimeCurve();
             break;   
@@ -125,7 +121,15 @@ public class StateContext {
                     context.stop();
                 else
                     context.play();
-             break;     
+            break;
+
+            case 'z' :
+                this.context.curve.undo();
+            break;         
+
+            case 'r' :
+                this.context.curve.redo();
+            break;    
 
             // Essa tecla é específica para cada estado, entao devemos implementá-la nas classes de State
             case DELETE :

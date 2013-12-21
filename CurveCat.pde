@@ -6,6 +6,10 @@ class CurveCat
   // Control points
   ArrayList<PVector> controlPoints;
 
+  // History of the curve
+  ArrayList<ArrayList<PVector>> history;
+  int historyIndex = -1;
+
   // If it can be decimed
   boolean decimable;
   float tolerance;
@@ -22,15 +26,19 @@ class CurveCat
     controlPoints = new ArrayList<PVector>();
     decimable = true;
     tolerance = 7;
+
+    history = new ArrayList<ArrayList<PVector>>();
   }
 
   void clear()
   {
+    saveCurve();
     decimable = true;
     controlPoints = new ArrayList<PVector>();
   }
 
   void removeElement(int index){
+    saveCurve();
     if (controlPoints.size()>1)
       controlPoints.remove(index);
   }
@@ -199,6 +207,7 @@ class CurveCat
   }
 
   void decimeAll(){
+    saveCurve();
     while(this.canBeDecimed()){
       this.decimeCurve(this.tolerance);
     }  
@@ -219,11 +228,13 @@ class CurveCat
 
   // Insere o ponto q entre index-1 e index
   void insertPoint(PVector q, int index){
+    saveCurve();
     controlPoints.add(index,q);
     this.decimable = true;
   }
 
   void insertPoint(PVector q){
+    saveCurve();
     controlPoints.add(q);
     this.decimable = true;
   }
@@ -410,6 +421,37 @@ class CurveCat
     this.decimeCurve(this.tolerance);
   }
 
+  void saveCurve(){
+    if(history.size() > 0){
+      if(history.get(history.size() - 1).equals(controlPoints))
+        return;
+    }
+    ArrayList<PVector> branch = (ArrayList<PVector>) controlPoints.clone();
+    history.add(branch);
+    historyIndex++;
+  }
+
+  void undo(){
+    if(historyIndex == history.size() - 1){
+      saveCurve();
+    }
+    historyIndex--;
+    update();
+  }
+
+  void redo(){
+    if(historyIndex + 1 < history.size() && historyIndex != -1){
+      historyIndex++;
+      update();
+    }
+  }
+
+  void update(){
+    if(historyIndex != -1 && historyIndex < history.size()){
+      controlPoints = history.get(historyIndex);
+    }
+  }
+
   /**
    MÉTODOS DE DESENHAR
    **/
@@ -421,7 +463,7 @@ class CurveCat
     strokeCap(ROUND);
     for (int i = 0; i < getNumberControlPoints() - 1; i++) {
       Segment seg = getSegment(i);
-        
+
       beginShape();
       curveVertex(seg.a.x, seg.a.y);
       curveVertex(seg.b.x, seg.b.y);
