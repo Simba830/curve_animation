@@ -297,12 +297,13 @@ class CurveCat
     int bestSegment = -1;
     float bestDistance = 10000000;
     float bestSegmentDistance = 100000;
+    float timeBestSegment = 0;
     
     for (int i = 0; i < cps.size()-1; i++) {
       Segment seg = getSegment(i);
 
       PVector result = new PVector();
-      for (int j=0; j<=numberDivisions/2; j++) 
+      for (int j=0; j<=numberDivisions; j++) 
       {
         float t = (float)(j) / (float)(numberDivisions);
         float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
@@ -312,11 +313,15 @@ class CurveCat
         if (j == 0 || dist < bestSegmentDistance) {
           bestSegmentDistance = dist;
           result.set(x, y, 0);
+          timeBestSegment = t;
         }
       }
       if (bestSegmentDistance < bestDistance) {
         r.set (result.x, result.y, 0);
-        bestSegment = i;
+        if(timeBestSegment < 0.5)
+          bestSegment = i;
+        else
+          bestSegment = i + 1;
         bestDistance = bestSegmentDistance;
       }
     }
@@ -470,28 +475,6 @@ class CurveCat
       curveVertex(seg.c.x, seg.c.y);
       curveVertex(seg.d.x, seg.d.y);
       endShape();
-      // curve (seg.a.x, seg.a.y, seg.b.x, seg.b.y, seg.c.x, seg.c.y, seg.d.x, seg.d.y);
-
-      // for (int j=0; j<=1000; j++) 
-      // {
-      //   float t = (float)(j) / (float)(numberDivisions);
-      //   float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-      //   float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
-      //   t = (float)(j+1) / (float)(numberDivisions);
-      //   float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-      //   float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
-
-      //   PVector r0 = new PVector(x, y), r1 = new PVector(x2,y2);
-      //   r1.sub(r0);
-
-      //   pushMatrix();
-      //   PVector orthogonal = new PVector((-1)*r1.y, r1.x);
-      //   translate( x + (x - x2)/2, y + (y - y2)/2);
-
-      //   int escalar = 50;
-      //   line(0, 0, orthogonal.x*escalar, orthogonal.y*escalar);
-      //   popMatrix();
-      // }
     }
   }
 

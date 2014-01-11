@@ -50,6 +50,7 @@ class EditingState extends State {
         if(distance > distanceToSelect)
         {
               context.diselect();
+              this.context.selectedSegments = new int[0];
         }
         else
         {
@@ -69,7 +70,7 @@ class EditingState extends State {
             selectedSegment = 0;
           }
 
-          if(distanceControlPoint > 10){
+          if(distanceControlPoint > 20){
               context.curve.insertPoint(q, context.selectedSegments[selectedSegment] + 1);
               context.selectedSegments[selectedSegment]++;
           }
@@ -105,7 +106,7 @@ class EditingState extends State {
               PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[i]);
               context.curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy, controlPoint.z), context.selectedSegments[i]);
             }
-          }else if(context.selectedSegments.length != 0){
+          }else if(context.selectedSegments.length == 1){
 
             // Pega a variação de x e de y
             float dx = context.mouse.x - context.pMouse.x;

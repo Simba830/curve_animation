@@ -47,7 +47,7 @@ PImage img;
 
 public void setup() 
 {
-  size(800, 600);
+  size(1024, 768);
   smooth();
 
   font = createFont("", 14);
@@ -531,12 +531,13 @@ class CurveCat
     int bestSegment = -1;
     float bestDistance = 10000000;
     float bestSegmentDistance = 100000;
+    float timeBestSegment = 0;
     
     for (int i = 0; i < cps.size()-1; i++) {
       Segment seg = getSegment(i);
 
       PVector result = new PVector();
-      for (int j=0; j<=numberDivisions/2; j++) 
+      for (int j=0; j<=numberDivisions; j++) 
       {
         float t = (float)(j) / (float)(numberDivisions);
         float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
@@ -546,11 +547,15 @@ class CurveCat
         if (j == 0 || dist < bestSegmentDistance) {
           bestSegmentDistance = dist;
           result.set(x, y, 0);
+          timeBestSegment = t;
         }
       }
       if (bestSegmentDistance < bestDistance) {
         r.set (result.x, result.y, 0);
-        bestSegment = i;
+        if(timeBestSegment < 0.5f)
+          bestSegment = i;
+        else
+          bestSegment = i + 1;
         bestDistance = bestSegmentDistance;
       }
     }
@@ -889,6 +894,7 @@ class EditingState extends State {
         if(distance > distanceToSelect)
         {
               context.diselect();
+              this.context.selectedSegments = new int[0];
         }
         else
         {
@@ -908,7 +914,7 @@ class EditingState extends State {
             selectedSegment = 0;
           }
 
-          if(distanceControlPoint > 10){
+          if(distanceControlPoint > 20){
               context.curve.insertPoint(q, context.selectedSegments[selectedSegment] + 1);
               context.selectedSegments[selectedSegment]++;
           }
@@ -944,7 +950,7 @@ class EditingState extends State {
               PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[i]);
               context.curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy, controlPoint.z), context.selectedSegments[i]);
             }
-          }else if(context.selectedSegments.length != 0){
+          }else if(context.selectedSegments.length == 1){
 
             // Pega a varia\u00e7\u00e3o de x e de y
             float dx = context.mouse.x - context.pMouse.x;
@@ -1018,6 +1024,68 @@ class EditingState extends State {
         text("Editing", posX, posY);
     }
  
+}
+class Element{
+	PVector position;
+	CurveCat curve;
+
+	Element(PVector _position){
+		position = _position;
+	}
+
+	public void drag(float dx, float dy)
+	{
+		position.x += dx;
+		position.y += dy;
+	}
+}
+class FontState extends State {
+
+    Text text = null;
+
+    FontState(Context _context){
+      super(_context);
+    }
+
+    public void mousePressed() 
+    {
+      if(text == null)
+        text = new Text("visitor1.ttf", 
+          20, 
+          new PVector(context.mouse.x, context.mouse.y), 
+          "", 
+          color(0,0,0));
+    }
+    
+    public void mouseReleased(PVector mouse) 
+    {
+
+    }
+    public void mouseDragged()
+    {	
+      float dx = context.mouse.x - context.pMouse.x;
+      float dy = context.mouse.y - context.pMouse.y;
+
+      text.drag(dx, dy);
+    }
+
+    public void keyPressed(){
+      String text = this.text.getText();
+      text = text + key; 
+      this.text.setText(text);
+    }
+
+    public void draw()
+    {
+      if(this.text != null){
+        this.text.draw();
+      }
+  	}
+
+    public void drawInterface()
+    {
+
+    }
 }
 // Linearly interpolates properties for a specific
 // time, given values of these properties at 
@@ -1650,6 +1718,43 @@ public class StateContext {
         image(img, 0, 0);
         popMatrix();
     }
+}
+class Text extends Element{
+	PFont font;
+	String text;
+	int c;
+
+	Text(String fontName, float size, PVector _position, String text, int c)
+	{
+		super(_position);
+		font = this.loadFont(fontName, size);
+		this.text = text;
+		this.c = c;
+	}
+
+	public void draw()
+	{
+		pushMatrix();
+			fill(this.c);
+			textFont(font);
+			text(text, position.x, position.y);
+		popMatrix();
+	}
+
+	private PFont loadFont(String fontName, float size)
+	{
+		return createFont(fontName, size);
+	}
+
+	public void setText(String _text)
+	{
+		this.text = _text;
+	}
+
+	public String getText()
+	{
+		return this.text;
+	}
 }
 static class Utils{
   

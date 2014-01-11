@@ -31,7 +31,7 @@ PImage img;
 
 public void setup() 
 {
-  size(800, 600);
+  size(1024, 768);
   smooth();
 
   font = createFont("", 14);
