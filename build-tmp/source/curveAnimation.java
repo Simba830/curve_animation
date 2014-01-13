@@ -709,28 +709,6 @@ class CurveCat
       curveVertex(seg.c.x, seg.c.y);
       curveVertex(seg.d.x, seg.d.y);
       endShape();
-      // curve (seg.a.x, seg.a.y, seg.b.x, seg.b.y, seg.c.x, seg.c.y, seg.d.x, seg.d.y);
-
-      // for (int j=0; j<=1000; j++) 
-      // {
-      //   float t = (float)(j) / (float)(numberDivisions);
-      //   float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-      //   float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
-      //   t = (float)(j+1) / (float)(numberDivisions);
-      //   float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-      //   float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
-
-      //   PVector r0 = new PVector(x, y), r1 = new PVector(x2,y2);
-      //   r1.sub(r0);
-
-      //   pushMatrix();
-      //   PVector orthogonal = new PVector((-1)*r1.y, r1.x);
-      //   translate( x + (x - x2)/2, y + (y - y2)/2);
-
-      //   int escalar = 50;
-      //   line(0, 0, orthogonal.x*escalar, orthogonal.y*escalar);
-      //   popMatrix();
-      // }
     }
   }
 
@@ -914,7 +892,7 @@ class EditingState extends State {
             selectedSegment = 0;
           }
 
-          if(distanceControlPoint > 20){
+          if(distanceControlPoint > 30){
               context.curve.insertPoint(q, context.selectedSegments[selectedSegment] + 1);
               context.selectedSegments[selectedSegment]++;
           }
@@ -1648,6 +1626,7 @@ public class StateContext {
             break;
         }
     }
+    
     public void draw()
     {
         background (255);
@@ -1680,9 +1659,8 @@ public class StateContext {
             ellipse(0,0, 20, 20);
             popMatrix();
         }
-
-
     }
+
     public void drawInterface()
     {
         int posX = width-80;

@@ -70,7 +70,7 @@ class EditingState extends State {
             selectedSegment = 0;
           }
 
-          if(distanceControlPoint > 20){
+          if(distanceControlPoint > 30){
               context.curve.insertPoint(q, context.selectedSegments[selectedSegment] + 1);
               context.selectedSegments[selectedSegment]++;
           }

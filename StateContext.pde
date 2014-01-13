@@ -137,6 +137,7 @@ public class StateContext {
             break;
         }
     }
+    
     void draw()
     {
         background (255);
@@ -169,9 +170,8 @@ public class StateContext {
             ellipse(0,0, 20, 20);
             popMatrix();
         }
-
-
     }
+
     void drawInterface()
     {
         int posX = width-80;
