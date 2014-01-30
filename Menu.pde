@@ -14,9 +14,8 @@ class Menu{
 		buttons = new ArrayList<Button>();
 	}
 
-	void createButton(String name){
-		Button newButton = new Button(name);
-		buttons.add(newButton);
+	void createButton(Button button){
+		buttons.add(button);
 	}
 
 	void updatePositions()
@@ -54,5 +53,18 @@ class Menu{
 				o.onMouseClick();
 			}
 		}
+	}
+
+	boolean isOver(PVector mouse)
+	{
+		if(Utils.mouseOverRect(new PVector(mouse.x, mouse.y), 
+								(int)(pos.x), 
+								(int)(pos.y), 
+								(int)(myWidth), 
+								(int)(myHeight) ))
+			{
+				return true;
+			}
+		return false;
 	}
 }

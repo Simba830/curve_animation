@@ -9,7 +9,7 @@ class FontState extends State {
     public void mousePressed() 
     {
       if(text == null)
-        text = new Text("visitor1.ttf", 
+        text = new Text("", 
           20, 
           new PVector(context.mouse.x, context.mouse.y), 
           "", 

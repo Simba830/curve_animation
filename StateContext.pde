@@ -14,12 +14,58 @@ public class StateContext {
         setState(new DrawningState(_context));
 
         menu = new Menu(new PVector(0,height - 100));
-        menu.createButton("Play");
+        menu.createButton(new Button("Play"){
+            void onMouseClick(){
+                if(context.isPlayed())
+                {
+                    this.name = "Play";
+                    context.stop();
+                }
+                else
+                {
+                    this.name = "Stop";
+                    context.play(); 
+                }
 
-        menu.createButton("Stop");
-        menu.createButton("Edit");
-        menu.createButton("Text");
-        menu.createButton("Circle");
+                return;
+            }
+        });
+
+        menu.createButton(new Button("Clear"){
+            void onMouseClick(){
+                context.curve.clear();
+                context.pos.clear();
+                context.stop();
+                stateContext.setState(new DrawningState(context));
+                context.selectedSegments = new int[0];
+            }
+        });
+
+        menu.createButton(new Button("OverSketch"){
+            void onMouseClick(){
+                if(stateContext.myState instanceof OverSketchState){
+                    stateContext.setState(new EditingState(context));
+                    return;
+                }
+
+                stateContext.setState(new OverSketchState(context));
+                context.selectedSegments = new int[0];
+                }
+        });
+
+        menu.createButton(new Button("Edit"){
+            void onMouseClick(){
+                if(!(stateContext.myState instanceof EditingState))
+                    stateContext.setState(new EditingState(context));
+            }
+        });
+
+        menu.createButton(new Button("Text"){
+            void onMouseClick(){
+                if(!(stateContext.myState instanceof FontState))
+                    stateContext.setState(new FontState(context));
+            }
+        });
 
         menu.updatePositions();
     }
@@ -51,36 +97,9 @@ public class StateContext {
     {
         menu.mousePressed(context, this);
 
-        // Verifica se clicou no botão "Clear";
-        /*if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width/2 + 60,height-40, 110, 30)){
-            context.curve.clear();
-            context.pos.clear();
-            context.stop();
-            this.setState(new DrawningState(context));
-            context.selectedSegments = new int[0];
+        if(menu.isOver(context.mouse)){
             return;
         }
-
-        if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width-80-130, height-20-20, 110, 30)){
-
-            if(this.myState instanceof OverSketchState){
-                this.setState(new EditingState(context));
-                return;
-            }
-
-            this.setState(new OverSketchState(context));
-            context.selectedSegments = new int[0];
-            return;
-        }
-
-        if(Utils.mouseOverRect(new PVector(mouseX, mouseY),20, height-50, 50, 50)){
-            if(context.isPlayed())
-                context.stop();
-            else
-                context.play(); 
-
-            return;
-        }*/
 
         // Seleciona o segmento em questão se for o mouse LEFT
         PVector closestPoint = new PVector();
@@ -103,37 +122,26 @@ public class StateContext {
     }
     void mouseDragged()
     {
+        if(menu.isOver(context.mouse)){
+            return;
+        }
+
         myState.mouseDragged();
     }
     void mouseReleased()
     {
+        if(menu.isOver(context.mouse)){
+            return;
+        }
+
         myState.mouseReleased();
     }
 
     void keyPressed(){
         switch (context.key){
-            case '1' :
-              this.setState(new DrawningState(this.context));
-            break;  
-
-            case '2' :
-                this.setState(new EditingState(this.context));
-            break;  
-
             case 'd' :
               this.debug();
             break;  
-
-            case 's' :
-                this.context.curve.decimeCurve();
-            break;   
-
-            case 'p' :
-                if(context.isPlayed())
-                    context.stop();
-                else
-                    context.play();
-            break;
 
             case 'z' :
                 this.context.curve.undo();
@@ -148,6 +156,8 @@ public class StateContext {
               myState.keyPressed();
             break;
         }
+
+        myState.keyPressed();
     }
     
     void draw()

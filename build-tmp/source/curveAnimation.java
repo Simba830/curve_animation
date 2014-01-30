@@ -132,7 +132,7 @@ public void update(){
 
 class Button
 {
-	private String name;
+	public String name;
 	private float width, height;
 	private int c, textColor;
 	public PVector pos;
@@ -147,7 +147,7 @@ class Button
 
 	public void onMouseClick()
 	{
-
+		println("stateContext: "+stateContext);
 	}
 
 	public void onMouseOver()
@@ -1069,7 +1069,7 @@ class FontState extends State {
     public void mousePressed() 
     {
       if(text == null)
-        text = new Text("visitor1.ttf", 
+        text = new Text("", 
           20, 
           new PVector(context.mouse.x, context.mouse.y), 
           "", 
@@ -1201,9 +1201,8 @@ class Menu{
 		buttons = new ArrayList<Button>();
 	}
 
-	public void createButton(String name){
-		Button newButton = new Button(name);
-		buttons.add(newButton);
+	public void createButton(Button button){
+		buttons.add(button);
 	}
 
 	public void updatePositions()
@@ -1241,6 +1240,19 @@ class Menu{
 				o.onMouseClick();
 			}
 		}
+	}
+
+	public boolean isOver(PVector mouse)
+	{
+		if(Utils.mouseOverRect(new PVector(mouse.x, mouse.y), 
+								(int)(pos.x), 
+								(int)(pos.y), 
+								(int)(myWidth), 
+								(int)(myHeight) ))
+			{
+				return true;
+			}
+		return false;
 	}
 }
 class OverSketchState extends State {
@@ -1602,12 +1614,58 @@ public class StateContext {
         setState(new DrawningState(_context));
 
         menu = new Menu(new PVector(0,height - 100));
-        menu.createButton("Play");
+        menu.createButton(new Button("Play"){
+            public void onMouseClick(){
+                if(context.isPlayed())
+                {
+                    this.name = "Play";
+                    context.stop();
+                }
+                else
+                {
+                    this.name = "Stop";
+                    context.play(); 
+                }
 
-        menu.createButton("Stop");
-        menu.createButton("Edit");
-        menu.createButton("Text");
-        menu.createButton("Circle");
+                return;
+            }
+        });
+
+        menu.createButton(new Button("Clear"){
+            public void onMouseClick(){
+                context.curve.clear();
+                context.pos.clear();
+                context.stop();
+                stateContext.setState(new DrawningState(context));
+                context.selectedSegments = new int[0];
+            }
+        });
+
+        menu.createButton(new Button("OverSketch"){
+            public void onMouseClick(){
+                if(stateContext.myState instanceof OverSketchState){
+                    stateContext.setState(new EditingState(context));
+                    return;
+                }
+
+                stateContext.setState(new OverSketchState(context));
+                context.selectedSegments = new int[0];
+                }
+        });
+
+        menu.createButton(new Button("Edit"){
+            public void onMouseClick(){
+                if(!(stateContext.myState instanceof EditingState))
+                    stateContext.setState(new EditingState(context));
+            }
+        });
+
+        menu.createButton(new Button("Text"){
+            public void onMouseClick(){
+                if(!(stateContext.myState instanceof FontState))
+                    stateContext.setState(new FontState(context));
+            }
+        });
 
         menu.updatePositions();
     }
@@ -1639,36 +1697,9 @@ public class StateContext {
     {
         menu.mousePressed(context, this);
 
-        // Verifica se clicou no bot\u00e3o "Clear";
-        /*if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width/2 + 60,height-40, 110, 30)){
-            context.curve.clear();
-            context.pos.clear();
-            context.stop();
-            this.setState(new DrawningState(context));
-            context.selectedSegments = new int[0];
+        if(menu.isOver(context.mouse)){
             return;
         }
-
-        if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width-80-130, height-20-20, 110, 30)){
-
-            if(this.myState instanceof OverSketchState){
-                this.setState(new EditingState(context));
-                return;
-            }
-
-            this.setState(new OverSketchState(context));
-            context.selectedSegments = new int[0];
-            return;
-        }
-
-        if(Utils.mouseOverRect(new PVector(mouseX, mouseY),20, height-50, 50, 50)){
-            if(context.isPlayed())
-                context.stop();
-            else
-                context.play(); 
-
-            return;
-        }*/
 
         // Seleciona o segmento em quest\u00e3o se for o mouse LEFT
         PVector closestPoint = new PVector();
@@ -1691,37 +1722,26 @@ public class StateContext {
     }
     public void mouseDragged()
     {
+        if(menu.isOver(context.mouse)){
+            return;
+        }
+
         myState.mouseDragged();
     }
     public void mouseReleased()
     {
+        if(menu.isOver(context.mouse)){
+            return;
+        }
+
         myState.mouseReleased();
     }
 
     public void keyPressed(){
         switch (context.key){
-            case '1' :
-              this.setState(new DrawningState(this.context));
-            break;  
-
-            case '2' :
-                this.setState(new EditingState(this.context));
-            break;  
-
             case 'd' :
               this.debug();
             break;  
-
-            case 's' :
-                this.context.curve.decimeCurve();
-            break;   
-
-            case 'p' :
-                if(context.isPlayed())
-                    context.stop();
-                else
-                    context.play();
-            break;
 
             case 'z' :
                 this.context.curve.undo();
@@ -1736,6 +1756,8 @@ public class StateContext {
               myState.keyPressed();
             break;
         }
+
+        myState.keyPressed();
     }
     
     public void draw()

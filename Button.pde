@@ -1,6 +1,6 @@
 class Button
 {
-	private String name;
+	public String name;
 	private float width, height;
 	private color c, textColor;
 	public PVector pos;
@@ -15,7 +15,7 @@ class Button
 
 	void onMouseClick()
 	{
-
+		println("stateContext: "+stateContext);
 	}
 
 	void onMouseOver()
