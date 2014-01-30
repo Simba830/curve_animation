@@ -49,7 +49,6 @@ public void setup()
   context.setSelectionBox(mouseInit, mouseFinal);
 
   stateContext = new StateContext(context);
-  stateContext.setContext(context);
 }
 
 // TODO Mudar isso para um interface só usando o mouse

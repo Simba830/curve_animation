@@ -65,7 +65,6 @@ public void setup()
   context.setSelectionBox(mouseInit, mouseFinal);
 
   stateContext = new StateContext(context);
-  stateContext.setContext(context);
 }
 
 // TODO Mudar isso para um interface s\u00f3 usando o mouse
@@ -185,6 +184,74 @@ class Button
 		this.pos = pos;
 	}
 }
+class Circle extends SceneElement{
+
+	float width, height;
+	boolean active;
+
+	Circle(float _width, float _height)
+	{
+		super(context.mouse);
+		this.width = _width;
+		this.height = _height;
+		active = false;
+	}
+
+	public void draw(float t)
+	{
+		if(t >= pos.keyTime(pos.nKeys()-1)){
+			t = pos.keyTime(pos.nKeys()-1);
+		}
+
+		PVector position;
+		if(!active){
+			position = pos.get(0);
+		}else{
+			position = pos.get(t);
+		}
+
+		fill(0);
+		stroke(0);
+		ellipse(position.x, position.y, this.width, this.height);
+	}
+
+	public float lastTime()
+	{
+		return pos.keyTime(pos.nKeys()-1);
+	}
+}
+class CircleState extends State {
+
+    CircleState(Context _context){
+      super(_context);
+    }
+
+    public void mousePressed() 
+    {
+    	Circle c = new Circle(20,20);
+    	context.addElement(c);	
+    	println("test");
+    }
+    
+    public void mouseReleased(PVector mouse) 
+    {
+
+    }
+
+    public void keyPressed(){
+      
+    }
+
+    public void draw()
+    {
+
+  	}
+
+    public void drawInterface()
+    {
+
+    }
+}
 class Context{
 	PVector mouse;
 	PVector pMouse;
@@ -196,16 +263,17 @@ class Context{
 	PVector mouseFinal;
 	int[] selectedSegments;
 	int mouseCount;
-	SmoothPositionInterpolator pos;
 	boolean play;
+	ArrayList<SceneElement> sceneElements;
 
 	Context(){
 		selectedSegments = new int[0];
 		this.curve = new CurveCat();
 		this.curve.setTolerance(7);
 
-		pos = new SmoothPositionInterpolator();
 		play = false;
+
+		sceneElements = new ArrayList<SceneElement>();
 	}
 
 	public void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
@@ -235,6 +303,7 @@ class Context{
 		println("this.keyCode: "+this.keyCode+",");
 		println("this.key: "+this.key+",");
 		Utils.print_r(selectedSegments);
+		println("elements"+sceneElements);
 	}
 
 	public void diselect(){
@@ -247,17 +316,16 @@ class Context{
 
 	public void play(){
 		frameCount = 0;
-		pos.clear();
 
 		if(curve.getNumberControlPoints() == 0){
 			return;
 		}
 
 
-		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
+		for (int i = 0; i < curve.getNumberControlPoints() - 1; i++){
 			PVector p = curve.getControlPoint(i);
 
-			pos.set(p.z, p);
+			//pos.set(p.z, p);
 		}
 
 		play = true;
@@ -269,14 +337,14 @@ class Context{
 			return;
 		}
 
-		pos.clear();
+		//pos.clear();
 
 		float length = curve.curveLength();
 
 		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
 			PVector p = curve.getControlPoint(i);
 
-			pos.set(p.z, p);
+			//pos.set(p.z, p);
 		}
 
 		play = true;
@@ -284,6 +352,29 @@ class Context{
 
 	public void stop(){
 		play = false;
+	}
+
+	public void addElement(SceneElement e)
+	{
+		sceneElements.add(e);
+	}
+
+	public void draw(float t){
+		for (SceneElement o : sceneElements) {
+			o.draw(t);
+		}
+	}
+
+	public float lastTime(){
+		float lastTime = 0;
+		for (SceneElement o : sceneElements) {
+			float lastTimeElement = o.lastTime();
+			if(lastTimeElement > lastTime){
+				lastTime = lastTimeElement;
+			}
+		}
+
+		return lastTime;
 	}
 
 }
@@ -1047,20 +1138,6 @@ class EditingState extends State {
     }
  
 }
-class Element{
-	PVector position;
-	CurveCat curve;
-
-	Element(PVector _position){
-		position = _position;
-	}
-
-	public void drag(float dx, float dy)
-	{
-		position.x += dx;
-		position.y += dy;
-	}
-}
 class FontState extends State {
 
     Text text = null;
@@ -1087,8 +1164,6 @@ class FontState extends State {
     {	
       float dx = context.mouse.x - context.pMouse.x;
       float dy = context.mouse.y - context.pMouse.y;
-
-      text.drag(dx, dy);
     }
 
     public void keyPressed(){
@@ -1108,6 +1183,76 @@ class FontState extends State {
     {
 
     }
+}
+class HorizontalMenu{
+	ArrayList<Button> buttons;
+	PVector pos;
+	float spacing;
+	int menuColor;
+	float myWidth, myHeight;
+
+	HorizontalMenu(PVector pos){
+		this.pos = pos;
+		spacing = 50;
+		menuColor = 0xff03426A;
+		this.myWidth = width;
+		this.myHeight = 100;
+		buttons = new ArrayList<Button>();
+	}
+
+	public void createButton(Button button){
+		buttons.add(button);
+	}
+
+	public void updatePositions()
+	{
+		int i = 0;
+		for (Button o : buttons) {
+			o.setPosition(new PVector( (pos.x + spacing) + i*(o.getWidth()/2 + spacing), pos.y + myHeight/2));
+			i++;
+		}
+	}
+
+	public void draw()
+	{
+		stroke(menuColor);
+		fill(menuColor);
+		rect(pos.x,pos.y,this.myWidth, this.myHeight);
+
+		fill(255);
+		int i = 0;
+		for (Button o : buttons) {
+			o.draw(new PVector( (pos.x + spacing) + i*(o.getWidth()/2 + spacing), pos.y + myHeight/2));
+			i++;
+		}
+	}
+
+	public void mousePressed(Context context, StateContext stateContext)
+	{
+		for (Button o : buttons) {
+			if(Utils.mouseOverRect(new PVector(context.mouse.x, context.mouse.y), 
+								(int)(o.pos.x - o.getWidth()/2), 
+								(int)(o.pos.y - o.getHeight()/2), 
+								(int)(o.pos.x + o.getWidth()/2), 
+								(int)(o.pos.y + o.getHeight()/2) ))
+			{
+				o.onMouseClick();
+			}
+		}
+	}
+
+	public boolean isOver(PVector mouse)
+	{
+		if(Utils.mouseOverRect(new PVector(mouse.x, mouse.y), 
+								(int)(pos.x), 
+								(int)(pos.y), 
+								(int)(myWidth), 
+								(int)(myHeight) ))
+			{
+				return true;
+			}
+		return false;
+	}
 }
 // Linearly interpolates properties for a specific
 // time, given values of these properties at 
@@ -1188,76 +1333,6 @@ class Interpolator {
   }
 };
 
-class Menu{
-	ArrayList<Button> buttons;
-	PVector pos;
-	float spacing;
-	int menuColor;
-	float myWidth, myHeight;
-
-	Menu(PVector pos){
-		this.pos = pos;
-		spacing = 50;
-		menuColor = 0xff03426A;
-		this.myWidth = width;
-		this.myHeight = 100;
-		buttons = new ArrayList<Button>();
-	}
-
-	public void createButton(Button button){
-		buttons.add(button);
-	}
-
-	public void updatePositions()
-	{
-		int i = 0;
-		for (Button o : buttons) {
-			o.setPosition(new PVector( (pos.x + spacing) + i*(o.getWidth()/2 + spacing), pos.y + myHeight/2));
-			i++;
-		}
-	}
-
-	public void draw()
-	{
-		stroke(menuColor);
-		fill(menuColor);
-		rect(pos.x,pos.y,this.myWidth, this.myHeight);
-
-		fill(255);
-		int i = 0;
-		for (Button o : buttons) {
-			o.draw(new PVector( (pos.x + spacing) + i*(o.getWidth()/2 + spacing), pos.y + myHeight/2));
-			i++;
-		}
-	}
-
-	public void mousePressed(Context context, StateContext stateContext)
-	{
-		for (Button o : buttons) {
-			if(Utils.mouseOverRect(new PVector(context.mouse.x, context.mouse.y), 
-								(int)(o.pos.x - o.getWidth()/2), 
-								(int)(o.pos.y - o.getHeight()/2), 
-								(int)(o.pos.x + o.getWidth()/2), 
-								(int)(o.pos.y + o.getHeight()/2) ))
-			{
-				o.onMouseClick();
-			}
-		}
-	}
-
-	public boolean isOver(PVector mouse)
-	{
-		if(Utils.mouseOverRect(new PVector(mouse.x, mouse.y), 
-								(int)(pos.x), 
-								(int)(pos.y), 
-								(int)(myWidth), 
-								(int)(myHeight) ))
-			{
-				return true;
-			}
-		return false;
-	}
-}
 class OverSketchState extends State {
 
     CurveCat aux;
@@ -1433,6 +1508,30 @@ class Property extends ArrayList<Float> {
     return super.get(i);
   }
 };
+class SceneElement
+{
+	String name;
+	SmoothPositionInterpolator pos;
+	CurveCat curve;
+
+	SceneElement(PVector position)
+	{
+		name = "Element";
+		pos = new SmoothPositionInterpolator();
+		pos.set(0, position);
+
+		this.curve = new CurveCat();
+		this.curve.setTolerance(7);
+	}
+
+	public void draw(){}
+	public void draw(float t){}
+	public void load(){}
+	public void update(){}
+	public float lastTime(){
+		return pos.keyTime(pos.nKeys()-1);
+	}
+}
 class Segment{
    PVector a,b,c,d;
   
@@ -1605,81 +1704,20 @@ public class StateContext {
 
     private State myState;
     private Context context;
-    private boolean debug;
-    private Menu menu;
+    private HorizontalMenu menu;
+    private VerticalMenu listElements;
 
+    private boolean debug;
         /**
          * Standard constructor
          */
     StateContext(Context _context) 
     {
         debug = false;
-        setState(new DrawningState(_context));
+        setState(new CircleState(_context));
+        this.context = _context;
 
-        menu = new Menu(new PVector(0,height - 100));
-        menu.createButton(new Button("Play"){
-            public void onMouseClick(){
-                if(context.isPlayed())
-                {
-                    this.name = "Play";
-                    context.stop();
-                }
-                else
-                {
-                    this.name = "Stop";
-                    context.play(); 
-                }
-
-                return;
-            }
-        });
-
-        menu.createButton(new Button("Clear"){
-            public void onMouseClick(){
-                context.curve.clear();
-                context.pos.clear();
-                context.stop();
-                stateContext.setState(new DrawningState(context));
-                context.selectedSegments = new int[0];
-            }
-        });
-
-        menu.createButton(new Button("OverSketch"){
-            public void onMouseClick(){
-                if(stateContext.myState instanceof OverSketchState){
-                    stateContext.setState(new EditingState(context));
-                    return;
-                }
-
-                stateContext.setState(new OverSketchState(context));
-                context.selectedSegments = new int[0];
-                }
-        });
-
-        menu.createButton(new Button("Edit"){
-            public void onMouseClick(){
-
-                if(!(stateContext.myState instanceof EditingState))
-                {
-                    stateContext.setState(new EditingState(context));
-                    name = "Draw";
-                }
-                else
-                {
-                    stateContext.setState(new DrawningState(context));
-                    name = "Edit";
-                }
-            }
-        });
-
-        menu.createButton(new Button("Text"){
-            public void onMouseClick(){
-                if(!(stateContext.myState instanceof FontState))
-                    stateContext.setState(new FontState(context));
-            }
-        });
-
-        menu.updatePositions();
+        createInterface();
     }
 
     public void setContext(Context _context){
@@ -1710,6 +1748,12 @@ public class StateContext {
         menu.mousePressed(context, this);
 
         if(menu.isOver(context.mouse)){
+            return;
+        }
+
+        listElements.mousePressed(context, this);
+
+        if(listElements.isOver(context.mouse)){
             return;
         }
 
@@ -1776,51 +1820,116 @@ public class StateContext {
     {
         background (255);
         noFill();
-        if (context.curve.getNumberControlPoints() >=4) 
-            context.curve.draw();
+        //if (context.curve.getNumberControlPoints() >=4) 
+        //    context.curve.draw();
         
         myState.draw();
 
         if(context.isPlayed()){
-            float lastTime = context.pos.keyTime(context.pos.nKeys()-1);
+            float lastTime = context.lastTime();
             float t = frameCount%PApplet.parseInt(lastTime);
 
-            // Essa parte faria parar no final da anima\u00e7\u00e3o
-            // if(t == 0)
-            //     context.stop();
-            
-            PVector p = context.pos.get(t);
-
-            PVector tan = context.pos.getTangent(t);
-            stroke(100,100,100);
-            context.pos.draw (100);
-            float ang = atan2(tan.y,tan.x);
-
-            pushMatrix();
-            translate (p.x,p.y);
-            rotate (ang);
-            noStroke();
-            fill(mainColor);
-            ellipse(0,0, 20, 20);
-            popMatrix();
+            context.draw(t);
+        }else{
+            context.draw(0.0f);
         }
+
+        drawInterface();
+        updateInterface();
     }
 
     public void drawInterface()
     {
         menu.draw();
+        listElements.draw();
         myState.drawInterface();
+    }
 
-        if(debug){
-          fill(255,0,0);
-          stroke(255,0,0);
-          text("Curve Length:"+context.curve.curveLength()+" px", 10, height-20);
-          text("Curve Tightness:"+curveT, 10, 20);
-          text("Tolerance:"+context.curve.tolerance, 10, 40);
+    public void updateInterface(){
+        listElements = new VerticalMenu(new PVector(width - 150, 20));
+        for (SceneElement o : context.sceneElements) {
+            listElements.addElement(o);
         }
     }
+
+    public void createInterface()
+    {   
+        listElements = new VerticalMenu(new PVector(width - 150, 20));
+
+        menu = new HorizontalMenu(new PVector(0,height - 100));
+        menu.createButton(new Button("Play"){
+            public void onMouseClick(){
+                if(context.isPlayed())
+                {
+                    this.name = "Play";
+                    context.stop();
+                }
+                else
+                {
+                    this.name = "Stop";
+                    context.play(); 
+                }
+
+                return;
+            }
+        });
+
+        menu.createButton(new Button("Clear"){
+            public void onMouseClick(){
+                context.curve.clear();
+                //context.pos.clear();
+                context.stop();
+                stateContext.setState(new DrawningState(context));
+                context.selectedSegments = new int[0];
+            }
+        });
+
+        menu.createButton(new Button("OverSketch"){
+            public void onMouseClick(){
+                if(stateContext.myState instanceof OverSketchState){
+                    stateContext.setState(new EditingState(context));
+                    return;
+                }
+
+                stateContext.setState(new OverSketchState(context));
+                context.selectedSegments = new int[0];
+                }
+        });
+
+        menu.createButton(new Button("Edit"){
+            public void onMouseClick(){
+
+                if(!(stateContext.myState instanceof EditingState))
+                {
+                    stateContext.setState(new EditingState(context));
+                    name = "Draw";
+                }
+                else
+                {
+                    stateContext.setState(new DrawningState(context));
+                    name = "Edit";
+                }
+            }
+        });
+
+        menu.createButton(new Button("Text"){
+            public void onMouseClick(){
+                if(!(stateContext.myState instanceof FontState))
+                    stateContext.setState(new FontState(context));
+            }
+        });
+
+        menu.createButton(new Button("Circle"){
+            public void onMouseClick(){
+                if(!(stateContext.myState instanceof CircleState))
+                    stateContext.setState(new CircleState(context));
+            }
+        });
+
+        menu.updatePositions();
+    }
 }
-class Text extends Element{
+class Text extends SceneElement{
 	PFont font;
 	String text;
 	int c;
@@ -1835,11 +1944,11 @@ class Text extends Element{
 
 	public void draw()
 	{
-		pushMatrix();
+		/*pushMatrix();
 			fill(this.c);
 			textFont(font);
 			text(text, position.x, position.y);
-		popMatrix();
+		popMatrix();*/
 	}
 
 	private PFont loadFont(String fontName, float size)
@@ -1880,6 +1989,88 @@ static class Utils{
       println(array[i]);
     }
   }
+}
+class VerticalMenu{
+	ArrayList<Button> buttons;
+	ArrayList<SceneElement> elements;
+	PVector pos;
+	float spacing;
+	int menuColor;
+	float myWidth, myHeight;
+
+	VerticalMenu(PVector pos){
+		this.pos = pos;
+		spacing = 15;
+		menuColor = 0xff03426A;
+		this.myWidth = 100;
+		this.myHeight = 500;
+		buttons = new ArrayList<Button>();
+		elements = new ArrayList<SceneElement>();
+	}
+
+	public void addElement(SceneElement element){
+		elements.add(element);
+		Button b = new Button(element.name){
+			public void onMouseClick(){
+				println("test");
+			}
+		};
+
+		b.width = 100;
+		b.height = 25;
+		buttons.add(b);
+	}
+
+	public void updatePositions()
+	{
+		int i = 0;
+		for (Button o : buttons) {
+			o.setPosition(new PVector( (pos.x + spacing) + i*(o.getWidth()/2 + spacing), pos.y + myHeight/2));
+			i++;
+		}
+	}
+
+	public void draw()
+	{
+		stroke(menuColor);
+		fill(menuColor);
+		rect(pos.x,pos.y,this.myWidth, this.myHeight);
+
+		fill(255);
+		int i = 0;
+		for (Button o : buttons) {
+			o.draw(new PVector( pos.x + myWidth/2, (pos.y + spacing) + i*(o.getHeight()/2 + spacing)));
+			i++;
+		}
+	}
+
+	public void mousePressed(Context context, StateContext stateContext)
+	{
+		for (Button o : buttons) {
+			if(Utils.mouseOverRect(new PVector(context.mouse.x, context.mouse.y), 
+								(int)(o.pos.x - o.getWidth()/2), 
+								(int)(o.pos.y - o.getHeight()/2), 
+								(int)(o.pos.x + o.getWidth()/2), 
+								(int)(o.pos.y + o.getHeight()/2) ))
+			{
+				o.onMouseClick();
+				return;
+			}
+		}
+	}
+
+	public boolean isOver(PVector mouse)
+	{
+		if(Utils.mouseOverRect(new PVector(mouse.x, mouse.y), 
+								(int)(pos.x), 
+								(int)(pos.y), 
+								(int)(myWidth), 
+								(int)(myHeight) ))
+			{
+				return true;
+			}
+		return false;
+	}
 }
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "curveAnimation" };

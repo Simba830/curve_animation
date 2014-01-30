@@ -9,16 +9,17 @@ class Context{
 	PVector mouseFinal;
 	int[] selectedSegments;
 	int mouseCount;
-	SmoothPositionInterpolator pos;
 	boolean play;
+	ArrayList<SceneElement> sceneElements;
 
 	Context(){
 		selectedSegments = new int[0];
 		this.curve = new CurveCat();
 		this.curve.setTolerance(7);
 
-		pos = new SmoothPositionInterpolator();
 		play = false;
+
+		sceneElements = new ArrayList<SceneElement>();
 	}
 
 	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
@@ -48,6 +49,7 @@ class Context{
 		println("this.keyCode: "+this.keyCode+",");
 		println("this.key: "+this.key+",");
 		Utils.print_r(selectedSegments);
+		println("elements"+sceneElements);
 	}
 
 	void diselect(){
@@ -60,17 +62,16 @@ class Context{
 
 	void play(){
 		frameCount = 0;
-		pos.clear();
 
 		if(curve.getNumberControlPoints() == 0){
 			return;
 		}
 
 
-		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
+		for (int i = 0; i < curve.getNumberControlPoints() - 1; i++){
 			PVector p = curve.getControlPoint(i);
 
-			pos.set(p.z, p);
+			//pos.set(p.z, p);
 		}
 
 		play = true;
@@ -82,14 +83,14 @@ class Context{
 			return;
 		}
 
-		pos.clear();
+		//pos.clear();
 
 		float length = curve.curveLength();
 
 		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
 			PVector p = curve.getControlPoint(i);
 
-			pos.set(p.z, p);
+			//pos.set(p.z, p);
 		}
 
 		play = true;
@@ -97,6 +98,29 @@ class Context{
 
 	void stop(){
 		play = false;
+	}
+
+	void addElement(SceneElement e)
+	{
+		sceneElements.add(e);
+	}
+
+	void draw(float t){
+		for (SceneElement o : sceneElements) {
+			o.draw(t);
+		}
+	}
+
+	float lastTime(){
+		float lastTime = 0;
+		for (SceneElement o : sceneElements) {
+			float lastTimeElement = o.lastTime();
+			if(lastTimeElement > lastTime){
+				lastTime = lastTimeElement;
+			}
+		}
+
+		return lastTime;
 	}
 
 }

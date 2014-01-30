@@ -1,11 +1,11 @@
-class Menu{
+class HorizontalMenu{
 	ArrayList<Button> buttons;
 	PVector pos;
 	float spacing;
 	color menuColor;
 	float myWidth, myHeight;
 
-	Menu(PVector pos){
+	HorizontalMenu(PVector pos){
 		this.pos = pos;
 		spacing = 50;
 		menuColor = #03426A;

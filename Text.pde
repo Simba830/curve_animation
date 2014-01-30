@@ -1,4 +1,4 @@
-class Text extends Element{
+class Text extends SceneElement{
 	PFont font;
 	String text;
 	color c;
@@ -13,11 +13,11 @@ class Text extends Element{
 
 	void draw()
 	{
-		pushMatrix();
+		/*pushMatrix();
 			fill(this.c);
 			textFont(font);
 			text(text, position.x, position.y);
-		popMatrix();
+		popMatrix();*/
 	}
 
 	private PFont loadFont(String fontName, float size)

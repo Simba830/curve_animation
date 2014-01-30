@@ -24,8 +24,6 @@ class FontState extends State {
     {	
       float dx = context.mouse.x - context.pMouse.x;
       float dy = context.mouse.y - context.pMouse.y;
-
-      text.drag(dx, dy);
     }
 
     public void keyPressed(){

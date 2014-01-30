@@ -2,81 +2,20 @@ public class StateContext {
 
     private State myState;
     private Context context;
-    private boolean debug;
-    private Menu menu;
+    private HorizontalMenu menu;
+    private VerticalMenu listElements;
 
+    private boolean debug;
         /**
          * Standard constructor
          */
     StateContext(Context _context) 
     {
         debug = false;
-        setState(new DrawningState(_context));
+        setState(new CircleState(_context));
+        this.context = _context;
 
-        menu = new Menu(new PVector(0,height - 100));
-        menu.createButton(new Button("Play"){
-            void onMouseClick(){
-                if(context.isPlayed())
-                {
-                    this.name = "Play";
-                    context.stop();
-                }
-                else
-                {
-                    this.name = "Stop";
-                    context.play(); 
-                }
-
-                return;
-            }
-        });
-
-        menu.createButton(new Button("Clear"){
-            void onMouseClick(){
-                context.curve.clear();
-                context.pos.clear();
-                context.stop();
-                stateContext.setState(new DrawningState(context));
-                context.selectedSegments = new int[0];
-            }
-        });
-
-        menu.createButton(new Button("OverSketch"){
-            void onMouseClick(){
-                if(stateContext.myState instanceof OverSketchState){
-                    stateContext.setState(new EditingState(context));
-                    return;
-                }
-
-                stateContext.setState(new OverSketchState(context));
-                context.selectedSegments = new int[0];
-                }
-        });
-
-        menu.createButton(new Button("Edit"){
-            void onMouseClick(){
-
-                if(!(stateContext.myState instanceof EditingState))
-                {
-                    stateContext.setState(new EditingState(context));
-                    name = "Draw";
-                }
-                else
-                {
-                    stateContext.setState(new DrawningState(context));
-                    name = "Edit";
-                }
-            }
-        });
-
-        menu.createButton(new Button("Text"){
-            void onMouseClick(){
-                if(!(stateContext.myState instanceof FontState))
-                    stateContext.setState(new FontState(context));
-            }
-        });
-
-        menu.updatePositions();
+        createInterface();
     }
 
     public void setContext(Context _context){
@@ -107,6 +46,12 @@ public class StateContext {
         menu.mousePressed(context, this);
 
         if(menu.isOver(context.mouse)){
+            return;
+        }
+
+        listElements.mousePressed(context, this);
+
+        if(listElements.isOver(context.mouse)){
             return;
         }
 
@@ -173,47 +118,112 @@ public class StateContext {
     {
         background (255);
         noFill();
-        if (context.curve.getNumberControlPoints() >=4) 
-            context.curve.draw();
+        //if (context.curve.getNumberControlPoints() >=4) 
+        //    context.curve.draw();
         
         myState.draw();
 
         if(context.isPlayed()){
-            float lastTime = context.pos.keyTime(context.pos.nKeys()-1);
+            float lastTime = context.lastTime();
             float t = frameCount%int(lastTime);
 
-            // Essa parte faria parar no final da animação
-            // if(t == 0)
-            //     context.stop();
-            
-            PVector p = context.pos.get(t);
-
-            PVector tan = context.pos.getTangent(t);
-            stroke(100,100,100);
-            context.pos.draw (100);
-            float ang = atan2(tan.y,tan.x);
-
-            pushMatrix();
-            translate (p.x,p.y);
-            rotate (ang);
-            noStroke();
-            fill(mainColor);
-            ellipse(0,0, 20, 20);
-            popMatrix();
+            context.draw(t);
+        }else{
+            context.draw(0.0);
         }
+
+        drawInterface();
+        updateInterface();
     }
 
     void drawInterface()
     {
         menu.draw();
+        listElements.draw();
         myState.drawInterface();
+    }
 
-        if(debug){
-          fill(255,0,0);
-          stroke(255,0,0);
-          text("Curve Length:"+context.curve.curveLength()+" px", 10, height-20);
-          text("Curve Tightness:"+curveT, 10, 20);
-          text("Tolerance:"+context.curve.tolerance, 10, 40);
+    void updateInterface(){
+        listElements = new VerticalMenu(new PVector(width - 150, 20));
+        for (SceneElement o : context.sceneElements) {
+            listElements.addElement(o);
         }
+    }
+
+    void createInterface()
+    {   
+        listElements = new VerticalMenu(new PVector(width - 150, 20));
+
+        menu = new HorizontalMenu(new PVector(0,height - 100));
+        menu.createButton(new Button("Play"){
+            public void onMouseClick(){
+                if(context.isPlayed())
+                {
+                    this.name = "Play";
+                    context.stop();
+                }
+                else
+                {
+                    this.name = "Stop";
+                    context.play(); 
+                }
+
+                return;
+            }
+        });
+
+        menu.createButton(new Button("Clear"){
+            public void onMouseClick(){
+                context.curve.clear();
+                //context.pos.clear();
+                context.stop();
+                stateContext.setState(new DrawningState(context));
+                context.selectedSegments = new int[0];
+            }
+        });
+
+        menu.createButton(new Button("OverSketch"){
+            public void onMouseClick(){
+                if(stateContext.myState instanceof OverSketchState){
+                    stateContext.setState(new EditingState(context));
+                    return;
+                }
+
+                stateContext.setState(new OverSketchState(context));
+                context.selectedSegments = new int[0];
+                }
+        });
+
+        menu.createButton(new Button("Edit"){
+            public void onMouseClick(){
+
+                if(!(stateContext.myState instanceof EditingState))
+                {
+                    stateContext.setState(new EditingState(context));
+                    name = "Draw";
+                }
+                else
+                {
+                    stateContext.setState(new DrawningState(context));
+                    name = "Edit";
+                }
+            }
+        });
+
+        menu.createButton(new Button("Text"){
+            public void onMouseClick(){
+                if(!(stateContext.myState instanceof FontState))
+                    stateContext.setState(new FontState(context));
+            }
+        });
+
+        menu.createButton(new Button("Circle"){
+            public void onMouseClick(){
+                if(!(stateContext.myState instanceof CircleState))
+                    stateContext.setState(new CircleState(context));
+            }
+        });
+
+        menu.updatePositions();
     }
 }
