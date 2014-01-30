@@ -130,6 +130,61 @@ public void update(){
 }
 
 
+class Button
+{
+	private String name;
+	private float width, height;
+	private int c, textColor;
+	public PVector pos;
+	Button(String name)
+	{
+		this.name = name;
+		width = height = 50;
+
+		c = 0xff3E97D1;
+		textColor = color(255);
+	}
+
+	public void onMouseClick()
+	{
+
+	}
+
+	public void onMouseOver()
+	{
+
+	}
+
+	public void draw(PVector pos)
+	{
+		pushMatrix();
+		rectMode(CENTER);
+		fill(c);
+		rect(pos.x,pos.y,width,height);
+
+		textAlign(CENTER, CENTER);
+		fill(textColor);
+		text(name, pos.x, pos.y, width, height);
+
+		rectMode(CORNER);
+		popMatrix();
+	}
+
+	public float getWidth()
+	{
+		return this.width;
+	}
+
+	public float getHeight()
+	{
+		return this.height;
+	}
+
+	public void setPosition(PVector pos)
+	{
+		this.pos = pos;
+	}
+}
 class Context{
 	PVector mouse;
 	PVector pMouse;
@@ -810,15 +865,8 @@ class DrawningState extends State {
 
     public void drawInterface()
     {
-      int posX = width-80;
-	    int posY = height-20;
-      fill(mainColor);
-      stroke(mainColor);
-      rect(posX-10,posY-20,80,30);
-      fill(255);
-      text("Creating", posX, posY);
+
     }
- 
 }
 class EditingState extends State {
 
@@ -992,14 +1040,7 @@ class EditingState extends State {
 
     public void drawInterface()
     {
-        int posX = width-80;
-        int posY = height-20;
-
-        fill(secondaryColor);
-        stroke(secondaryColor);
-        rect(posX-10,posY-20,80,30);
-        fill(255);
-        text("Editing", posX, posY);
+      
     }
  
 }
@@ -1144,6 +1185,64 @@ class Interpolator {
   }
 };
 
+class Menu{
+	ArrayList<Button> buttons;
+	PVector pos;
+	float spacing;
+	int menuColor;
+	float myWidth, myHeight;
+
+	Menu(PVector pos){
+		this.pos = pos;
+		spacing = 50;
+		menuColor = 0xff03426A;
+		this.myWidth = width;
+		this.myHeight = 100;
+		buttons = new ArrayList<Button>();
+	}
+
+	public void createButton(String name){
+		Button newButton = new Button(name);
+		buttons.add(newButton);
+	}
+
+	public void updatePositions()
+	{
+		int i = 0;
+		for (Button o : buttons) {
+			o.setPosition(new PVector( (pos.x + spacing) + i*(o.getWidth()/2 + spacing), pos.y + myHeight/2));
+			i++;
+		}
+	}
+
+	public void draw()
+	{
+		stroke(menuColor);
+		fill(menuColor);
+		rect(pos.x,pos.y,this.myWidth, this.myHeight);
+
+		fill(255);
+		int i = 0;
+		for (Button o : buttons) {
+			o.draw(new PVector( (pos.x + spacing) + i*(o.getWidth()/2 + spacing), pos.y + myHeight/2));
+			i++;
+		}
+	}
+
+	public void mousePressed(Context context, StateContext stateContext)
+	{
+		for (Button o : buttons) {
+			if(Utils.mouseOverRect(new PVector(context.mouse.x, context.mouse.y), 
+								(int)(o.pos.x - o.getWidth()/2), 
+								(int)(o.pos.y - o.getHeight()/2), 
+								(int)(o.pos.x + o.getWidth()/2), 
+								(int)(o.pos.y + o.getHeight()/2) ))
+			{
+				o.onMouseClick();
+			}
+		}
+	}
+}
 class OverSketchState extends State {
 
     CurveCat aux;
@@ -1492,6 +1591,7 @@ public class StateContext {
     private State myState;
     private Context context;
     private boolean debug;
+    private Menu menu;
 
         /**
          * Standard constructor
@@ -1500,7 +1600,16 @@ public class StateContext {
     {
         debug = false;
         setState(new DrawningState(_context));
-        
+
+        menu = new Menu(new PVector(0,height - 100));
+        menu.createButton("Play");
+
+        menu.createButton("Stop");
+        menu.createButton("Edit");
+        menu.createButton("Text");
+        menu.createButton("Circle");
+
+        menu.updatePositions();
     }
 
     public void setContext(Context _context){
@@ -1528,8 +1637,10 @@ public class StateContext {
      */
     public void mousePressed()
     {
+        menu.mousePressed(context, this);
+
         // Verifica se clicou no bot\u00e3o "Clear";
-        if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width/2 + 60,height-40, 110, 30)){
+        /*if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width/2 + 60,height-40, 110, 30)){
             context.curve.clear();
             context.pos.clear();
             context.stop();
@@ -1557,7 +1668,7 @@ public class StateContext {
                 context.play(); 
 
             return;
-        }
+        }*/
 
         // Seleciona o segmento em quest\u00e3o se for o mouse LEFT
         PVector closestPoint = new PVector();
@@ -1663,24 +1774,7 @@ public class StateContext {
 
     public void drawInterface()
     {
-        int posX = width-80;
-        int posY = height-20;
-        stroke(thirdColor);
-        fill(thirdColor);
-        rect(width-80-130, height-20-20, 110, 30);
-
-        stroke(255);
-        fill(255);
-        text("OverSkecthing", posX-125, posY);
-
-        stroke(thirdColor);
-        fill(thirdColor);
-        rect(width/2 + 60, height-40, 110, 30);
-
-        stroke(255);
-        fill(255);
-        text("Clear", width/2 + 70, height-20);
-
+        menu.draw();
         myState.drawInterface();
 
         if(debug){
@@ -1690,11 +1784,6 @@ public class StateContext {
           text("Curve Tightness:"+curveT, 10, 20);
           text("Tolerance:"+context.curve.tolerance, 10, 40);
         }
-
-        pushMatrix();
-        translate(20, height-50);
-        image(img, 0, 0);
-        popMatrix();
     }
 }
 class Text extends Element{

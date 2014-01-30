@@ -3,6 +3,7 @@ public class StateContext {
     private State myState;
     private Context context;
     private boolean debug;
+    private Menu menu;
 
         /**
          * Standard constructor
@@ -11,7 +12,16 @@ public class StateContext {
     {
         debug = false;
         setState(new DrawningState(_context));
-        
+
+        menu = new Menu(new PVector(0,height - 100));
+        menu.createButton("Play");
+
+        menu.createButton("Stop");
+        menu.createButton("Edit");
+        menu.createButton("Text");
+        menu.createButton("Circle");
+
+        menu.updatePositions();
     }
 
     public void setContext(Context _context){
@@ -39,8 +49,10 @@ public class StateContext {
      */
     void mousePressed()
     {
+        menu.mousePressed(context, this);
+
         // Verifica se clicou no botão "Clear";
-        if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width/2 + 60,height-40, 110, 30)){
+        /*if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width/2 + 60,height-40, 110, 30)){
             context.curve.clear();
             context.pos.clear();
             context.stop();
@@ -68,7 +80,7 @@ public class StateContext {
                 context.play(); 
 
             return;
-        }
+        }*/
 
         // Seleciona o segmento em questão se for o mouse LEFT
         PVector closestPoint = new PVector();
@@ -174,24 +186,7 @@ public class StateContext {
 
     void drawInterface()
     {
-        int posX = width-80;
-        int posY = height-20;
-        stroke(thirdColor);
-        fill(thirdColor);
-        rect(width-80-130, height-20-20, 110, 30);
-
-        stroke(255);
-        fill(255);
-        text("OverSkecthing", posX-125, posY);
-
-        stroke(thirdColor);
-        fill(thirdColor);
-        rect(width/2 + 60, height-40, 110, 30);
-
-        stroke(255);
-        fill(255);
-        text("Clear", width/2 + 70, height-20);
-
+        menu.draw();
         myState.drawInterface();
 
         if(debug){
@@ -201,10 +196,5 @@ public class StateContext {
           text("Curve Tightness:"+curveT, 10, 20);
           text("Tolerance:"+context.curve.tolerance, 10, 40);
         }
-
-        pushMatrix();
-        translate(20, height-50);
-        image(img, 0, 0);
-        popMatrix();
     }
 }

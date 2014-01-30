@@ -58,13 +58,6 @@ class DrawningState extends State {
 
     public void drawInterface()
     {
-      int posX = width-80;
-	    int posY = height-20;
-      fill(mainColor);
-      stroke(mainColor);
-      rect(posX-10,posY-20,80,30);
-      fill(255);
-      text("Creating", posX, posY);
+
     }
- 
 }
