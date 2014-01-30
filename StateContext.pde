@@ -55,8 +55,17 @@ public class StateContext {
 
         menu.createButton(new Button("Edit"){
             void onMouseClick(){
+
                 if(!(stateContext.myState instanceof EditingState))
+                {
                     stateContext.setState(new EditingState(context));
+                    name = "Draw";
+                }
+                else
+                {
+                    stateContext.setState(new DrawningState(context));
+                    name = "Edit";
+                }
             }
         });
 

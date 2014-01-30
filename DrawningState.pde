@@ -47,8 +47,11 @@ class DrawningState extends State {
     }
 
     public void keyPressed(){
-      context.curve.clear(); 
-      context.selectedSegments = new int[0];
+      if(context.key == DELETE)
+      {
+        context.curve.clear(); 
+        context.selectedSegments = new int[0];
+      }
     }
 
     public void draw()
