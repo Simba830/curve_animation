@@ -2,8 +2,7 @@ public class StateContext {
 
     private State myState;
     private Context context;
-    private HorizontalMenu menu;
-    private VerticalMenu listElements;
+    private VerticalMenu listElements, menu;
 
     private boolean debug;
         /**
@@ -118,22 +117,27 @@ public class StateContext {
     {
         background (255);
         noFill();
-        //if (context.curve.getNumberControlPoints() >=4) 
-        //    context.curve.draw();
         
         myState.draw();
 
         if(context.isPlayed()){
+            context.refreshInterpolator();
             float lastTime = context.lastTime();
-            float t = frameCount%int(lastTime);
 
-            context.draw(t);
+            if(lastTime == 0){
+                context.stop();
+            }else{
+                float t = frameCount%int(lastTime);
+                context.draw(t);
+            }
+
+
         }else{
             context.draw(0.0);
         }
 
-        drawInterface();
         updateInterface();
+        drawInterface();
     }
 
     void drawInterface()
@@ -148,13 +152,15 @@ public class StateContext {
         for (SceneElement o : context.sceneElements) {
             listElements.addElement(o);
         }
+
+        listElements.updatePositions();
     }
 
     void createInterface()
     {   
         listElements = new VerticalMenu(new PVector(width - 150, 20));
 
-        menu = new HorizontalMenu(new PVector(0,height - 100));
+        menu = new VerticalMenu(new PVector(20, 20));
         menu.createButton(new Button("Play"){
             public void onMouseClick(){
                 if(context.isPlayed())

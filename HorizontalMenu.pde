@@ -36,7 +36,7 @@ class HorizontalMenu{
 		fill(255);
 		int i = 0;
 		for (Button o : buttons) {
-			o.draw(new PVector( (pos.x + spacing) + i*(o.getWidth()/2 + spacing), pos.y + myHeight/2));
+			o.draw(new PVector( o.pos.x, o.pos.y ));
 			i++;
 		}
 	}
@@ -47,8 +47,8 @@ class HorizontalMenu{
 			if(Utils.mouseOverRect(new PVector(context.mouse.x, context.mouse.y), 
 								(int)(o.pos.x - o.getWidth()/2), 
 								(int)(o.pos.y - o.getHeight()/2), 
-								(int)(o.pos.x + o.getWidth()/2), 
-								(int)(o.pos.y + o.getHeight()/2) ))
+								(int)(o.getWidth()), 
+								(int)(o.getHeight()) ))
 			{
 				o.onMouseClick();
 			}

@@ -11,6 +11,7 @@ class Context{
 	int mouseCount;
 	boolean play;
 	ArrayList<SceneElement> sceneElements;
+	SceneElement selectedElement;
 
 	Context(){
 		selectedSegments = new int[0];
@@ -20,6 +21,7 @@ class Context{
 		play = false;
 
 		sceneElements = new ArrayList<SceneElement>();
+		selectedElement = null;
 	}
 
 	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
@@ -63,16 +65,7 @@ class Context{
 	void play(){
 		frameCount = 0;
 
-		if(curve.getNumberControlPoints() == 0){
-			return;
-		}
-
-
-		for (int i = 0; i < curve.getNumberControlPoints() - 1; i++){
-			PVector p = curve.getControlPoint(i);
-
-			//pos.set(p.z, p);
-		}
+		refreshInterpolator();
 
 		play = true;
 	}
@@ -83,14 +76,15 @@ class Context{
 			return;
 		}
 
-		//pos.clear();
+		PVector p;
 
-		float length = curve.curveLength();
+		for (SceneElement o : sceneElements) {
+			o.pos.clear();
 
-		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
-			PVector p = curve.getControlPoint(i);
-
-			//pos.set(p.z, p);
+			for (int i = 0; i< o.curve.getNumberControlPoints(); i++){
+				p = o.curve.getControlPoint(i);
+				o.pos.set(p.z, p);
+			}
 		}
 
 		play = true;
@@ -107,20 +101,36 @@ class Context{
 
 	void draw(float t){
 		for (SceneElement o : sceneElements) {
+			if(o == selectedElement){
+				o.c = color(255,0,0);
+				o.curveColor = color(0,0,0);
+			}else{
+				o.c = color(0,0,0);
+				o.curveColor = color(200,200,200);
+			}
 			o.draw(t);
+			o.drawCurve();
 		}
 	}
 
 	float lastTime(){
 		float lastTime = 0;
+		float lastTimeElement = 0;
 		for (SceneElement o : sceneElements) {
-			float lastTimeElement = o.lastTime();
+			lastTimeElement = o.lastTime();
 			if(lastTimeElement > lastTime){
 				lastTime = lastTimeElement;
 			}
 		}
 
 		return lastTime;
+	}
+
+	void setSelectedElement(SceneElement element){
+		selectedElement = null;
+		selectedElement = element;
+		curve = selectedElement.curve;
+		stateContext.setState(new DrawningState(this));
 	}
 
 }

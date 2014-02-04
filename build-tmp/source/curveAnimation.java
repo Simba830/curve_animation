@@ -48,6 +48,7 @@ PImage img;
 public void setup() 
 {
   size(1024, 768);
+  frameRate(30);
   smooth();
 
   font = createFont("", 14);
@@ -192,13 +193,18 @@ class Circle extends SceneElement{
 	Circle(float _width, float _height)
 	{
 		super(context.mouse);
+		this.name = "Circle";
 		this.width = _width;
 		this.height = _height;
-		active = false;
+		active = true;
 	}
 
 	public void draw(float t)
 	{
+		if(pos.nKeys() < 1){
+			return;
+		}
+
 		if(t >= pos.keyTime(pos.nKeys()-1)){
 			t = pos.keyTime(pos.nKeys()-1);
 		}
@@ -210,14 +216,21 @@ class Circle extends SceneElement{
 			position = pos.get(t);
 		}
 
-		fill(0);
+		fill(c);
 		stroke(0);
 		ellipse(position.x, position.y, this.width, this.height);
 	}
 
 	public float lastTime()
 	{
+		if(pos.nKeys() < 1)
+			return 0;
+
 		return pos.keyTime(pos.nKeys()-1);
+	}
+
+	public boolean isOver(PVector mouse){
+		return true;
 	}
 }
 class CircleState extends State {
@@ -230,7 +243,8 @@ class CircleState extends State {
     {
     	Circle c = new Circle(20,20);
     	context.addElement(c);	
-    	println("test");
+        //stateContext.setState(new DrawningState(context));
+        //context.setSelectedElement(c);
     }
     
     public void mouseReleased(PVector mouse) 
@@ -265,6 +279,7 @@ class Context{
 	int mouseCount;
 	boolean play;
 	ArrayList<SceneElement> sceneElements;
+	SceneElement selectedElement;
 
 	Context(){
 		selectedSegments = new int[0];
@@ -274,6 +289,7 @@ class Context{
 		play = false;
 
 		sceneElements = new ArrayList<SceneElement>();
+		selectedElement = null;
 	}
 
 	public void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
@@ -317,16 +333,7 @@ class Context{
 	public void play(){
 		frameCount = 0;
 
-		if(curve.getNumberControlPoints() == 0){
-			return;
-		}
-
-
-		for (int i = 0; i < curve.getNumberControlPoints() - 1; i++){
-			PVector p = curve.getControlPoint(i);
-
-			//pos.set(p.z, p);
-		}
+		refreshInterpolator();
 
 		play = true;
 	}
@@ -337,14 +344,15 @@ class Context{
 			return;
 		}
 
-		//pos.clear();
+		PVector p;
 
-		float length = curve.curveLength();
+		for (SceneElement o : sceneElements) {
+			o.pos.clear();
 
-		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
-			PVector p = curve.getControlPoint(i);
-
-			//pos.set(p.z, p);
+			for (int i = 0; i< o.curve.getNumberControlPoints(); i++){
+				p = o.curve.getControlPoint(i);
+				o.pos.set(p.z, p);
+			}
 		}
 
 		play = true;
@@ -361,20 +369,36 @@ class Context{
 
 	public void draw(float t){
 		for (SceneElement o : sceneElements) {
+			if(o == selectedElement){
+				o.c = color(255,0,0);
+				o.curveColor = color(0,0,0);
+			}else{
+				o.c = color(0,0,0);
+				o.curveColor = color(200,200,200);
+			}
 			o.draw(t);
+			o.drawCurve();
 		}
 	}
 
 	public float lastTime(){
 		float lastTime = 0;
+		float lastTimeElement = 0;
 		for (SceneElement o : sceneElements) {
-			float lastTimeElement = o.lastTime();
+			lastTimeElement = o.lastTime();
 			if(lastTimeElement > lastTime){
 				lastTime = lastTimeElement;
 			}
 		}
 
 		return lastTime;
+	}
+
+	public void setSelectedElement(SceneElement element){
+		selectedElement = null;
+		selectedElement = element;
+		curve = selectedElement.curve;
+		stateContext.setState(new DrawningState(this));
 	}
 
 }
@@ -866,7 +890,7 @@ class CurveCat
     for (int i = 0; i < getNumberControlPoints(); i++) 
     {
       ellipse (controlPoints.get(i).x, controlPoints.get(i).y, 7, 7);
-      text("t: "+controlPoints.get(i).z, controlPoints.get(i).x + 10, controlPoints.get(i).y - 10);
+      text("t: "+(controlPoints.get(i).z/30), controlPoints.get(i).x + 10, controlPoints.get(i).y - 10);
     } 
     fill(255);
   }
@@ -1222,7 +1246,7 @@ class HorizontalMenu{
 		fill(255);
 		int i = 0;
 		for (Button o : buttons) {
-			o.draw(new PVector( (pos.x + spacing) + i*(o.getWidth()/2 + spacing), pos.y + myHeight/2));
+			o.draw(new PVector( o.pos.x, o.pos.y ));
 			i++;
 		}
 	}
@@ -1233,8 +1257,8 @@ class HorizontalMenu{
 			if(Utils.mouseOverRect(new PVector(context.mouse.x, context.mouse.y), 
 								(int)(o.pos.x - o.getWidth()/2), 
 								(int)(o.pos.y - o.getHeight()/2), 
-								(int)(o.pos.x + o.getWidth()/2), 
-								(int)(o.pos.y + o.getHeight()/2) ))
+								(int)(o.getWidth()), 
+								(int)(o.getHeight()) ))
 			{
 				o.onMouseClick();
 			}
@@ -1512,24 +1536,40 @@ class SceneElement
 {
 	String name;
 	SmoothPositionInterpolator pos;
+	int c, curveColor;
 	CurveCat curve;
 
 	SceneElement(PVector position)
 	{
+		c = color(0,0,0);
+		curveColor = color(100,100,100);
 		name = "Element";
 		pos = new SmoothPositionInterpolator();
 		pos.set(0, position);
 
 		this.curve = new CurveCat();
-		this.curve.setTolerance(7);
+		this.curve.setTolerance(5);
 	}
 
 	public void draw(){}
 	public void draw(float t){}
+	public void drawCurve(){
+		curve.strokeColor = curveColor;
+		noFill();
+		if(curve.getNumberControlPoints() >= 4)
+			this.curve.draw();
+
+
+		stroke(0);
+	}
 	public void load(){}
 	public void update(){}
 	public float lastTime(){
 		return pos.keyTime(pos.nKeys()-1);
+	}
+
+	public boolean isOver(PVector mouse){
+		return true;
 	}
 }
 class Segment{
@@ -1546,6 +1586,40 @@ class Segment{
    
    }
   
+}
+class SelectState extends State
+{
+	SelectState(Context _context){
+      super(_context);
+    }
+
+    public void mousePressed() 
+    {
+    	for (SceneElement o : context.sceneElements) {
+    		if(o.isOver(context.mouse)){
+    			context.setSelectedElement(o);
+    		}
+    	}
+    }
+    
+    public void mouseReleased(PVector mouse) 
+    {
+
+    }
+
+    public void keyPressed(){
+      
+    }
+
+    public void draw()
+    {
+
+  	}
+
+    public void drawInterface()
+    {
+
+    }
 }
 // Smooth (Cubic) interpolation of properties
 class SmoothInterpolator extends Interpolator {
@@ -1704,8 +1778,7 @@ public class StateContext {
 
     private State myState;
     private Context context;
-    private HorizontalMenu menu;
-    private VerticalMenu listElements;
+    private VerticalMenu listElements, menu;
 
     private boolean debug;
         /**
@@ -1820,22 +1893,27 @@ public class StateContext {
     {
         background (255);
         noFill();
-        //if (context.curve.getNumberControlPoints() >=4) 
-        //    context.curve.draw();
         
         myState.draw();
 
         if(context.isPlayed()){
+            context.refreshInterpolator();
             float lastTime = context.lastTime();
-            float t = frameCount%PApplet.parseInt(lastTime);
 
-            context.draw(t);
+            if(lastTime == 0){
+                context.stop();
+            }else{
+                float t = frameCount%PApplet.parseInt(lastTime);
+                context.draw(t);
+            }
+
+
         }else{
             context.draw(0.0f);
         }
 
-        drawInterface();
         updateInterface();
+        drawInterface();
     }
 
     public void drawInterface()
@@ -1850,13 +1928,15 @@ public class StateContext {
         for (SceneElement o : context.sceneElements) {
             listElements.addElement(o);
         }
+
+        listElements.updatePositions();
     }
 
     public void createInterface()
     {   
         listElements = new VerticalMenu(new PVector(width - 150, 20));
 
-        menu = new HorizontalMenu(new PVector(0,height - 100));
+        menu = new VerticalMenu(new PVector(20, 20));
         menu.createButton(new Button("Play"){
             public void onMouseClick(){
                 if(context.isPlayed())
@@ -2012,10 +2092,16 @@ class VerticalMenu{
 		elements.add(element);
 		Button b = new Button(element.name){
 			public void onMouseClick(){
-				println("test");
+				context.setSelectedElement(stateContext.listElements.getElement(this));
 			}
 		};
 
+		b.width = 100;
+		b.height = 25;
+		buttons.add(b);
+	}
+
+	public void createButton(Button b){
 		b.width = 100;
 		b.height = 25;
 		buttons.add(b);
@@ -2025,7 +2111,7 @@ class VerticalMenu{
 	{
 		int i = 0;
 		for (Button o : buttons) {
-			o.setPosition(new PVector( (pos.x + spacing) + i*(o.getWidth()/2 + spacing), pos.y + myHeight/2));
+			o.setPosition(new PVector( pos.x + myWidth/2, (pos.y + spacing) + i*(o.getHeight()/2 + spacing) ));
 			i++;
 		}
 	}
@@ -2039,23 +2125,25 @@ class VerticalMenu{
 		fill(255);
 		int i = 0;
 		for (Button o : buttons) {
-			o.draw(new PVector( pos.x + myWidth/2, (pos.y + spacing) + i*(o.getHeight()/2 + spacing)));
+			o.draw(new PVector(o.pos.x, o.pos.y));
 			i++;
 		}
 	}
 
 	public void mousePressed(Context context, StateContext stateContext)
 	{
+		int i = 0;
 		for (Button o : buttons) {
 			if(Utils.mouseOverRect(new PVector(context.mouse.x, context.mouse.y), 
 								(int)(o.pos.x - o.getWidth()/2), 
 								(int)(o.pos.y - o.getHeight()/2), 
-								(int)(o.pos.x + o.getWidth()/2), 
-								(int)(o.pos.y + o.getHeight()/2) ))
+								(int)(o.getWidth()), 
+								(int)(o.getHeight()) ))
 			{
 				o.onMouseClick();
 				return;
 			}
+			i++;
 		}
 	}
 
@@ -2070,6 +2158,15 @@ class VerticalMenu{
 				return true;
 			}
 		return false;
+	}
+
+	public SceneElement getElement(Button b){
+		for (int i = 0; i < buttons.size(); i++) {
+			if(b == buttons.get(i)){
+				return (SceneElement) elements.get(i);
+			}
+		}
+		return null;
 	}
 }
   static public void main(String[] passedArgs) {

@@ -6,13 +6,18 @@ class Circle extends SceneElement{
 	Circle(float _width, float _height)
 	{
 		super(context.mouse);
+		this.name = "Circle";
 		this.width = _width;
 		this.height = _height;
-		active = false;
+		active = true;
 	}
 
 	void draw(float t)
 	{
+		if(pos.nKeys() < 1){
+			return;
+		}
+
 		if(t >= pos.keyTime(pos.nKeys()-1)){
 			t = pos.keyTime(pos.nKeys()-1);
 		}
@@ -24,13 +29,20 @@ class Circle extends SceneElement{
 			position = pos.get(t);
 		}
 
-		fill(0);
+		fill(c);
 		stroke(0);
 		ellipse(position.x, position.y, this.width, this.height);
 	}
 
 	float lastTime()
 	{
+		if(pos.nKeys() < 1)
+			return 0;
+
 		return pos.keyTime(pos.nKeys()-1);
+	}
+
+	boolean isOver(PVector mouse){
+		return true;
 	}
 }

@@ -1,15 +1,16 @@
-class CircleState extends State {
-
-    CircleState(Context _context){
+class SelectState extends State
+{
+	SelectState(Context _context){
       super(_context);
     }
 
     public void mousePressed() 
     {
-    	Circle c = new Circle(20,20);
-    	context.addElement(c);	
-        //stateContext.setState(new DrawningState(context));
-        //context.setSelectedElement(c);
+    	for (SceneElement o : context.sceneElements) {
+    		if(o.isOver(context.mouse)){
+    			context.setSelectedElement(o);
+    		}
+    	}
     }
     
     public void mouseReleased(PVector mouse) 
