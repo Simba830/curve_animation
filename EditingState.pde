@@ -24,7 +24,11 @@ class EditingState extends State {
               {
                context.selectedSegments = new int[1];
                context.selectedSegments[0] = selectedSegment;
+               
+               context.alignTimes(selectedSegment);
               }
+              
+              
             }
             // Remove todos os segmentos selecionados
             for (int i = context.selectedSegments.length - 1; i>=0; i--){

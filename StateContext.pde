@@ -133,7 +133,7 @@ public class StateContext {
 
 
         }else{
-            context.draw(0.0);
+            context.draw();
         }
 
         updateInterface();
@@ -177,6 +177,14 @@ public class StateContext {
                 return;
             }
         });
+        
+        menu.createButton(new Button("Select"){
+            public void onMouseClick(){
+                stateContext.setState(new SelectState(context));
+                context.setSelectedElement(null);
+                return;
+            }
+        });
 
         menu.createButton(new Button("Clear"){
             public void onMouseClick(){
@@ -200,19 +208,15 @@ public class StateContext {
                 }
         });
 
+        menu.createButton(new Button("Draw"){
+            public void onMouseClick(){
+              stateContext.setState(new DrawningState(context));
+            }
+        });
+        
         menu.createButton(new Button("Edit"){
             public void onMouseClick(){
-
-                if(!(stateContext.myState instanceof EditingState))
-                {
-                    stateContext.setState(new EditingState(context));
-                    name = "Draw";
-                }
-                else
-                {
-                    stateContext.setState(new DrawningState(context));
-                    name = "Edit";
-                }
+              stateContext.setState(new EditingState(context));
             }
         });
 

@@ -113,6 +113,22 @@ class Context{
 		}
 	}
 
+        void draw()
+        {
+             float t = 0.0;
+             for (SceneElement o : sceneElements) {
+                  if(o == selectedElement){
+                    o.c = color(255,0,0);
+                    o.curveColor = color(0,0,0);
+                  }else{
+                    o.c = color(0,0,0);
+                    o.curveColor = color(200,200,200);
+                  }
+                  o.draw(t);
+                  o.drawCurve();
+                }
+        }
+
 	float lastTime(){
 		float lastTime = 0;
 		float lastTimeElement = 0;
@@ -129,8 +145,15 @@ class Context{
 	void setSelectedElement(SceneElement element){
 		selectedElement = null;
 		selectedElement = element;
-		curve = selectedElement.curve;
-		stateContext.setState(new DrawningState(this));
+                if(selectedElement != null){
+		  curve = selectedElement.curve;
+		  
+                }
 	}
+
+        void alignTimes(int selected)
+        {
+            
+        }
 
 }

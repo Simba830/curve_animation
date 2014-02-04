@@ -14,7 +14,7 @@ class SceneElement
 		pos.set(0, position);
 
 		this.curve = new CurveCat();
-		this.curve.setTolerance(5);
+		this.curve.setTolerance(15);
 	}
 
 	void draw(){}

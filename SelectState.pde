@@ -9,6 +9,7 @@ class SelectState extends State
     	for (SceneElement o : context.sceneElements) {
     		if(o.isOver(context.mouse)){
     			context.setSelectedElement(o);
+                        return;
     		}
     	}
     }
@@ -16,6 +17,12 @@ class SelectState extends State
     public void mouseReleased(PVector mouse) 
     {
 
+    }
+    
+    public void mouseDragged()
+    {
+        stateContext.setState(new DrawningState(context));
+        stateContext.mouseDragged();
     }
 
     public void keyPressed(){
@@ -25,7 +32,7 @@ class SelectState extends State
     public void draw()
     {
 
-  	}
+    }
 
     public void drawInterface()
     {
