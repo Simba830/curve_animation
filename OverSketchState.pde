@@ -113,7 +113,6 @@ class OverSketchState extends State {
             }
         }
     }
-    @Override
     public void drawInterface()
     {
         int posX = width-80;
