@@ -27,7 +27,8 @@ class SmoothInterpolator extends Interpolator {
       else return prop.get(i);
     }
     else {
-      assert (time.size() > 0);
+      if (time.size() > 0)
+        println("Error: time.size() <= 0");
       return prop.get(0);
     }
   }

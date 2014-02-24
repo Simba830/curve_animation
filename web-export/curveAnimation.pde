@@ -126,7 +126,7 @@ class Context{
 	int[] selectedSegments;
 	int mouseCount;
 	SmoothPositionInterpolator pos;
-	boolean play;
+	boolean playing;
 
 	Context(){
 		selectedSegments = new int[0];
@@ -134,7 +134,7 @@ class Context{
 		this.curve.setTolerance(7);
 
 		pos = new SmoothPositionInterpolator();
-		play = false;
+		playing = false;
 	}
 
 	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
@@ -189,7 +189,7 @@ class Context{
 			pos.set(p.z, p);
 		}
 
-		play = true;
+		playing= true;
 	}
 
 	void refreshInterpolator(){
@@ -208,11 +208,11 @@ class Context{
 			pos.set(p.z, p);
 		}
 
-		play = true;
+		playing= true;
 	}
 
 	void stop(){
-		play = false;
+		playing= false;
 	}
 
 }
@@ -408,8 +408,8 @@ class CurveCat
             float y2 = curvePoint(segP.a.y, segP.b.y, segP.c.y, segP.d.y, tAux);
             PVector v2 = new PVector(x2,y2);
 
-            float dist = v1.dist(v2);
-            if(dist >= tolerance){
+            float distance = v1.dist(v2);
+            if(distance >= tolerance){
                remove = false;
             }
          }
@@ -526,10 +526,10 @@ class CurveCat
         float t = (float)(j) / (float)(numberDivisions);
         float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
         float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
-        float dist = dist (x, y, q.x, q.y);
+        float distance = dist(x, y, q.x, q.y);
 
-        if (j == 0 || dist < bestSegmentDistance) {
-          bestSegmentDistance = dist;
+        if (j == 0 || distance < bestSegmentDistance) {
+          bestSegmentDistance = distance;
           result.set(x, y, 0);
           timeBestSegment = t;
         }
@@ -589,8 +589,8 @@ class CurveCat
         t = (float)(j+1) / (float)(numberDivisions);
         float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
         float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
-        float dist = dist (x, y, x2, y2);
-        curveLength += dist;
+        float distance = dist(x, y, x2, y2);
+        curveLength += distance;
       }
     }
     return (float)curveLength;
@@ -610,8 +610,8 @@ class CurveCat
         t = (float)(j+1) / (float)(numberDivisions);
         float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
         float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
-        float dist = dist (x, y, x2, y2);
-        curveLength += dist;
+        float distance = dist(x, y, x2, y2);
+        curveLength += distance;
       }
     }
     return (float)curveLength;
@@ -1117,7 +1117,8 @@ class Interpolator {
       else return prop.get(i);
     }
     else {
-      assert (time.size() > 0);
+      if (time.size() > 0)
+        println("Returned error because Time.size() <= 0");
       return prop.get(0);
     }
   }
@@ -1289,7 +1290,11 @@ class Property extends ArrayList<Float> {
   // Sets the i'th dimension of the property
   // to value v
   void set(int i, float v) {
-     assert(i>=0);
+    if(i>=0)  
+    {
+         println("Error: Property->get->i < 0");
+         super.add(0.0);
+    }
      while (i >= size()) add(0.0);
      super.set(i,v);
   }
@@ -1297,8 +1302,12 @@ class Property extends ArrayList<Float> {
   // Returns the i'th dimension of the property.
   // Returns 0.0 if that dimension was never set
   Float get(int i) {
-    assert (i>=0);
+    if (i>=0)
+    {
+         println("Error: Property->get->i < 0");
+    }
     if (i >= size()) return 0.0;
+    
     return super.get(i);
   }
 };
@@ -1346,7 +1355,8 @@ class SmoothInterpolator extends Interpolator {
       else return prop.get(i);
     }
     else {
-      assert (time.size() > 0);
+      if (time.size() > 0)
+        println("Error: time.size() <= 0");
       return prop.get(0);
     }
   }
@@ -1368,7 +1378,7 @@ class SmoothPositionInterpolator {
 
   // Converts a property to a PVector
   PVector toPVector (Property p) {
-    return new PVector (p.get(0), p.get(1), p.get(2));
+    return new PVector(p.get(0), p.get(1), p.get(2));
   }
   
   // Returns the number of keyframes

@@ -31,7 +31,11 @@ class Property extends ArrayList<Float> {
   // Sets the i'th dimension of the property
   // to value v
   void set(int i, float v) {
-     assert(i>=0);
+    if(i>=0)  
+    {
+         println("Error: Property->get->i < 0");
+         super.add(0.0);
+    }
      while (i >= size()) add(0.0);
      super.set(i,v);
   }
@@ -39,8 +43,12 @@ class Property extends ArrayList<Float> {
   // Returns the i'th dimension of the property.
   // Returns 0.0 if that dimension was never set
   Float get(int i) {
-    assert (i>=0);
+    if (i>=0)
+    {
+         println("Error: Property->get->i < 0");
+    }
     if (i >= size()) return 0.0;
+    
     return super.get(i);
   }
 };

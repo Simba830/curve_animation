@@ -13,7 +13,7 @@ class SmoothPositionInterpolator {
 
   // Converts a property to a PVector
   PVector toPVector (Property p) {
-    return new PVector (p.get(0), p.get(1), p.get(2));
+    return new PVector(p.get(0), p.get(1), p.get(2));
   }
   
   // Returns the number of keyframes

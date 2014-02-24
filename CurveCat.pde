@@ -190,8 +190,8 @@ class CurveCat
             float y2 = curvePoint(segP.a.y, segP.b.y, segP.c.y, segP.d.y, tAux);
             PVector v2 = new PVector(x2,y2);
 
-            float dist = v1.dist(v2);
-            if(dist >= tolerance){
+            float distance = v1.dist(v2);
+            if(distance >= tolerance){
                remove = false;
             }
          }
@@ -308,10 +308,10 @@ class CurveCat
         float t = (float)(j) / (float)(numberDivisions);
         float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
         float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
-        float dist = dist (x, y, q.x, q.y);
+        float distance = dist(x, y, q.x, q.y);
 
-        if (j == 0 || dist < bestSegmentDistance) {
-          bestSegmentDistance = dist;
+        if (j == 0 || distance < bestSegmentDistance) {
+          bestSegmentDistance = distance;
           result.set(x, y, 0);
           timeBestSegment = t;
         }
@@ -371,8 +371,8 @@ class CurveCat
         t = (float)(j+1) / (float)(numberDivisions);
         float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
         float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
-        float dist = dist (x, y, x2, y2);
-        curveLength += dist;
+        float distance = dist(x, y, x2, y2);
+        curveLength += distance;
       }
     }
     return (float)curveLength;
@@ -392,8 +392,8 @@ class CurveCat
         t = (float)(j+1) / (float)(numberDivisions);
         float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
         float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
-        float dist = dist (x, y, x2, y2);
-        curveLength += dist;
+        float distance = dist(x, y, x2, y2);
+        curveLength += distance;
       }
     }
     return (float)curveLength;

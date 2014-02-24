@@ -66,7 +66,8 @@ class Interpolator {
       else return prop.get(i);
     }
     else {
-      assert (time.size() > 0);
+      if (time.size() > 0)
+        println("Returned error because Time.size() <= 0");
       return prop.get(0);
     }
   }

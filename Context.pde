@@ -10,7 +10,7 @@ class Context{
 	int[] selectedSegments;
 	int mouseCount;
 	SmoothPositionInterpolator pos;
-	boolean play;
+	boolean playing;
 
 	Context(){
 		selectedSegments = new int[0];
@@ -18,7 +18,7 @@ class Context{
 		this.curve.setTolerance(7);
 
 		pos = new SmoothPositionInterpolator();
-		play = false;
+		playing = false;
 	}
 
 	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
@@ -73,7 +73,7 @@ class Context{
 			pos.set(p.z, p);
 		}
 
-		play = true;
+		playing= true;
 	}
 
 	void refreshInterpolator(){
@@ -92,11 +92,11 @@ class Context{
 			pos.set(p.z, p);
 		}
 
-		play = true;
+		playing= true;
 	}
 
 	void stop(){
-		play = false;
+		playing= false;
 	}
 
 }
