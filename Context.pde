@@ -55,7 +55,7 @@ class Context{
 	}
 
 	boolean isPlayed(){
-		return play;
+		return playing;
 	}
 
 	void play(){
