@@ -105,12 +105,6 @@ void update(){
     key,
     mouseInit,
     mouseFinal);
-
-    try{
-      context.setMouseCount(mouseEvent.getClickCount());
-    }catch(NullPointerException e){
-      context.setMouseCount(0);
-    }
 }
 
 
@@ -171,7 +165,7 @@ class Context{
 	}
 
 	boolean isPlayed(){
-		return play;
+		return playing;
 	}
 
 	void play(){
@@ -233,7 +227,7 @@ class CurveCat
   float tolerance;
 
   // Number of points that the curve can be show
-  int numberDivisions = 1000; 
+  int numberDivisions = 100; 
 
   // Min Ditance wich can be in the curve
   float minDistance = 5;
@@ -1119,6 +1113,7 @@ class Interpolator {
     else {
       if (time.size() > 0)
         println("Returned error because Time.size() <= 0");
+      
       return prop.get(0);
     }
   }
@@ -1302,9 +1297,10 @@ class Property extends ArrayList<Float> {
   // Returns the i'th dimension of the property.
   // Returns 0.0 if that dimension was never set
   Float get(int i) {
-    if (i>=0)
+    if (i<0)
     {
          println("Error: Property->get->i < 0");
+         return 0.0;
     }
     if (i >= size()) return 0.0;
     

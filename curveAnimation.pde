@@ -105,12 +105,6 @@ void update(){
     key,
     mouseInit,
     mouseFinal);
-
-    try{
-      context.setMouseCount(mouseEvent.getClickCount());
-    }catch(NullPointerException e){
-      context.setMouseCount(0);
-    }
 }
 
 

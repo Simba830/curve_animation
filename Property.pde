@@ -43,9 +43,10 @@ class Property extends ArrayList<Float> {
   // Returns the i'th dimension of the property.
   // Returns 0.0 if that dimension was never set
   Float get(int i) {
-    if (i>=0)
+    if (i<0)
     {
          println("Error: Property->get->i < 0");
+         return 0.0;
     }
     if (i >= size()) return 0.0;
     

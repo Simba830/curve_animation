@@ -15,7 +15,7 @@ class CurveCat
   float tolerance;
 
   // Number of points that the curve can be show
-  int numberDivisions = 1000; 
+  int numberDivisions = 100; 
 
   // Min Ditance wich can be in the curve
   float minDistance = 5;
