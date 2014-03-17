@@ -1,113 +1,3 @@
-/**
- AnimationApp.pde
- Author: Guilherme Herzog
- Created on: May 13
- **/
-
-PFont font; // it's a font
-float curveT;
-
-// Curve
-CurveCat curve;
-CurveCat decimedCurve;
-
-// Selection Box
-PVector mouseInit;
-PVector mouseFinal;
-
-// State Context
-StateContext stateContext;
-
-// Context
-Context context;
-
-// Colours
-color mainColor = #0066C8;
-color secondaryColor = #FF9700;
-color thirdColor = #3990E3;
-
-// Images
-PImage img;
-
-public void setup() 
-{
-  size(1024, 768);
-  smooth();
-
-  font = createFont("", 14);
-  curveT = 0;
-  img = loadImage("play.png");
-
-  // PVectors used to create the selection box
-  mouseInit = new PVector(0,0);
-  mouseFinal = new PVector(0,0);
-
-  curveTightness(curveT);
-
-  context = new Context();
-  update();
-  context.setSelectionBox(mouseInit, mouseFinal);
-
-  stateContext = new StateContext(context);
-  stateContext.setContext(context);
-}
-
-// TODO Mudar isso para um interface só usando o mouse
-void keyPressed() 
-{ 
-  update();
-  stateContext.keyPressed();
-}
-
-// Mouse press callback
-void mousePressed() 
-{
-  mouseInit.set(mouseX, mouseY);
-  mouseFinal.set(mouseX, mouseY);
-  update();
-  stateContext.mousePressed();
-}
-    
-void mouseReleased()
-{
-
-  update();
-  stateContext.mouseReleased();
-
-  // Resets dragged rectangle
-  mouseInit.set(0,0);
-  mouseFinal.set(0,0);
-  update();
-}
-
-// Mouse drag callback
-void mouseDragged () 
-{
-  update();
-  mouseFinal.set(mouseX, mouseY);
-  stateContext.mouseDragged();
-}
-
-
-void draw() 
-{
-  update();
-  stateContext.draw();
-  stateContext.drawInterface();
-}
-
-void update(){
-  context.updateContext(
-    new PVector(mouseX, mouseY),
-    new PVector(pmouseX, pmouseY), 
-    mouseButton,
-    keyCode, 
-    key,
-    mouseInit,
-    mouseFinal);
-}
-
-
 class Context{
 	PVector mouse;
 	PVector pMouse;
@@ -180,7 +70,8 @@ class Context{
 		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
 			PVector p = curve.getControlPoint(i);
 
-			pos.set(p.z, p);
+			console.log("p.z"+p.z);
+			//pos.set(p.z + 1, p);
 		}
 
 		playing= true;
@@ -210,6 +101,7 @@ class Context{
 	}
 
 }
+
 //
 // Classe que representa uma curva Catmull-Rom
 //
@@ -728,6 +620,7 @@ class CurveCat
   }
 }
 
+
 class DrawningState extends State {
 
     float distanceToSelect = 5;
@@ -788,15 +681,8 @@ class DrawningState extends State {
 
     public void drawInterface()
     {
-      int posX = width-80;
-	    int posY = height-20;
-      fill(mainColor);
-      stroke(mainColor);
-      rect(posX-10,posY-20,80,30);
-      fill(255);
-      text("Creating", posX, posY);
+
     }
- 
 }
 class EditingState extends State {
 
@@ -1083,7 +969,8 @@ class Interpolator {
   // Sets the property p for time t
   void set (float t, Property p) {
     int i = locateTime(t);
-    if (i >=0 && time.get(i) == t) {
+    console.log("I"+i);
+    if (i >0 && time.get(i) == t) {
       prop.set(i,p);
     }
     else {
@@ -1123,6 +1010,7 @@ class Interpolator {
     prop = new ArrayList<Property>();    
   }
 };
+
 
 class OverSketchState extends State {
 
@@ -1252,6 +1140,7 @@ class OverSketchState extends State {
     }
  
 }
+
 // A property is an array of floats representing a
 // multidimensional point
 class Property extends ArrayList<Float> {
@@ -1285,7 +1174,7 @@ class Property extends ArrayList<Float> {
   // Sets the i'th dimension of the property
   // to value v
   void set(int i, float v) {
-    if(i>=0)  
+    if(i < 0)  
     {
          println("Error: Property->get->i < 0");
          super.add(0.0);
@@ -1307,6 +1196,7 @@ class Property extends ArrayList<Float> {
     return super.get(i);
   }
 };
+
 class Segment{
    PVector a,b,c,d;
   
@@ -1322,6 +1212,7 @@ class Segment{
    }
   
 }
+
 // Smooth (Cubic) interpolation of properties
 class SmoothInterpolator extends Interpolator {
 
@@ -1358,6 +1249,7 @@ class SmoothInterpolator extends Interpolator {
   }
 
 };
+
 
 // Wraps a interpolator class so that 
 // methods return PVectors representing positions rather 
@@ -1439,6 +1331,7 @@ class SmoothPositionInterpolator {
     interp.clear();
   }
 }
+
 
 class State
 {
@@ -1747,4 +1640,122 @@ static class Utils{
     }
   }
 }
+/**
+ AnimationApp.pde
+ Author: Guilherme Herzog
+ Created on: May 13
+ **/
+
+PFont font; // it's a font
+float curveT;
+
+// Curve
+CurveCat curve;
+CurveCat decimedCurve;
+
+// Selection Box
+PVector mouseInit;
+PVector mouseFinal;
+
+// State Context
+StateContext stateContext;
+
+// Context
+Context context;
+
+// Colours
+color mainColor = #0066C8;
+color secondaryColor = #FF9700;
+color thirdColor = #3990E3;
+
+// Images
+PImage img;
+
+int width,height;
+
+Context getContext(){
+  return context;
+}
+
+public void setup() 
+{
+  width = 800;
+  height = 600;
+  size(width, height);
+
+  smooth();
+
+  font = createFont("", 14);
+  curveT = 0;
+  img = loadImage("play.png");
+
+  // PVectors used to create the selection box
+  mouseInit = new PVector(0,0);
+  mouseFinal = new PVector(0,0);
+
+  curveTightness(curveT);
+
+  context = new Context();
+  update();
+  context.setSelectionBox(mouseInit, mouseFinal);
+
+  stateContext = new StateContext(context);
+  stateContext.setContext(context);
+}
+
+// TODO Mudar isso para um interface só usando o mouse
+void keyPressed() 
+{ 
+  update();
+  stateContext.keyPressed();
+}
+
+// Mouse press callback
+void mousePressed() 
+{
+  mouseInit.set(mouseX, mouseY);
+  mouseFinal.set(mouseX, mouseY);
+  update();
+  stateContext.mousePressed();
+}
+    
+void mouseReleased()
+{
+
+  update();
+  stateContext.mouseReleased();
+
+  // Resets dragged rectangle
+  mouseInit.set(0,0);
+  mouseFinal.set(0,0);
+  update();
+}
+
+// Mouse drag callback
+void mouseDragged () 
+{
+  update();
+  mouseFinal.set(mouseX, mouseY);
+  stateContext.mouseDragged();
+}
+
+
+void draw() 
+{
+  update();
+  stateContext.draw();
+  stateContext.drawInterface();
+}
+
+void update(){
+  context.updateContext(
+    new PVector(mouseX, mouseY),
+    new PVector(pmouseX, pmouseY), 
+    mouseButton,
+    keyCode, 
+    key,
+    mouseInit,
+    mouseFinal);
+}
+
 
