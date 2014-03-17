@@ -2,7 +2,6 @@
 	<head>
 		<title>CurveAnimation</title>
 
-		<link rel="stylesheet" type="text/css" href="css/main.css">
 
 		<!--[if lt IE 9]>
 			<script type="text/javascript">alert("Your browser does not support the canvas tag.");</script>
@@ -10,6 +9,7 @@
 
 		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="css/bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="css/main.css">
 	</head>
 
 	<body>
@@ -24,7 +24,12 @@
 			</noscript>
 
 	    	<div id='interface'>
-	    		<button type="button" onClick="processing.getContext().play()" class="btn btn-default">Default</button>
+	    		<button type="button" onClick="processing.getContext().play()" class="myBtn btn btn-primary">
+	    			<span class="glyphicon glyphicon-play"></span>
+	    		</button>
+	    		<button type="button" onClick="processing.getContext().play()" class="myBtn btn btn-default">Default</button>
+	    		<button type="button" onClick="processing.getContext().play()" class="myBtn btn btn-default">Default</button>
+	    		<button type="button" onClick="processing.getContext().play()" class="myBtn btn btn-default ">Default</button>
 	    	</div>
 		</div>
 
