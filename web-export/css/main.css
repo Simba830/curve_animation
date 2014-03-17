@@ -1,7 +1,8 @@
 #content{
 	margin: 100px auto;
 	width: 800px;
-}
+/*	O Quintanilha é lindo
+*/}
 
 #canvas{
 	border-style: solid;
@@ -21,4 +22,8 @@
 	border-left-width: 0;
 	border-right-width: 0;
 	border-top-width: 0;
+}
+
+#dino{
+	padding-top: 500px;
 }
