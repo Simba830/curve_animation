@@ -9,16 +9,19 @@ class Context{
 	PVector mouseFinal;
 	int[] selectedSegments;
 	int mouseCount;
-	SmoothPositionInterpolator pos;
 	boolean playing;
+	ArrayList<SceneElement> sceneElements;
+	SceneElement selectedElement;
 
 	Context(){
 		selectedSegments = new int[0];
 		this.curve = new CurveCat();
 		this.curve.setTolerance(7);
 
-		pos = new SmoothPositionInterpolator();
 		playing = false;
+
+		sceneElements = new ArrayList<SceneElement>();
+		selectedElement = null;
 	}
 
 	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
@@ -48,6 +51,7 @@ class Context{
 		println("this.keyCode: "+this.keyCode+",");
 		println("this.key: "+this.key+",");
 		Utils.print_r(selectedSegments);
+		println("elements"+sceneElements);
 	}
 
 	void diselect(){
@@ -60,21 +64,10 @@ class Context{
 
 	void play(){
 		frameCount = 0;
-		pos.clear();
 
-		if(curve.getNumberControlPoints() == 0){
-			return;
-		}
+		refreshInterpolator();
 
-
-		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
-			PVector p = curve.getControlPoint(i);
-
-			console.log("p.z"+p.z);
-			//pos.set(p.z + 1, p);
-		}
-
-		playing= true;
+		playing = true;
 	}
 
 	void refreshInterpolator(){
@@ -83,21 +76,62 @@ class Context{
 			return;
 		}
 
-		pos.clear();
+		PVector p;
 
-		float length = curve.curveLength();
+		for (SceneElement o : sceneElements) {
+			o.pos.clear();
 
-		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
-			PVector p = curve.getControlPoint(i);
-
-			pos.set(p.z, p);
+			for (int i = 0; i< o.curve.getNumberControlPoints(); i++){
+				p = o.curve.getControlPoint(i);
+				o.pos.set(p.z, p);
+			}
 		}
 
-		playing= true;
+		play = true;
 	}
 
 	void stop(){
-		playing= false;
+		playing = false;
+	}
+
+	void addElement(SceneElement e)
+	{
+		sceneElements.add(e);
+	}
+
+	void draw(float t){
+		for (SceneElement o : sceneElements) {
+			if(o == selectedElement){
+				o.c = color(255,0,0);
+				o.curveColor = color(0,0,0);
+			}else{
+				o.c = color(0,0,0);
+				o.curveColor = color(200,200,200);
+			}
+			o.draw(t);
+			o.drawCurve();
+		}
+	}
+
+	float lastTime(){
+		float lastTime = 0;
+		float lastTimeElement = 0;
+		for (SceneElement o : sceneElements) {
+			lastTimeElement = o.lastTime();
+			if(lastTimeElement > lastTime){
+				lastTime = lastTimeElement;
+			}
+		}
+
+		return lastTime;
+	}
+
+	void setSelectedElement(SceneElement element){
+		selectedElement = null;
+		selectedElement = element;
+        if(selectedElement != null){
+		  curve = selectedElement.curve;
+        }
 	}
 
 }

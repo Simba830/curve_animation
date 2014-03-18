@@ -1,8 +1,8 @@
 #content{
 	margin: 100px auto;
 	width: 800px;
-/*	O Quintanilha é lindo
-*/}
+	position: relative;
+}
 
 #canvas{
 	border-style: solid;
@@ -10,9 +10,15 @@
 	border-color: black;
 }
 
-#interface{
+#main-interface{
 	position: absolute;
-	top: 100px;
+	top: 0;
+}
+
+#element-interface{
+	position: absolute;
+	right: 0;
+	top: 0;
 }
 
 .myBtn{
@@ -24,6 +30,10 @@
 	border-top-width: 0;
 }
 
-#dino{
-	padding-top: 500px;
+.btn-default{
+	border-width: 1;
+	border-color: black;
+	border-radius: 0px 0px;
+	display: block;
+	width: 100%;
 }

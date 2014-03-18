@@ -35,6 +35,10 @@ Context getContext(){
   return context;
 }
 
+stateContext getStateContext(){
+  return stateContext;
+}
+
 public void setup() 
 {
   width = 800;
@@ -102,7 +106,6 @@ void draw()
 {
   update();
   stateContext.draw();
-  stateContext.drawInterface();
 }
 
 void update(){

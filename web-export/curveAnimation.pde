@@ -1,3 +1,88 @@
+class Circle extends SceneElement{
+
+	float width, height;
+	boolean active;
+
+	Circle(float _width, float _height)
+	{
+		super(context.mouse);
+		this.name = "Circle";
+		this.width = _width;
+		this.height = _height;
+		active = true;
+	}
+
+	void draw(float t)
+	{
+		if(pos.nKeys() < 1){
+			return;
+		}
+
+		if(t >= pos.keyTime(pos.nKeys()-1)){
+			t = pos.keyTime(pos.nKeys()-1);
+		}
+
+		PVector position;
+		if(!active){
+			position = pos.interp.get(0);
+		}else{
+			position = pos.interp.get(t);
+		}
+
+		fill(c);
+		stroke(0);
+		ellipse(position.x, position.y, this.width, this.height);
+	}
+
+	float lastTime()
+	{
+		if(pos.nKeys() < 1)
+			return 0;
+
+		return pos.keyTime(pos.nKeys()-1);
+	}
+
+	boolean isOver(PVector mouse){
+                PVector position = pos.get(0);
+                float radious = this.width;
+		return (mouse.x - position.x)*(mouse.x - position.x) + (mouse.y - position.y)*(mouse.y - position.y) <= radious;
+	}
+}
+
+class CircleState extends State {
+
+    CircleState(Context _context){
+      super(_context);
+    }
+
+    public void mousePressed() 
+    {
+        console.log("CircleState mousePressed");
+    	Circle c = new Circle(20,20);
+    	context.addElement(c);	
+        //stateContext.setState(new DrawningState(context));
+        context.setSelectedElement(c);
+    }
+    
+    public void mouseReleased(PVector mouse) 
+    {
+
+    }
+
+    public void keyPressed(){
+      
+    }
+
+    public void draw()
+    {
+
+  	}
+
+    public void drawInterface()
+    {
+
+    }
+}
 class Context{
 	PVector mouse;
 	PVector pMouse;
@@ -9,16 +94,19 @@ class Context{
 	PVector mouseFinal;
 	int[] selectedSegments;
 	int mouseCount;
-	SmoothPositionInterpolator pos;
 	boolean playing;
+	ArrayList<SceneElement> sceneElements;
+	SceneElement selectedElement;
 
 	Context(){
 		selectedSegments = new int[0];
 		this.curve = new CurveCat();
 		this.curve.setTolerance(7);
 
-		pos = new SmoothPositionInterpolator();
 		playing = false;
+
+		sceneElements = new ArrayList<SceneElement>();
+		selectedElement = null;
 	}
 
 	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
@@ -48,6 +136,7 @@ class Context{
 		println("this.keyCode: "+this.keyCode+",");
 		println("this.key: "+this.key+",");
 		Utils.print_r(selectedSegments);
+		println("elements"+sceneElements);
 	}
 
 	void diselect(){
@@ -60,21 +149,10 @@ class Context{
 
 	void play(){
 		frameCount = 0;
-		pos.clear();
 
-		if(curve.getNumberControlPoints() == 0){
-			return;
-		}
+		refreshInterpolator();
 
-
-		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
-			PVector p = curve.getControlPoint(i);
-
-			console.log("p.z"+p.z);
-			//pos.set(p.z + 1, p);
-		}
-
-		playing= true;
+		playing = true;
 	}
 
 	void refreshInterpolator(){
@@ -83,21 +161,62 @@ class Context{
 			return;
 		}
 
-		pos.clear();
+		PVector p;
 
-		float length = curve.curveLength();
+		for (SceneElement o : sceneElements) {
+			o.pos.clear();
 
-		for (int i = 0; i<curve.getNumberControlPoints() - 1; i++){
-			PVector p = curve.getControlPoint(i);
-
-			pos.set(p.z, p);
+			for (int i = 0; i< o.curve.getNumberControlPoints(); i++){
+				p = o.curve.getControlPoint(i);
+				o.pos.set(p.z, p);
+			}
 		}
 
-		playing= true;
+		play = true;
 	}
 
 	void stop(){
-		playing= false;
+		playing = false;
+	}
+
+	void addElement(SceneElement e)
+	{
+		sceneElements.add(e);
+	}
+
+	void draw(float t){
+		for (SceneElement o : sceneElements) {
+			if(o == selectedElement){
+				o.c = color(255,0,0);
+				o.curveColor = color(0,0,0);
+			}else{
+				o.c = color(0,0,0);
+				o.curveColor = color(200,200,200);
+			}
+			o.draw(t);
+			o.drawCurve();
+		}
+	}
+
+	float lastTime(){
+		float lastTime = 0;
+		float lastTimeElement = 0;
+		for (SceneElement o : sceneElements) {
+			lastTimeElement = o.lastTime();
+			if(lastTimeElement > lastTime){
+				lastTime = lastTimeElement;
+			}
+		}
+
+		return lastTime;
+	}
+
+	void setSelectedElement(SceneElement element){
+		selectedElement = null;
+		selectedElement = element;
+        if(selectedElement != null){
+		  curve = selectedElement.curve;
+        }
 	}
 
 }
@@ -968,8 +1087,8 @@ class Interpolator {
 
   // Sets the property p for time t
   void set (float t, Property p) {
+    console.log("t"+t);
     int i = locateTime(t);
-    console.log("I"+i);
     if (i >0 && time.get(i) == t) {
       prop.set(i,p);
     }
@@ -1197,6 +1316,48 @@ class Property extends ArrayList<Float> {
   }
 };
 
+class SceneElement
+{
+	String name;
+	SmoothPositionInterpolator pos;
+	color c, curveColor;
+	CurveCat curve;
+
+	SceneElement(PVector position)
+	{
+		console.log("SceneElement construct");
+		c = color(0,0,0);
+		curveColor = color(100,100,100);
+		name = "Element";
+		pos = new SmoothPositionInterpolator();
+		pos.interp.set(0,position);
+
+		console.log("Pos working!");
+		this.curve = new CurveCat();
+		this.curve.setTolerance(15);
+	}
+
+	void draw(float t){}
+	void drawCurve(){
+		curve.strokeColor = curveColor;
+		noFill();
+		if(curve.getNumberControlPoints() >= 4)
+			this.curve.draw();
+
+
+		stroke(0);
+	}
+	void load(){}
+	void update(){}
+	float lastTime(){
+		return pos.keyTime(pos.nKeys()-1);
+	}
+
+	boolean isOver(PVector mouse){
+		return true;
+	}
+}
+
 class Segment{
    PVector a,b,c,d;
   
@@ -1373,20 +1534,32 @@ public class StateContext {
 
     private State myState;
     private Context context;
-    private boolean debug;
 
+    private boolean debug;
         /**
          * Standard constructor
          */
     StateContext(Context _context) 
     {
         debug = false;
-        setState(new DrawningState(_context));
-        
+        setState(new CircleState(_context));
+        this.context = _context;
     }
 
     public void setContext(Context _context){
         this.context = _context;
+    }
+
+    public void setNameState(String nameState){
+        switch (nameState) {
+            case 'circle' :
+                myState = new CircleState(this.context);
+            break;    
+
+            default :
+                myState = new DrawningState(this.context);
+            break;    
+        }
     }
 
     public void debug(){
@@ -1410,37 +1583,6 @@ public class StateContext {
      */
     void mousePressed()
     {
-        // Verifica se clicou no botão "Clear";
-        if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width/2 + 60,height-40, 110, 30)){
-            context.curve.clear();
-            context.pos.clear();
-            context.stop();
-            this.setState(new DrawningState(context));
-            context.selectedSegments = new int[0];
-            return;
-        }
-
-        if(Utils.mouseOverRect(new PVector(mouseX, mouseY),width-80-130, height-20-20, 110, 30)){
-
-            if(this.myState instanceof OverSketchState){
-                this.setState(new EditingState(context));
-                return;
-            }
-
-            this.setState(new OverSketchState(context));
-            context.selectedSegments = new int[0];
-            return;
-        }
-
-        if(Utils.mouseOverRect(new PVector(mouseX, mouseY),20, height-50, 50, 50)){
-            if(context.isPlayed())
-                context.stop();
-            else
-                context.play(); 
-
-            return;
-        }
-
         // Seleciona o segmento em questão se for o mouse LEFT
         PVector closestPoint = new PVector();
         PVector q = new PVector(context.mouse.x, context.mouse.y);
@@ -1471,28 +1613,9 @@ public class StateContext {
 
     void keyPressed(){
         switch (context.key){
-            case '1' :
-              this.setState(new DrawningState(this.context));
-            break;  
-
-            case '2' :
-                this.setState(new EditingState(this.context));
-            break;  
-
             case 'd' :
               this.debug();
             break;  
-
-            case 's' :
-                this.context.curve.decimeCurve();
-            break;   
-
-            case 'p' :
-                if(context.isPlayed())
-                    context.stop();
-                else
-                    context.play();
-            break;
 
             case 'z' :
                 this.context.curve.undo();
@@ -1507,78 +1630,35 @@ public class StateContext {
               myState.keyPressed();
             break;
         }
+
+        myState.keyPressed();
     }
     
     void draw()
     {
         background (255);
         noFill();
-        if (context.curve.getNumberControlPoints() >=4) 
-            context.curve.draw();
         
         myState.draw();
 
         if(context.isPlayed()){
-            float lastTime = context.pos.keyTime(context.pos.nKeys()-1);
-            float t = frameCount%int(lastTime);
+            context.refreshInterpolator();
+            float lastTime = context.lastTime();
 
-            // Essa parte faria parar no final da animação
-            // if(t == 0)
-            //     context.stop();
-            
-            PVector p = context.pos.get(t);
+            if(lastTime == 0){
+                context.stop();
+            }else{
+                float t = frameCount%int(lastTime);
+                context.draw(t);
+            }
 
-            PVector tan = context.pos.getTangent(t);
-            stroke(100,100,100);
-            context.pos.draw (100);
-            float ang = atan2(tan.y,tan.x);
 
-            pushMatrix();
-            translate (p.x,p.y);
-            rotate (ang);
-            noStroke();
-            fill(mainColor);
-            ellipse(0,0, 20, 20);
-            popMatrix();
+        }else{
+            context.draw(0.0);
         }
-    }
-
-    void drawInterface()
-    {
-        int posX = width-80;
-        int posY = height-20;
-        stroke(thirdColor);
-        fill(thirdColor);
-        rect(width-80-130, height-20-20, 110, 30);
-
-        stroke(255);
-        fill(255);
-        text("OverSkecthing", posX-125, posY);
-
-        stroke(thirdColor);
-        fill(thirdColor);
-        rect(width/2 + 60, height-40, 110, 30);
-
-        stroke(255);
-        fill(255);
-        text("Clear", width/2 + 70, height-20);
-
-        myState.drawInterface();
-
-        if(debug){
-          fill(255,0,0);
-          stroke(255,0,0);
-          text("Curve Length:"+context.curve.curveLength()+" px", 10, height-20);
-          text("Curve Tightness:"+curveT, 10, 20);
-          text("Tolerance:"+context.curve.tolerance, 10, 40);
-        }
-
-        pushMatrix();
-        translate(20, height-50);
-        image(img, 0, 0);
-        popMatrix();
     }
 }
+
 class Text extends Element{
 	PFont font;
 	String text;
@@ -1677,6 +1757,10 @@ Context getContext(){
   return context;
 }
 
+stateContext getStateContext(){
+  return stateContext;
+}
+
 public void setup() 
 {
   width = 800;
@@ -1744,7 +1828,6 @@ void draw()
 {
   update();
   stateContext.draw();
-  stateContext.drawInterface();
 }
 
 void update(){

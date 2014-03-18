@@ -37,8 +37,8 @@ class Interpolator {
 
   // Sets the property p for time t
   void set (float t, Property p) {
+    console.log("t"+t);
     int i = locateTime(t);
-    console.log("I"+i);
     if (i >0 && time.get(i) == t) {
       prop.set(i,p);
     }

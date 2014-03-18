@@ -24,13 +24,39 @@
 				<p>JavaScript is required to view the contents of this page.</p>
 			</noscript>
 
-	    	<div id='interface'>
+	    	<div id='main-interface'>
+	    		<button type="button" onClick="" class="menu-control btn btn-default">
+	    			Menu
+	    		</button>
+
 	    		<button type="button" onClick="processing.getContext().play()" class="myBtn btn btn-primary">
-	    			<span class="glyphicon glyphicon-play"></span>
+	    			<span class="glyphicon glyphicon-play"></span> Play
+	    		</button>
+
+	    		<button type="button" onClick="processing.getStateContext().setNameState('circle')" class="myBtn btn btn-primary">
+	    			<span class="glyphicon glyphicon-unchecked"></span> Circle
+	    		</button>
+
+	    		<button type="button" onClick="processing.getStateContext().setNameState('circle')" class="myBtn btn btn-primary">
+	    			<span class="glyphicon glyphicon-font"></span> Font
+	    		</button>
+
+	    	</div>
+
+	    	<div id='element-interface'>
+	    		<button type="button" onClick="" class="menu-control btn btn-default">
+	    			Inspector
+	    		</button>
+
+	    		<button type="button" onClick="processing.getContext().curve.clear()" class="myBtn btn btn-primary">
+	    			<span class="glyphicon glyphicon-remove"></span> Clear Curve
+	    		</button>
+
+	    		<button type="button" onClick="processing.getStateContext().setNameState('circle')" class="myBtn btn btn-primary">
+	    			<span class="glyphicon glyphicon-record"></span> Record
 	    		</button>
 	    	</div>
 	    	 
-
 		</div>
 
 		<!-- Scripts -->
