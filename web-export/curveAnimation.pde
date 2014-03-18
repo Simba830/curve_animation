@@ -39,11 +39,11 @@ class Circle extends SceneElement{
 		if(pos.nKeys() < 1)
 			return 0;
 
-		return pos.keyTime(pos.nKeys()-1);
+		return pos.interp.time.get(pos.nKeys()-1);
 	}
 
 	boolean isOver(PVector mouse){
-                PVector position = pos.get(0);
+                PVector position = pos.interp.get(0);
                 float radious = this.width;
 		return (mouse.x - position.x)*(mouse.x - position.x) + (mouse.y - position.y)*(mouse.y - position.y) <= radious;
 	}
@@ -168,7 +168,8 @@ class Context{
 
 			for (int i = 0; i< o.curve.getNumberControlPoints(); i++){
 				p = o.curve.getControlPoint(i);
-				o.pos.set(p.z, p);
+
+				o.pos.interp.set(p.z, p);
 			}
 		}
 
@@ -1087,7 +1088,6 @@ class Interpolator {
 
   // Sets the property p for time t
   void set (float t, Property p) {
-    console.log("t"+t);
     int i = locateTime(t);
     if (i >0 && time.get(i) == t) {
       prop.set(i,p);
@@ -1374,6 +1374,48 @@ class Segment{
   
 }
 
+class SelectState extends State
+{
+	SelectState(Context _context){
+      super(_context);
+    }
+
+    public void mousePressed() 
+    {
+    	for (SceneElement o : context.sceneElements) {
+    		if(o.isOver(context.mouse)){
+    			context.setSelectedElement(o);
+                        return;
+    		}
+    	}
+    }
+    
+    public void mouseReleased(PVector mouse) 
+    {
+
+    }
+    
+    public void mouseDragged()
+    {
+        stateContext.setState(new DrawningState(context));
+        stateContext.mouseDragged();
+    }
+
+    public void keyPressed(){
+      
+    }
+
+    public void draw()
+    {
+
+    }
+
+    public void drawInterface()
+    {
+
+    }
+}
+
 // Smooth (Cubic) interpolation of properties
 class SmoothInterpolator extends Interpolator {
 
@@ -1386,15 +1428,17 @@ class SmoothInterpolator extends Interpolator {
         // Compute the 4 points that will be used
         // to interpolate the property 
         Property a,b,c,d;
-        a = b = prop.get(i); 
-        c = d = prop.get(i+1); 
+        a = b = (ArrayList<Float>)prop.get(i); 
+        c = d = (ArrayList<Float>)prop.get(i+1); 
         if (i > 0) a = prop.get(i-1); 
         if (i+2 < time.size()) d = prop.get(i+2);
         // Interpolate the parameter
         float s = norm (t, time.get(i), time.get(i+1)); 
         // Now interpolate the property dimensions
-        Property p = new Property(); 
-        int n = max (a.size(), b.size());
+        Property p = new Property();
+
+        // int n = max (a.size(), b.size());
+        int n = 3;
         for (int k = 0; k < n; k++) {
           p.set(k, curvePoint(a.get(k), b.get(k), c.get(k), d.get(k), s));
         }
@@ -1408,7 +1452,6 @@ class SmoothInterpolator extends Interpolator {
       return prop.get(0);
     }
   }
-
 };
 
 
@@ -1554,7 +1597,15 @@ public class StateContext {
         switch (nameState) {
             case 'circle' :
                 myState = new CircleState(this.context);
-            break;    
+            break;   
+
+            case 'select' :
+                 myState = new SelectState(this.context);
+             break;   
+
+            case 'draw' :
+                  myState = new DrawningState(this.context);
+              break;      
 
             default :
                 myState = new DrawningState(this.context);

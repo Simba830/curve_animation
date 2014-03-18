@@ -39,11 +39,11 @@ class Circle extends SceneElement{
 		if(pos.nKeys() < 1)
 			return 0;
 
-		return pos.keyTime(pos.nKeys()-1);
+		return pos.interp.time.get(pos.nKeys()-1);
 	}
 
 	boolean isOver(PVector mouse){
-                PVector position = pos.get(0);
+                PVector position = pos.interp.get(0);
                 float radious = this.width;
 		return (mouse.x - position.x)*(mouse.x - position.x) + (mouse.y - position.y)*(mouse.y - position.y) <= radious;
 	}

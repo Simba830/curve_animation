@@ -22,7 +22,15 @@ public class StateContext {
         switch (nameState) {
             case 'circle' :
                 myState = new CircleState(this.context);
-            break;    
+            break;   
+
+            case 'select' :
+                 myState = new SelectState(this.context);
+             break;   
+
+            case 'draw' :
+                  myState = new DrawningState(this.context);
+              break;      
 
             default :
                 myState = new DrawningState(this.context);
