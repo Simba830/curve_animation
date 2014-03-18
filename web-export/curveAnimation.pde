@@ -34,6 +34,14 @@ class Circle extends SceneElement{
 		ellipse(position.x, position.y, this.width, this.height);
 	}
 
+	void setWidth(float x){
+		this.width = x;
+	}
+
+	void setHeight(float x){
+		this.height = x;
+	}
+
 	float lastTime()
 	{
 		if(pos.nKeys() < 1)
@@ -57,16 +65,25 @@ class CircleState extends State {
 
     public void mousePressed() 
     {
-        console.log("CircleState mousePressed");
     	Circle c = new Circle(20,20);
     	context.addElement(c);	
-        //stateContext.setState(new DrawningState(context));
         context.setSelectedElement(c);
     }
-    
-    public void mouseReleased(PVector mouse) 
-    {
 
+    public void mouseDragged(){
+        Circle c = context.getSelectedElement();
+        PVector pos = c.pos.interp.get(0);
+
+        float dx = abs(context.pMouse.x - pos.x);
+        float dy = abs(context.pMouse.y - pos.y);
+
+        c.setWidth(dx);
+        c.setHeight(dx);
+    }
+    
+    public void mouseReleased() 
+    {
+        stateContext.setStateName("draw");
     }
 
     public void keyPressed(){
@@ -150,9 +167,8 @@ class Context{
 	void play(){
 		frameCount = 0;
 
-		refreshInterpolator();
-
 		playing = true;
+		refreshInterpolator();
 	}
 
 	void refreshInterpolator(){
@@ -220,6 +236,22 @@ class Context{
         }
 	}
 
+	SceneElement getSelectedElement(){
+		return selectedElement;
+	}
+
+	void deleteSelectedElement(){
+		for (int i = 0; i < sceneElements.size(); ++i) {
+			SceneElement o = sceneElements.get(i);
+			if(o == selectedElement){
+				sceneElements.remove(i);
+				return;
+			}
+		}
+
+		selectedElement = null;
+		stateContext.setStateName("select");
+	}
 }
 
 //
@@ -1325,14 +1357,12 @@ class SceneElement
 
 	SceneElement(PVector position)
 	{
-		console.log("SceneElement construct");
 		c = color(0,0,0);
 		curveColor = color(100,100,100);
 		name = "Element";
 		pos = new SmoothPositionInterpolator();
 		pos.interp.set(0,position);
 
-		console.log("Pos working!");
 		this.curve = new CurveCat();
 		this.curve.setTolerance(15);
 	}
@@ -1397,8 +1427,8 @@ class SelectState extends State
     
     public void mouseDragged()
     {
-        stateContext.setState(new DrawningState(context));
-        stateContext.mouseDragged();
+        //stateContext.setState(new DrawningState(context));
+        //stateContext.mouseDragged();
     }
 
     public void keyPressed(){
@@ -1578,14 +1608,12 @@ public class StateContext {
     private State myState;
     private Context context;
 
-    private boolean debug;
         /**
          * Standard constructor
          */
     StateContext(Context _context) 
     {
-        debug = false;
-        setState(new CircleState(_context));
+        setState(new SelectState(_context));
         this.context = _context;
     }
 
@@ -1593,7 +1621,7 @@ public class StateContext {
         this.context = _context;
     }
 
-    public void setNameState(String nameState){
+    public void setStateName(String nameState){
         switch (nameState) {
             case 'circle' :
                 myState = new CircleState(this.context);
@@ -1613,10 +1641,6 @@ public class StateContext {
         }
     }
 
-    public void debug(){
-        debug = !debug;
-    }
- 
     /**
      * Setter method for the state.
      * Normally only called by classes implementing the State interface.
@@ -1664,10 +1688,6 @@ public class StateContext {
 
     void keyPressed(){
         switch (context.key){
-            case 'd' :
-              this.debug();
-            break;  
-
             case 'z' :
                 this.context.curve.undo();
             break;         

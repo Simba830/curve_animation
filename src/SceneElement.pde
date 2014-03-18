@@ -7,14 +7,12 @@ class SceneElement
 
 	SceneElement(PVector position)
 	{
-		console.log("SceneElement construct");
 		c = color(0,0,0);
 		curveColor = color(100,100,100);
 		name = "Element";
 		pos = new SmoothPositionInterpolator();
 		pos.interp.set(0,position);
 
-		console.log("Pos working!");
 		this.curve = new CurveCat();
 		this.curve.setTolerance(15);
 	}

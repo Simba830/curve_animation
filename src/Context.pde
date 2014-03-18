@@ -65,9 +65,8 @@ class Context{
 	void play(){
 		frameCount = 0;
 
-		refreshInterpolator();
-
 		playing = true;
+		refreshInterpolator();
 	}
 
 	void refreshInterpolator(){
@@ -135,4 +134,20 @@ class Context{
         }
 	}
 
+	SceneElement getSelectedElement(){
+		return selectedElement;
+	}
+
+	void deleteSelectedElement(){
+		for (int i = 0; i < sceneElements.size(); ++i) {
+			SceneElement o = sceneElements.get(i);
+			if(o == selectedElement){
+				sceneElements.remove(i);
+				return;
+			}
+		}
+
+		selectedElement = null;
+		stateContext.setStateName("select");
+	}
 }

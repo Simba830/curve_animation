@@ -21,8 +21,8 @@ class SelectState extends State
     
     public void mouseDragged()
     {
-        stateContext.setState(new DrawningState(context));
-        stateContext.mouseDragged();
+        //stateContext.setState(new DrawningState(context));
+        //stateContext.mouseDragged();
     }
 
     public void keyPressed(){

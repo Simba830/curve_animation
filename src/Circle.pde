@@ -34,6 +34,14 @@ class Circle extends SceneElement{
 		ellipse(position.x, position.y, this.width, this.height);
 	}
 
+	void setWidth(float x){
+		this.width = x;
+	}
+
+	void setHeight(float x){
+		this.height = x;
+	}
+
 	float lastTime()
 	{
 		if(pos.nKeys() < 1)

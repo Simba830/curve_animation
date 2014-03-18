@@ -3,14 +3,12 @@ public class StateContext {
     private State myState;
     private Context context;
 
-    private boolean debug;
         /**
          * Standard constructor
          */
     StateContext(Context _context) 
     {
-        debug = false;
-        setState(new CircleState(_context));
+        setState(new SelectState(_context));
         this.context = _context;
     }
 
@@ -18,7 +16,7 @@ public class StateContext {
         this.context = _context;
     }
 
-    public void setNameState(String nameState){
+    public void setStateName(String nameState){
         switch (nameState) {
             case 'circle' :
                 myState = new CircleState(this.context);
@@ -38,10 +36,6 @@ public class StateContext {
         }
     }
 
-    public void debug(){
-        debug = !debug;
-    }
- 
     /**
      * Setter method for the state.
      * Normally only called by classes implementing the State interface.
@@ -89,10 +83,6 @@ public class StateContext {
 
     void keyPressed(){
         switch (context.key){
-            case 'd' :
-              this.debug();
-            break;  
-
             case 'z' :
                 this.context.curve.undo();
             break;         
