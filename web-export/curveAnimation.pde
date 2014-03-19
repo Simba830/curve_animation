@@ -22,7 +22,7 @@ class Circle extends SceneElement{
 			t = pos.keyTime(pos.nKeys()-1);
 		}
 
-		PVector position;
+		Property position;
 		if(!active){
 			position = pos.interp.get(0);
 		}else{
@@ -168,6 +168,13 @@ class Context{
 		frameCount = 0;
 
 		playing = true;
+		refreshInterpolator();
+	}
+
+	void togglePlay(){
+		playing = !playing;
+
+		frameCount = 0;
 		refreshInterpolator();
 	}
 
@@ -1294,22 +1301,41 @@ class OverSketchState extends State {
 
 // A property is an array of floats representing a
 // multidimensional point
-class Property extends ArrayList<Float> {
+class Property {
+  
+  ArrayList<Float> prop = new ArrayList<Float>();
   
   // An empty property
   Property() {
-    super();
+    prop = new ArrayList<Float>();
   }
 
+  // Make sure this property has room for storing n floats
+  void setDimension (int n) {
+    while (size() < n) add(0.0);
+  }
+
+  // Returns the number of floats defined for the property
+  int size() {
+    return prop.size();
+  }
+  
+  // Adds another float to the property
+  void add (Float f) {
+    prop.add(f);
+  }
+  
   // A one-float property
   Property (float a) {
     super();
+    setDimension (1);
     set (0,a);
   }
 
   // A two-float property
   Property (float a, float b) {
     super();
+    setDimension (2);
     set (0,a);
     set (1,b);
   }
@@ -1317,6 +1343,7 @@ class Property extends ArrayList<Float> {
   // A three-float property
   Property (float a, float b, float c) {
     super();
+    setDimension (3);
     set (0,a);
     set (1,b);
     set (2,c);
@@ -1325,28 +1352,20 @@ class Property extends ArrayList<Float> {
   // Sets the i'th dimension of the property
   // to value v
   void set(int i, float v) {
-    if(i < 0)  
-    {
-         println("Error: Property->get->i < 0");
-         super.add(0.0);
-    }
+     my_assert(i>=0);
      while (i >= size()) add(0.0);
-     super.set(i,v);
+     prop.set(i,v);
   }
 
   // Returns the i'th dimension of the property.
   // Returns 0.0 if that dimension was never set
   Float get(int i) {
-    if (i<0)
-    {
-         println("Error: Property->get->i < 0");
-         return 0.0;
-    }
+    my_assert (i>=0);
     if (i >= size()) return 0.0;
-    
-    return super.get(i);
+    return prop.get(i);
   }
 };
+
 
 class SceneElement
 {
@@ -1458,17 +1477,15 @@ class SmoothInterpolator extends Interpolator {
         // Compute the 4 points that will be used
         // to interpolate the property 
         Property a,b,c,d;
-        a = b = (ArrayList<Float>)prop.get(i); 
-        c = d = (ArrayList<Float>)prop.get(i+1); 
-        if (i > 0) a = prop.get(i-1); 
-        if (i+2 < time.size()) d = prop.get(i+2);
+        a = b = new Property( prop.get(i)[0], prop.get(i)[1], prop.get(i)[2]); 
+        c = d = (Property) new Property( prop.get(i + 1)[0], prop.get(i + 1)[1], prop.get(i + 1)[2]); 
+        if (i > 0) a = new Property( prop.get(i - 1)[0], prop.get(i - 1)[1], prop.get(i - 1)[2]) ; 
+        if (i+2 < time.size()) d = new Property( prop.get(i + 2)[0], prop.get(i + 2)[1], prop.get(i + 2)[2]);
         // Interpolate the parameter
         float s = norm (t, time.get(i), time.get(i+1)); 
         // Now interpolate the property dimensions
-        Property p = new Property();
-
-        // int n = max (a.size(), b.size());
-        int n = 3;
+        Property p = new Property(); 
+        int n = max (a.size(), b.size());
         for (int k = 0; k < n; k++) {
           p.set(k, curvePoint(a.get(k), b.get(k), c.get(k), d.get(k), s));
         }
@@ -1477,11 +1494,11 @@ class SmoothInterpolator extends Interpolator {
       else return prop.get(i);
     }
     else {
-      if (time.size() > 0)
-        println("Error: time.size() <= 0");
+      my_assert (time.size() > 0);
       return prop.get(0);
     }
   }
+
 };
 
 
@@ -1525,6 +1542,8 @@ class SmoothPositionInterpolator {
   
   // Gets the position at time t
   PVector get (float t) {
+    println("get do SmoothPositionInterpolator");
+    println("toPVector (interp.get(t)): "+toPVector (interp.get(t)));
     return toPVector (interp.get(t));
   }
   
@@ -1791,6 +1810,11 @@ static class Utils{
     }
   }
 }
+
+void my_assert (boolean p) {
+  if (!p) println ("my_assertion failed");
+}
+
 /**
  AnimationApp.pde
  Author: Guilherme Herzog

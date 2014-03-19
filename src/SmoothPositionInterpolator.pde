@@ -38,6 +38,8 @@ class SmoothPositionInterpolator {
   
   // Gets the position at time t
   PVector get (float t) {
+    println("get do SmoothPositionInterpolator");
+    println("toPVector (interp.get(t)): "+toPVector (interp.get(t)));
     return toPVector (interp.get(t));
   }
   

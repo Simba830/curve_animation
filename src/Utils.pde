@@ -22,3 +22,7 @@ static class Utils{
     }
   }
 }
+
+void my_assert (boolean p) {
+  if (!p) println ("my_assertion failed");
+}

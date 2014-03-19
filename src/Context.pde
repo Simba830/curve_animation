@@ -69,6 +69,13 @@ class Context{
 		refreshInterpolator();
 	}
 
+	void togglePlay(){
+		playing = !playing;
+
+		frameCount = 0;
+		refreshInterpolator();
+	}
+
 	void refreshInterpolator(){
 
 		if(!this.isPlayed()){
