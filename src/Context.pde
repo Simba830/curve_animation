@@ -118,6 +118,8 @@ class Context{
 			o.draw(t);
 			o.drawCurve();
 		}
+
+		text("Tempo: "+t, 20, height - 20);
 	}
 
 	float lastTime(){

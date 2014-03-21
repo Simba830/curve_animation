@@ -23,7 +23,7 @@
 
 .myBtn{
 	display: block;
-	width: 100%;
+	width: 150px;
 	border-radius: 0px 0px;
 	border-left-width: 0;
 	border-right-width: 0;
@@ -35,5 +35,5 @@
 	border-color: black;
 	border-radius: 0px 0px;
 	display: block;
-	width: 100%;
+	width: 150px;
 }

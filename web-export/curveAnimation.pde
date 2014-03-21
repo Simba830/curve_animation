@@ -51,7 +51,7 @@ class Circle extends SceneElement{
 	}
 
 	boolean isOver(PVector mouse){
-                PVector position = pos.interp.get(0);
+                PVector position = pos.get(0);
                 float radious = this.width;
 		return (mouse.x - position.x)*(mouse.x - position.x) + (mouse.y - position.y)*(mouse.y - position.y) <= radious;
 	}
@@ -220,6 +220,8 @@ class Context{
 			o.draw(t);
 			o.drawCurve();
 		}
+
+		text("Tempo: "+t, 20, height - 20);
 	}
 
 	float lastTime(){
