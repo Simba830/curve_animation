@@ -22,11 +22,11 @@ class Circle extends SceneElement{
 			t = pos.keyTime(pos.nKeys()-1);
 		}
 
-		Property position;
+		PVector position;
 		if(!active){
-			position = pos.interp.get(0);
+			position = pos.get(0);
 		}else{
-			position = pos.interp.get(t);
+			position = pos.get(t);
 		}
 
 		fill(c);

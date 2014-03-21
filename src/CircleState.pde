@@ -13,7 +13,7 @@ class CircleState extends State {
 
     public void mouseDragged(){
         Circle c = context.getSelectedElement();
-        PVector pos = c.pos.interp.get(0);
+        PVector pos = c.pos.get(0);
 
         float dx = abs(context.pMouse.x - pos.x);
         float dy = abs(context.pMouse.y - pos.y);

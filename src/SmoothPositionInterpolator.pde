@@ -4,11 +4,11 @@
 class SmoothPositionInterpolator {
   
   // The interpolator being wrapped
-  SmoothInterpolator interp;
+  Interpolator interp;
   
   // Constructor
-  SmoothPositionInterpolator () {
-    this.interp = new SmoothInterpolator();
+  SmoothPositionInterpolator (interpolator interp) {
+    this.interp = interp;
   }
 
   // Converts a property to a PVector
@@ -38,8 +38,6 @@ class SmoothPositionInterpolator {
   
   // Gets the position at time t
   PVector get (float t) {
-    println("get do SmoothPositionInterpolator");
-    println("toPVector (interp.get(t)): "+toPVector (interp.get(t)));
     return toPVector (interp.get(t));
   }
   

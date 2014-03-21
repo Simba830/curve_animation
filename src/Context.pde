@@ -90,7 +90,7 @@ class Context{
 			for (int i = 0; i< o.curve.getNumberControlPoints(); i++){
 				p = o.curve.getControlPoint(i);
 
-				o.pos.interp.set(p.z, p);
+				o.pos.set(p.z, p);
 			}
 		}
 

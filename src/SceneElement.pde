@@ -10,8 +10,8 @@ class SceneElement
 		c = color(0,0,0);
 		curveColor = color(100,100,100);
 		name = "Element";
-		pos = new SmoothPositionInterpolator();
-		pos.interp.set(0,position);
+		pos = new SmoothPositionInterpolator(new SmoothInterpolator());
+		pos.set(0,position);
 
 		this.curve = new CurveCat();
 		this.curve.setTolerance(15);

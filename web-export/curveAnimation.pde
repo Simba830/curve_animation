@@ -22,11 +22,11 @@ class Circle extends SceneElement{
 			t = pos.keyTime(pos.nKeys()-1);
 		}
 
-		Property position;
+		PVector position;
 		if(!active){
-			position = pos.interp.get(0);
+			position = pos.get(0);
 		}else{
-			position = pos.interp.get(t);
+			position = pos.get(t);
 		}
 
 		fill(c);
@@ -72,7 +72,7 @@ class CircleState extends State {
 
     public void mouseDragged(){
         Circle c = context.getSelectedElement();
-        PVector pos = c.pos.interp.get(0);
+        PVector pos = c.pos.get(0);
 
         float dx = abs(context.pMouse.x - pos.x);
         float dy = abs(context.pMouse.y - pos.y);
@@ -192,7 +192,7 @@ class Context{
 			for (int i = 0; i< o.curve.getNumberControlPoints(); i++){
 				p = o.curve.getControlPoint(i);
 
-				o.pos.interp.set(p.z, p);
+				o.pos.set(p.z, p);
 			}
 		}
 
@@ -1128,7 +1128,7 @@ class Interpolator {
   // Sets the property p for time t
   void set (float t, Property p) {
     int i = locateTime(t);
-    if (i >0 && time.get(i) == t) {
+    if (i >=0 && time.get(i) == t) {
       prop.set(i,p);
     }
     else {
@@ -1156,17 +1156,16 @@ class Interpolator {
       else return prop.get(i);
     }
     else {
-      if (time.size() > 0)
-        println("Returned error because Time.size() <= 0");
-      
+      my_assert (time.size() > 0);
       return prop.get(0);
     }
   }
 
   void clear(){
     time = new ArrayList<Float>();
-    prop = new ArrayList<Property>();    
+    prop = new ArrayList<Property>();
   }
+
 };
 
 
@@ -1307,7 +1306,6 @@ class Property {
   
   // An empty property
   Property() {
-    prop = new ArrayList<Float>();
   }
 
   // Make sure this property has room for storing n floats
@@ -1379,8 +1377,8 @@ class SceneElement
 		c = color(0,0,0);
 		curveColor = color(100,100,100);
 		name = "Element";
-		pos = new SmoothPositionInterpolator();
-		pos.interp.set(0,position);
+		pos = new SmoothPositionInterpolator(new SmoothInterpolator());
+		pos.set(0,position);
 
 		this.curve = new CurveCat();
 		this.curve.setTolerance(15);
@@ -1477,10 +1475,10 @@ class SmoothInterpolator extends Interpolator {
         // Compute the 4 points that will be used
         // to interpolate the property 
         Property a,b,c,d;
-        a = b = new Property( prop.get(i)[0], prop.get(i)[1], prop.get(i)[2]); 
-        c = d = (Property) new Property( prop.get(i + 1)[0], prop.get(i + 1)[1], prop.get(i + 1)[2]); 
-        if (i > 0) a = new Property( prop.get(i - 1)[0], prop.get(i - 1)[1], prop.get(i - 1)[2]) ; 
-        if (i+2 < time.size()) d = new Property( prop.get(i + 2)[0], prop.get(i + 2)[1], prop.get(i + 2)[2]);
+        a = b = prop.get(i); 
+        c = d = prop.get(i+1); 
+        if (i > 0) a = prop.get(i-1); 
+        if (i+2 < time.size()) d = prop.get(i+2);
         // Interpolate the parameter
         float s = norm (t, time.get(i), time.get(i+1)); 
         // Now interpolate the property dimensions
@@ -1508,11 +1506,11 @@ class SmoothInterpolator extends Interpolator {
 class SmoothPositionInterpolator {
   
   // The interpolator being wrapped
-  SmoothInterpolator interp;
+  Interpolator interp;
   
   // Constructor
-  SmoothPositionInterpolator () {
-    this.interp = new SmoothInterpolator();
+  SmoothPositionInterpolator (interpolator interp) {
+    this.interp = interp;
   }
 
   // Converts a property to a PVector
@@ -1542,8 +1540,6 @@ class SmoothPositionInterpolator {
   
   // Gets the position at time t
   PVector get (float t) {
-    println("get do SmoothPositionInterpolator");
-    println("toPVector (interp.get(t)): "+toPVector (interp.get(t)));
     return toPVector (interp.get(t));
   }
   

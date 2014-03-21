@@ -10,10 +10,10 @@ class SmoothInterpolator extends Interpolator {
         // Compute the 4 points that will be used
         // to interpolate the property 
         Property a,b,c,d;
-        a = b = new Property( prop.get(i)[0], prop.get(i)[1], prop.get(i)[2]); 
-        c = d = (Property) new Property( prop.get(i + 1)[0], prop.get(i + 1)[1], prop.get(i + 1)[2]); 
-        if (i > 0) a = new Property( prop.get(i - 1)[0], prop.get(i - 1)[1], prop.get(i - 1)[2]) ; 
-        if (i+2 < time.size()) d = new Property( prop.get(i + 2)[0], prop.get(i + 2)[1], prop.get(i + 2)[2]);
+        a = b = prop.get(i); 
+        c = d = prop.get(i+1); 
+        if (i > 0) a = prop.get(i-1); 
+        if (i+2 < time.size()) d = prop.get(i+2);
         // Interpolate the parameter
         float s = norm (t, time.get(i), time.get(i+1)); 
         // Now interpolate the property dimensions

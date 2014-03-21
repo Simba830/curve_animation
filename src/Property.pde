@@ -6,7 +6,6 @@ class Property {
   
   // An empty property
   Property() {
-    prop = new ArrayList<Float>();
   }
 
   // Make sure this property has room for storing n floats

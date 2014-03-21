@@ -38,7 +38,7 @@ class Interpolator {
   // Sets the property p for time t
   void set (float t, Property p) {
     int i = locateTime(t);
-    if (i >0 && time.get(i) == t) {
+    if (i >=0 && time.get(i) == t) {
       prop.set(i,p);
     }
     else {
@@ -66,16 +66,15 @@ class Interpolator {
       else return prop.get(i);
     }
     else {
-      if (time.size() > 0)
-        println("Returned error because Time.size() <= 0");
-      
+      my_assert (time.size() > 0);
       return prop.get(0);
     }
   }
 
   void clear(){
     time = new ArrayList<Float>();
-    prop = new ArrayList<Property>();    
+    prop = new ArrayList<Property>();
   }
+
 };
 
