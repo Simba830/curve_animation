@@ -12,6 +12,7 @@ class Context{
 	boolean playing;
 	ArrayList<SceneElement> sceneElements;
 	SceneElement selectedElement;
+	int t;
 
 	Context(){
 		selectedSegments = new int[0];
@@ -19,6 +20,7 @@ class Context{
 		this.curve.setTolerance(7);
 
 		playing = false;
+		t = 0;
 
 		sceneElements = new ArrayList<SceneElement>();
 		selectedElement = null;
@@ -107,6 +109,12 @@ class Context{
 	}
 
 	void draw(float t){
+		if(t == 0){
+			t = this.t;
+		}
+
+		println("t: "+t);
+
 		for (SceneElement o : sceneElements) {
 			if(o == selectedElement){
 				o.c = color(255,0,0);
@@ -119,6 +127,8 @@ class Context{
 			o.drawCurve();
 		}
 
+		fill(0);
+		stroke(0);
 		text("Tempo: "+t, 20, height - 20);
 	}
 
@@ -158,5 +168,9 @@ class Context{
 
 		selectedElement = null;
 		stateContext.setStateName("select");
+	}
+
+	void alignTimes(int t){
+		this.t = t;
 	}
 }

@@ -57,6 +57,8 @@ public class StateContext {
         PVector closestPoint = new PVector();
         PVector q = new PVector(context.mouse.x, context.mouse.y);
         int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
+
+        console.log(selectedSegment);
         //int closestControlPointIndex  = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
         PVector closestControlPoint = context.curve.getControlPoint(selectedSegment);
 

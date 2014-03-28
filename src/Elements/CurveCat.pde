@@ -245,7 +245,7 @@ class CurveCat
     try {
       controlPoints.set(index,q);    
     } catch (Exception e) {
-        //print("Erro ao setar ponto de controle");
+        print("Erro ao setar ponto de controle");
     }
   }
 
@@ -294,22 +294,40 @@ class CurveCat
   // 
   int findClosestPoint (ArrayList<PVector> cps, PVector q, PVector r) {
 
+    // Inicia com -1 para saber se deu certo
     int bestSegment = -1;
+
+    // Melhor distancia é máxima inicialmente
     float bestDistance = 10000000;
+
+    // Melhor distancia do segmento maxima
     float bestSegmentDistance = 100000;
+
+    // Etc...
     float timeBestSegment = 0;
     
+    // Para cada ponto de controle
     for (int i = 0; i < cps.size()-1; i++) {
+      // Pego o segmento
       Segment seg = getSegment(i);
 
+      // Criando vetor de resultado
       PVector result = new PVector();
+
+      // Para o número de divisões faça
       for (int j=0; j<=numberDivisions; j++) 
       {
+        // Calcula o t
         float t = (float)(j) / (float)(numberDivisions);
+
+        //Pega o x e y
         float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
         float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+
+        // Calcula distancia entre o vetor q e o x e y
         float distance = dist(x, y, q.x, q.y);
 
+        // Se for o primeiro coloca como melhor distancia
         if (j == 0 || distance < bestSegmentDistance) {
           bestSegmentDistance = distance;
           result.set(x, y, 0);
@@ -322,6 +340,7 @@ class CurveCat
           bestSegment = i;
         else
           bestSegment = i + 1;
+
         bestDistance = bestSegmentDistance;
       }
     }
@@ -470,10 +489,10 @@ class CurveCat
       Segment seg = getSegment(i);
 
       beginShape();
-      curveVertex(seg.a.x, seg.a.y);
-      curveVertex(seg.b.x, seg.b.y);
-      curveVertex(seg.c.x, seg.c.y);
-      curveVertex(seg.d.x, seg.d.y);
+        curveVertex(seg.a.x, seg.a.y);
+        curveVertex(seg.b.x, seg.b.y);
+        curveVertex(seg.c.x, seg.c.y);
+        curveVertex(seg.d.x, seg.d.y);
       endShape();
     }
   }

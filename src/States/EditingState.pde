@@ -15,10 +15,15 @@ class EditingState extends State {
             // Verfica se tem nenhum element selecionado
             if(context.selectedSegments.length == 0)
             {
-              // Então seleciona o mais próximo
+              // Create a variable for the closestpoint
               PVector closestPoint = new PVector();
+
+              //Vector that
               PVector q = new PVector(context.mouse.x, context.mouse.y);
+
+              // Context finde the closest point gives the selectedSegment
               int selectedSegment = context.curve.findClosestPoint(context.curve.controlPoints, q, closestPoint);
+
               float distance = q.dist(closestPoint);
               if (distance < distanceToSelect)
               {
@@ -26,6 +31,7 @@ class EditingState extends State {
                context.selectedSegments[0] = selectedSegment;
               }
             }
+
             // Remove todos os segmentos selecionados
             for (int i = context.selectedSegments.length - 1; i>=0; i--){
               context.curve.removeElement(context.selectedSegments[i]);
@@ -68,11 +74,13 @@ class EditingState extends State {
             context.selectedSegments = new int[1];
             context.selectedSegments[0] = selectedSegment;
             selectedSegment = 0;
+            context.alignTimes(context.curve.getControlPoint(selectedSegment));
           }
 
-          if(distanceControlPoint > 30){
-              context.curve.insertPoint(q, context.selectedSegments[selectedSegment] + 1);
-              context.selectedSegments[selectedSegment]++;
+          println("distanceControlPoint: "+distanceControlPoint);
+          if(distanceControlPoint > 50){
+              context.curve.insertPoint(q, context.selectedSegments[selectedSegment]);
+              // context.selectedSegments[selectedSegment]++;
           }
         }  
       }

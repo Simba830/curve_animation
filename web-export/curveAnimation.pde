@@ -1,105 +1,155 @@
-class Circle extends SceneElement{
+static class Utils{
+  
+  static void printArrayPVector(PVector[] p)
+  {
+    for (int i=0;i<p.length-1;i++)
+      println(i+" "+p[i]);
+  }
 
-	float width, height;
-	boolean active;
+  static boolean mouseOverRect(PVector mouse, int x, int y, int w, int h) {
+  	return (mouse.x >= x && mouse.x <= x+w && mouse.y >= y && mouse.y <= y+h);
+  }
 
-	Circle(float _width, float _height)
-	{
-		super(context.mouse);
-		this.name = "Circle";
-		this.width = _width;
-		this.height = _height;
-		active = true;
-	}
-
-	void draw(float t)
-	{
-		if(pos.nKeys() < 1){
-			return;
-		}
-
-		if(t >= pos.keyTime(pos.nKeys()-1)){
-			t = pos.keyTime(pos.nKeys()-1);
-		}
-
-		PVector position;
-		if(!active){
-			position = pos.get(0);
-		}else{
-			position = pos.get(t);
-		}
-
-		fill(c);
-		stroke(0);
-		ellipse(position.x, position.y, this.width, this.height);
-	}
-
-	void setWidth(float x){
-		this.width = x;
-	}
-
-	void setHeight(float x){
-		this.height = x;
-	}
-
-	float lastTime()
-	{
-		if(pos.nKeys() < 1)
-			return 0;
-
-		return pos.interp.time.get(pos.nKeys()-1);
-	}
-
-	boolean isOver(PVector mouse){
-                PVector position = pos.get(0);
-                float radious = this.width;
-		return (mouse.x - position.x)*(mouse.x - position.x) + (mouse.y - position.y)*(mouse.y - position.y) <= radious;
-	}
-}
-
-class CircleState extends State {
-
-    CircleState(Context _context){
-      super(_context);
-    }
-
-    public void mousePressed() 
-    {
-    	Circle c = new Circle(20,20);
-    	context.addElement(c);	
-        context.setSelectedElement(c);
-    }
-
-    public void mouseDragged(){
-        Circle c = context.getSelectedElement();
-        PVector pos = c.pos.get(0);
-
-        float dx = abs(context.pMouse.x - pos.x);
-        float dy = abs(context.pMouse.y - pos.y);
-
-        c.setWidth(dx);
-        c.setHeight(dx);
-    }
-    
-    public void mouseReleased() 
-    {
-        stateContext.setStateName("draw");
-    }
-
-    public void keyPressed(){
-      
-    }
-
-    public void draw()
-    {
-
+  static void pvectorArrayCopy(PVector[] src, PVector[] dest){
+  	for (int i = 0; i<src.length; i++){
+  		dest[i] = src[i];
   	}
+  }
 
-    public void drawInterface()
-    {
-
+  static void print_r(int[] array){
+    for (int i = 0; i<array.length; i++){
+      println(array[i]);
     }
+  }
 }
+
+void my_assert (boolean p) {
+  if (!p) println ("my_assertion failed");
+}
+
+/**
+ AnimationApp.pde
+ Author: Guilherme Herzog
+ Created on: May 13
+ **/
+
+PFont font; // it's a font
+float curveT;
+
+// Curve
+CurveCat curve;
+CurveCat decimedCurve;
+
+// Selection Box
+PVector mouseInit;
+PVector mouseFinal;
+
+// State Context
+StateContext stateContext;
+
+// Context
+Context context;
+
+// Colours
+color mainColor = #0066C8;
+color secondaryColor = #FF9700;
+color thirdColor = #3990E3;
+
+// Images
+PImage img;
+
+int width,height;
+
+Context getContext(){
+  return context;
+}
+
+stateContext getStateContext(){
+  return stateContext;
+}
+
+public void setup() 
+{
+  width = 800;
+  height = 600;
+  size(width, height);
+
+  smooth();
+
+  font = createFont("", 14);
+  curveT = 0;
+  img = loadImage("play.png");
+
+  // PVectors used to create the selection box
+  mouseInit = new PVector(0,0);
+  mouseFinal = new PVector(0,0);
+
+  curveTightness(curveT);
+
+  context = new Context();
+  update();
+  context.setSelectionBox(mouseInit, mouseFinal);
+
+  stateContext = new StateContext(context);
+  stateContext.setContext(context);
+}
+
+// TODO Mudar isso para um interface só usando o mouse
+void keyPressed() 
+{ 
+  update();
+  stateContext.keyPressed();
+}
+
+// Mouse press callback
+void mousePressed() 
+{
+  mouseInit.set(mouseX, mouseY);
+  mouseFinal.set(mouseX, mouseY);
+  update();
+  stateContext.mousePressed();
+}
+    
+void mouseReleased()
+{
+
+  update();
+  stateContext.mouseReleased();
+
+  // Resets dragged rectangle
+  mouseInit.set(0,0);
+  mouseFinal.set(0,0);
+  update();
+}
+
+// Mouse drag callback
+void mouseDragged () 
+{
+  update();
+  mouseFinal.set(mouseX, mouseY);
+  stateContext.mouseDragged();
+}
+
+
+void draw() 
+{
+  update();
+  stateContext.draw();
+}
+
+void update(){
+  context.updateContext(
+    new PVector(mouseX, mouseY),
+    new PVector(pmouseX, pmouseY), 
+    mouseButton,
+    keyCode, 
+    key,
+    mouseInit,
+    mouseFinal);
+}
+
+
+
 class Context{
 	PVector mouse;
 	PVector pMouse;
@@ -114,6 +164,7 @@ class Context{
 	boolean playing;
 	ArrayList<SceneElement> sceneElements;
 	SceneElement selectedElement;
+	int t;
 
 	Context(){
 		selectedSegments = new int[0];
@@ -121,6 +172,7 @@ class Context{
 		this.curve.setTolerance(7);
 
 		playing = false;
+		t = 0;
 
 		sceneElements = new ArrayList<SceneElement>();
 		selectedElement = null;
@@ -209,6 +261,12 @@ class Context{
 	}
 
 	void draw(float t){
+		if(t == 0){
+			t = this.t;
+		}
+
+		println("t: "+t);
+
 		for (SceneElement o : sceneElements) {
 			if(o == selectedElement){
 				o.c = color(255,0,0);
@@ -221,6 +279,8 @@ class Context{
 			o.drawCurve();
 		}
 
+		fill(0);
+		stroke(0);
 		text("Tempo: "+t, 20, height - 20);
 	}
 
@@ -260,6 +320,198 @@ class Context{
 
 		selectedElement = null;
 		stateContext.setStateName("select");
+	}
+
+	void alignTimes(int t){
+		this.t = t;
+	}
+}
+
+public class StateContext {
+
+    private State myState;
+    private Context context;
+
+        /**
+         * Standard constructor
+         */
+    StateContext(Context _context) 
+    {
+        setState(new SelectState(_context));
+        this.context = _context;
+    }
+
+    public void setContext(Context _context){
+        this.context = _context;
+    }
+
+    public void setStateName(String nameState){
+        switch (nameState) {
+            case 'circle' :
+                myState = new CircleState(this.context);
+            break;   
+
+            case 'select' :
+                 myState = new SelectState(this.context);
+             break;   
+
+            case 'draw' :
+                  myState = new DrawningState(this.context);
+              break;      
+
+            default :
+                myState = new DrawningState(this.context);
+            break;    
+        }
+    }
+
+    /**
+     * Setter method for the state.
+     * Normally only called by classes implementing the State interface.
+     * 
+     * Devemos criar um método setState pra cada Estado
+     * @param NEW_STATE
+     */
+    public void setState(final State NEW_STATE) {
+        myState = NEW_STATE;
+    }
+ 
+    /**
+     * Mouse Actions Methods
+     * @param  PVector mouse
+     */
+    void mousePressed()
+    {
+        // Seleciona o segmento em questão se for o mouse LEFT
+        PVector closestPoint = new PVector();
+        PVector q = new PVector(context.mouse.x, context.mouse.y);
+        int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
+
+        console.log(selectedSegment);
+        //int closestControlPointIndex  = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
+        PVector closestControlPoint = context.curve.getControlPoint(selectedSegment);
+
+        float distance = q.dist(closestPoint);
+
+        if(distance < 10 && !(myState instanceof OverSketchState) && !(myState instanceof EditingState)){
+          myState = new EditingState(this.context);
+        }
+
+        if(selectedSegment == context.curve.getNumberControlPoints() - 2 && distance < 10){
+            myState = new DrawningState(this.context);
+        }
+
+        myState.mousePressed();
+    }
+    void mouseDragged()
+    {
+        myState.mouseDragged();
+    }
+    void mouseReleased()
+    {
+        myState.mouseReleased();
+    }
+
+    void keyPressed(){
+        switch (context.key){
+            case 'z' :
+                this.context.curve.undo();
+            break;         
+
+            case 'r' :
+                this.context.curve.redo();
+            break;    
+
+            // Essa tecla é específica para cada estado, entao devemos implementá-la nas classes de State
+            case DELETE :
+              myState.keyPressed();
+            break;
+        }
+
+        myState.keyPressed();
+    }
+    
+    void draw()
+    {
+        background (255);
+        noFill();
+        
+        myState.draw();
+
+        if(context.isPlayed()){
+            context.refreshInterpolator();
+            float lastTime = context.lastTime();
+
+            if(lastTime == 0){
+                context.stop();
+            }else{
+                float t = frameCount%int(lastTime);
+                context.draw(t);
+            }
+
+
+        }else{
+            context.draw(0.0);
+        }
+    }
+}
+
+class Circle extends SceneElement{
+
+	float width, height;
+	boolean active;
+
+	Circle(float _width, float _height)
+	{
+		super(context.mouse);
+		this.name = "Circle";
+		this.width = _width;
+		this.height = _height;
+		active = true;
+	}
+
+	void draw(float t)
+	{
+		if(pos.nKeys() < 1){
+			return;
+		}
+
+		if(t >= pos.keyTime(pos.nKeys()-1)){
+			t = pos.keyTime(pos.nKeys()-1);
+		}
+
+		PVector position;
+		if(!active){
+			position = pos.get(0);
+		}else{
+			position = pos.get(t);
+		}
+
+		fill(c);
+		stroke(0);
+		ellipse(position.x, position.y, this.width, this.height);
+	}
+
+	void setWidth(float x){
+		this.width = x;
+	}
+
+	void setHeight(float x){
+		this.height = x;
+	}
+
+	float lastTime()
+	{
+		if(pos.nKeys() < 1)
+			return 0;
+
+		return pos.interp.time.get(pos.nKeys()-1);
+	}
+
+	boolean isOver(PVector mouse){
+                PVector position = pos.get(0);
+                float radious = this.width;
+		return (mouse.x - position.x)*(mouse.x - position.x) + (mouse.y - position.y)*(mouse.y - position.y) <= radious;
 	}
 }
 
@@ -510,7 +762,7 @@ class CurveCat
     try {
       controlPoints.set(index,q);    
     } catch (Exception e) {
-        //print("Erro ao setar ponto de controle");
+        print("Erro ao setar ponto de controle");
     }
   }
 
@@ -559,22 +811,40 @@ class CurveCat
   // 
   int findClosestPoint (ArrayList<PVector> cps, PVector q, PVector r) {
 
+    // Inicia com -1 para saber se deu certo
     int bestSegment = -1;
+
+    // Melhor distancia é máxima inicialmente
     float bestDistance = 10000000;
+
+    // Melhor distancia do segmento maxima
     float bestSegmentDistance = 100000;
+
+    // Etc...
     float timeBestSegment = 0;
     
+    // Para cada ponto de controle
     for (int i = 0; i < cps.size()-1; i++) {
+      // Pego o segmento
       Segment seg = getSegment(i);
 
+      // Criando vetor de resultado
       PVector result = new PVector();
+
+      // Para o número de divisões faça
       for (int j=0; j<=numberDivisions; j++) 
       {
+        // Calcula o t
         float t = (float)(j) / (float)(numberDivisions);
+
+        //Pega o x e y
         float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
         float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+
+        // Calcula distancia entre o vetor q e o x e y
         float distance = dist(x, y, q.x, q.y);
 
+        // Se for o primeiro coloca como melhor distancia
         if (j == 0 || distance < bestSegmentDistance) {
           bestSegmentDistance = distance;
           result.set(x, y, 0);
@@ -587,6 +857,7 @@ class CurveCat
           bestSegment = i;
         else
           bestSegment = i + 1;
+
         bestDistance = bestSegmentDistance;
       }
     }
@@ -735,10 +1006,10 @@ class CurveCat
       Segment seg = getSegment(i);
 
       beginShape();
-      curveVertex(seg.a.x, seg.a.y);
-      curveVertex(seg.b.x, seg.b.y);
-      curveVertex(seg.c.x, seg.c.y);
-      curveVertex(seg.d.x, seg.d.y);
+        curveVertex(seg.a.x, seg.a.y);
+        curveVertex(seg.b.x, seg.b.y);
+        curveVertex(seg.c.x, seg.c.y);
+        curveVertex(seg.d.x, seg.d.y);
       endShape();
     }
   }
@@ -782,6 +1053,423 @@ class CurveCat
 }
 
 
+class Element{
+	PVector position;
+	CurveCat curve;
+
+	Element(PVector _position){
+		position = _position;
+	}
+
+	void drag(float dx, float dy)
+	{
+		position.x += dx;
+		position.y += dy;
+	}
+}
+class SceneElement
+{
+	String name;
+	SmoothPositionInterpolator pos;
+	color c, curveColor;
+	CurveCat curve;
+
+	SceneElement(PVector position)
+	{
+		c = color(0,0,0);
+		curveColor = color(100,100,100);
+		name = "Element";
+		pos = new SmoothPositionInterpolator(new SmoothInterpolator());
+		pos.set(0,position);
+
+		this.curve = new CurveCat();
+		this.curve.setTolerance(15);
+	}
+
+	void draw(float t){}
+	void drawCurve(){
+		curve.strokeColor = curveColor;
+		noFill();
+		if(curve.getNumberControlPoints() >= 4)
+			this.curve.draw();
+
+
+		stroke(0);
+	}
+	void load(){}
+	void update(){}
+	float lastTime(){
+		return pos.keyTime(pos.nKeys()-1);
+	}
+
+	boolean isOver(PVector mouse){
+		return true;
+	}
+}
+
+class Segment{
+   PVector a,b,c,d;
+  
+   Segment(PVector _a, PVector _b, PVector _c, PVector _d){
+      a = _a;
+      b = _b;
+      c = _c;
+      d = _d;
+   } 
+   
+   Segment(){
+   
+   }
+  
+}
+
+class Text extends Element{
+	PFont font;
+	String text;
+	color c;
+
+	Text(String fontName, float size, PVector _position, String text, color c)
+	{
+		super(_position);
+		font = this.loadFont(fontName, size);
+		this.text = text;
+		this.c = c;
+	}
+
+	void draw()
+	{
+		pushMatrix();
+			fill(this.c);
+			textFont(font);
+			text(text, position.x, position.y);
+		popMatrix();
+	}
+
+	private PFont loadFont(String fontName, float size)
+	{
+		return createFont(fontName, size);
+	}
+
+	void setText(String _text)
+	{
+		this.text = _text;
+	}
+
+	String getText()
+	{
+		return this.text;
+	}
+}
+// Linearly interpolates properties for a specific
+// time, given values of these properties at 
+// known times (keyframes)
+class Interpolator {
+  ArrayList<Float> time;
+  ArrayList<Property> prop;
+ 
+  // Constructor
+  Interpolator() {
+    time = new ArrayList<Float>();
+    prop = new ArrayList<Property>();
+  }
+  
+  // Returns the number of keyframes
+  int nKeys () {
+    return time.size();
+  }
+
+  // Return the time for keyframe i
+  float keyTime(int i) {
+    return time.get(i);
+  }
+
+  // Return the property for keyframe i
+  Property keyProp (int i) {
+    return prop.get(i);
+  }
+
+  // Returns the greatest index of time which contains a 
+  // value smaller or equal to t. If no such value exists, 
+  // returns -1.
+  int locateTime(float t) {
+    int i = -1;
+    while (i+1 < time.size() && time.get(i+1) <= t) i++;
+    return i;
+  }
+
+  // Sets the property p for time t
+  void set (float t, Property p) {
+    int i = locateTime(t);
+    if (i >=0 && time.get(i) == t) {
+      prop.set(i,p);
+    }
+    else {
+      time.add(i+1,t);
+      prop.add(i+1,p);
+    }
+  }
+
+  // Gets the (linearly) interpolated property for time t 
+  Property get(float t) {
+    int i = locateTime(t);
+    if (i >=0) {
+      if (time.get(i) == t) {
+        return prop.get(i);
+      }
+      else if (i+1 < time.size()) {
+        float s = norm (t, time.get(i), time.get(i+1));
+        Property p = new Property(), a = prop.get(i), b = prop.get(i+1);
+        int n = max (a.size(), b.size());
+        for (int k = 0; k < n; k++) {
+          p.set(k, lerp(a.get(k), b.get(k), s));
+        }
+        return p;
+      }
+      else return prop.get(i);
+    }
+    else {
+      my_assert (time.size() > 0);
+      return prop.get(0);
+    }
+  }
+
+  void clear(){
+    time = new ArrayList<Float>();
+    prop = new ArrayList<Property>();
+  }
+
+};
+
+
+// A property is an array of floats representing a
+// multidimensional point
+class Property {
+  
+  ArrayList<Float> prop = new ArrayList<Float>();
+  
+  // An empty property
+  Property() {
+  }
+
+  // Make sure this property has room for storing n floats
+  void setDimension (int n) {
+    while (size() < n) add(0.0);
+  }
+
+  // Returns the number of floats defined for the property
+  int size() {
+    return prop.size();
+  }
+  
+  // Adds another float to the property
+  void add (Float f) {
+    prop.add(f);
+  }
+  
+  // A one-float property
+  Property (float a) {
+    super();
+    setDimension (1);
+    set (0,a);
+  }
+
+  // A two-float property
+  Property (float a, float b) {
+    super();
+    setDimension (2);
+    set (0,a);
+    set (1,b);
+  }
+
+  // A three-float property
+  Property (float a, float b, float c) {
+    super();
+    setDimension (3);
+    set (0,a);
+    set (1,b);
+    set (2,c);
+  }
+
+  // Sets the i'th dimension of the property
+  // to value v
+  void set(int i, float v) {
+     my_assert(i>=0);
+     while (i >= size()) add(0.0);
+     prop.set(i,v);
+  }
+
+  // Returns the i'th dimension of the property.
+  // Returns 0.0 if that dimension was never set
+  Float get(int i) {
+    my_assert (i>=0);
+    if (i >= size()) return 0.0;
+    return prop.get(i);
+  }
+};
+
+
+// Smooth (Cubic) interpolation of properties
+class SmoothInterpolator extends Interpolator {
+
+  // Gets the Catmull-Rom interpolated property for time t 
+  Property get(float t) {
+    int i = locateTime(t);
+    if (i >= 0) {
+      if (time.get(i) == t) return prop.get(i);
+      if (i+1 < time.size()) {
+        // Compute the 4 points that will be used
+        // to interpolate the property 
+        Property a,b,c,d;
+        a = b = prop.get(i); 
+        c = d = prop.get(i+1); 
+        if (i > 0) a = prop.get(i-1); 
+        if (i+2 < time.size()) d = prop.get(i+2);
+        // Interpolate the parameter
+        float s = norm (t, time.get(i), time.get(i+1)); 
+        // Now interpolate the property dimensions
+        Property p = new Property(); 
+        int n = max (a.size(), b.size());
+        for (int k = 0; k < n; k++) {
+          p.set(k, curvePoint(a.get(k), b.get(k), c.get(k), d.get(k), s));
+        }
+        return p;
+      }
+      else return prop.get(i);
+    }
+    else {
+      my_assert (time.size() > 0);
+      return prop.get(0);
+    }
+  }
+
+};
+
+
+// Wraps a interpolator class so that 
+// methods return PVectors representing positions rather 
+// than generic properties
+class SmoothPositionInterpolator {
+  
+  // The interpolator being wrapped
+  Interpolator interp;
+  
+  // Constructor
+  SmoothPositionInterpolator (interpolator interp) {
+    this.interp = interp;
+  }
+
+  // Converts a property to a PVector
+  PVector toPVector (Property p) {
+    return new PVector(p.get(0), p.get(1), p.get(2));
+  }
+  
+  // Returns the number of keyframes
+  int nKeys () {
+    return interp.time.size();
+  }
+
+  // Return the time for keyframe i
+  float keyTime(int i) {
+    return interp.time.get(i);
+  }
+
+  // Return the property for keyframe i
+  PVector keyPos (int i) {
+    return toPVector(interp.prop.get(i));
+  }
+
+  // Sets the position for time t
+  void set (float t, PVector p) { 
+    interp.set(t, new Property (p.x, p.y, p.z));
+  }
+  
+  // Gets the position at time t
+  PVector get (float t) {
+    return toPVector (interp.get(t));
+  }
+  
+  // Returns the estimated tangent (a unit vector) at point t
+  PVector getTangent (float t) {
+    PVector tan = (t < 0.01) ?
+                   PVector.sub(get(t+0.01),get(t)) :
+                   PVector.sub(get(t),get(t-0.01));
+    tan.normalize();
+    return tan;
+  }
+  
+  // Draws key frames as circles and the curve 
+  // as n segments equally spaced in time
+  void draw(int n) {
+    pushStyle();
+    noFill();
+    float tickSize = 5;
+    float tMax = keyTime(nKeys()-1);
+    PVector p0 = get(0);
+    for (int i = 0; i < n; i++) {
+      float t = (float) i * tMax / (n-1);
+      PVector p = get(t);
+      PVector tan = getTangent(t);
+      tan.mult(tickSize);
+      line(p0.x,p0.y,p.x,p.y);
+      line(p.x-tan.y, p.y+tan.x,p.x+tan.y, p.y-tan.x);
+      p0 = p;
+    }
+    popStyle();
+    for (int i = 0; i < interp.nKeys(); i++) {
+      Property p = interp.keyProp(i);
+      ellipse(p.get(0), p.get(1), 10, 10);
+    }
+  }
+
+  void clear(){
+    interp.clear();
+  }
+}
+
+
+class CircleState extends State {
+
+    CircleState(Context _context){
+      super(_context);
+    }
+
+    public void mousePressed() 
+    {
+    	Circle c = new Circle(20,20);
+    	context.addElement(c);	
+        context.setSelectedElement(c);
+    }
+
+    public void mouseDragged(){
+        Circle c = context.getSelectedElement();
+        PVector pos = c.pos.get(0);
+
+        float dx = abs(context.pMouse.x - pos.x);
+        float dy = abs(context.pMouse.y - pos.y);
+
+        c.setWidth(dx);
+        c.setHeight(dx);
+    }
+    
+    public void mouseReleased() 
+    {
+        stateContext.setStateName("draw");
+    }
+
+    public void keyPressed(){
+      
+    }
+
+    public void draw()
+    {
+
+  	}
+
+    public void drawInterface()
+    {
+
+    }
+}
 class DrawningState extends State {
 
     float distanceToSelect = 5;
@@ -862,10 +1550,15 @@ class EditingState extends State {
             // Verfica se tem nenhum element selecionado
             if(context.selectedSegments.length == 0)
             {
-              // Então seleciona o mais próximo
+              // Create a variable for the closestpoint
               PVector closestPoint = new PVector();
+
+              //Vector that
               PVector q = new PVector(context.mouse.x, context.mouse.y);
+
+              // Context finde the closest point gives the selectedSegment
               int selectedSegment = context.curve.findClosestPoint(context.curve.controlPoints, q, closestPoint);
+
               float distance = q.dist(closestPoint);
               if (distance < distanceToSelect)
               {
@@ -873,6 +1566,7 @@ class EditingState extends State {
                context.selectedSegments[0] = selectedSegment;
               }
             }
+
             // Remove todos os segmentos selecionados
             for (int i = context.selectedSegments.length - 1; i>=0; i--){
               context.curve.removeElement(context.selectedSegments[i]);
@@ -915,11 +1609,13 @@ class EditingState extends State {
             context.selectedSegments = new int[1];
             context.selectedSegments[0] = selectedSegment;
             selectedSegment = 0;
+            context.alignTimes(selectedSegment);
           }
 
-          if(distanceControlPoint > 30){
-              context.curve.insertPoint(q, context.selectedSegments[selectedSegment] + 1);
-              context.selectedSegments[selectedSegment]++;
+          println("distanceControlPoint: "+distanceControlPoint);
+          if(distanceControlPoint > 50){
+              context.curve.insertPoint(q, context.selectedSegments[selectedSegment]);
+              // context.selectedSegments[selectedSegment]++;
           }
         }  
       }
@@ -1028,20 +1724,6 @@ class EditingState extends State {
     }
  
 }
-class Element{
-	PVector position;
-	CurveCat curve;
-
-	Element(PVector _position){
-		position = _position;
-	}
-
-	void drag(float dx, float dy)
-	{
-		position.x += dx;
-		position.y += dy;
-	}
-}
 class FontState extends State {
 
     Text text = null;
@@ -1090,87 +1772,6 @@ class FontState extends State {
 
     }
 }
-// Linearly interpolates properties for a specific
-// time, given values of these properties at 
-// known times (keyframes)
-class Interpolator {
-  ArrayList<Float> time;
-  ArrayList<Property> prop;
- 
-  // Constructor
-  Interpolator() {
-    time = new ArrayList<Float>();
-    prop = new ArrayList<Property>();
-  }
-  
-  // Returns the number of keyframes
-  int nKeys () {
-    return time.size();
-  }
-
-  // Return the time for keyframe i
-  float keyTime(int i) {
-    return time.get(i);
-  }
-
-  // Return the property for keyframe i
-  Property keyProp (int i) {
-    return prop.get(i);
-  }
-
-  // Returns the greatest index of time which contains a 
-  // value smaller or equal to t. If no such value exists, 
-  // returns -1.
-  int locateTime(float t) {
-    int i = -1;
-    while (i+1 < time.size() && time.get(i+1) <= t) i++;
-    return i;
-  }
-
-  // Sets the property p for time t
-  void set (float t, Property p) {
-    int i = locateTime(t);
-    if (i >=0 && time.get(i) == t) {
-      prop.set(i,p);
-    }
-    else {
-      time.add(i+1,t);
-      prop.add(i+1,p);
-    }
-  }
-
-  // Gets the (linearly) interpolated property for time t 
-  Property get(float t) {
-    int i = locateTime(t);
-    if (i >=0) {
-      if (time.get(i) == t) {
-        return prop.get(i);
-      }
-      else if (i+1 < time.size()) {
-        float s = norm (t, time.get(i), time.get(i+1));
-        Property p = new Property(), a = prop.get(i), b = prop.get(i+1);
-        int n = max (a.size(), b.size());
-        for (int k = 0; k < n; k++) {
-          p.set(k, lerp(a.get(k), b.get(k), s));
-        }
-        return p;
-      }
-      else return prop.get(i);
-    }
-    else {
-      my_assert (time.size() > 0);
-      return prop.get(0);
-    }
-  }
-
-  void clear(){
-    time = new ArrayList<Float>();
-    prop = new ArrayList<Property>();
-  }
-
-};
-
-
 class OverSketchState extends State {
 
     CurveCat aux;
@@ -1300,129 +1901,6 @@ class OverSketchState extends State {
  
 }
 
-// A property is an array of floats representing a
-// multidimensional point
-class Property {
-  
-  ArrayList<Float> prop = new ArrayList<Float>();
-  
-  // An empty property
-  Property() {
-  }
-
-  // Make sure this property has room for storing n floats
-  void setDimension (int n) {
-    while (size() < n) add(0.0);
-  }
-
-  // Returns the number of floats defined for the property
-  int size() {
-    return prop.size();
-  }
-  
-  // Adds another float to the property
-  void add (Float f) {
-    prop.add(f);
-  }
-  
-  // A one-float property
-  Property (float a) {
-    super();
-    setDimension (1);
-    set (0,a);
-  }
-
-  // A two-float property
-  Property (float a, float b) {
-    super();
-    setDimension (2);
-    set (0,a);
-    set (1,b);
-  }
-
-  // A three-float property
-  Property (float a, float b, float c) {
-    super();
-    setDimension (3);
-    set (0,a);
-    set (1,b);
-    set (2,c);
-  }
-
-  // Sets the i'th dimension of the property
-  // to value v
-  void set(int i, float v) {
-     my_assert(i>=0);
-     while (i >= size()) add(0.0);
-     prop.set(i,v);
-  }
-
-  // Returns the i'th dimension of the property.
-  // Returns 0.0 if that dimension was never set
-  Float get(int i) {
-    my_assert (i>=0);
-    if (i >= size()) return 0.0;
-    return prop.get(i);
-  }
-};
-
-
-class SceneElement
-{
-	String name;
-	SmoothPositionInterpolator pos;
-	color c, curveColor;
-	CurveCat curve;
-
-	SceneElement(PVector position)
-	{
-		c = color(0,0,0);
-		curveColor = color(100,100,100);
-		name = "Element";
-		pos = new SmoothPositionInterpolator(new SmoothInterpolator());
-		pos.set(0,position);
-
-		this.curve = new CurveCat();
-		this.curve.setTolerance(15);
-	}
-
-	void draw(float t){}
-	void drawCurve(){
-		curve.strokeColor = curveColor;
-		noFill();
-		if(curve.getNumberControlPoints() >= 4)
-			this.curve.draw();
-
-
-		stroke(0);
-	}
-	void load(){}
-	void update(){}
-	float lastTime(){
-		return pos.keyTime(pos.nKeys()-1);
-	}
-
-	boolean isOver(PVector mouse){
-		return true;
-	}
-}
-
-class Segment{
-   PVector a,b,c,d;
-  
-   Segment(PVector _a, PVector _b, PVector _c, PVector _d){
-      a = _a;
-      b = _b;
-      c = _c;
-      d = _d;
-   } 
-   
-   Segment(){
-   
-   }
-  
-}
-
 class SelectState extends State
 {
 	SelectState(Context _context){
@@ -1465,125 +1943,6 @@ class SelectState extends State
     }
 }
 
-// Smooth (Cubic) interpolation of properties
-class SmoothInterpolator extends Interpolator {
-
-  // Gets the Catmull-Rom interpolated property for time t 
-  Property get(float t) {
-    int i = locateTime(t);
-    if (i >= 0) {
-      if (time.get(i) == t) return prop.get(i);
-      if (i+1 < time.size()) {
-        // Compute the 4 points that will be used
-        // to interpolate the property 
-        Property a,b,c,d;
-        a = b = prop.get(i); 
-        c = d = prop.get(i+1); 
-        if (i > 0) a = prop.get(i-1); 
-        if (i+2 < time.size()) d = prop.get(i+2);
-        // Interpolate the parameter
-        float s = norm (t, time.get(i), time.get(i+1)); 
-        // Now interpolate the property dimensions
-        Property p = new Property(); 
-        int n = max (a.size(), b.size());
-        for (int k = 0; k < n; k++) {
-          p.set(k, curvePoint(a.get(k), b.get(k), c.get(k), d.get(k), s));
-        }
-        return p;
-      }
-      else return prop.get(i);
-    }
-    else {
-      my_assert (time.size() > 0);
-      return prop.get(0);
-    }
-  }
-
-};
-
-
-// Wraps a interpolator class so that 
-// methods return PVectors representing positions rather 
-// than generic properties
-class SmoothPositionInterpolator {
-  
-  // The interpolator being wrapped
-  Interpolator interp;
-  
-  // Constructor
-  SmoothPositionInterpolator (interpolator interp) {
-    this.interp = interp;
-  }
-
-  // Converts a property to a PVector
-  PVector toPVector (Property p) {
-    return new PVector(p.get(0), p.get(1), p.get(2));
-  }
-  
-  // Returns the number of keyframes
-  int nKeys () {
-    return interp.time.size();
-  }
-
-  // Return the time for keyframe i
-  float keyTime(int i) {
-    return interp.time.get(i);
-  }
-
-  // Return the property for keyframe i
-  PVector keyPos (int i) {
-    return toPVector(interp.prop.get(i));
-  }
-
-  // Sets the position for time t
-  void set (float t, PVector p) { 
-    interp.set(t, new Property (p.x, p.y, p.z));
-  }
-  
-  // Gets the position at time t
-  PVector get (float t) {
-    return toPVector (interp.get(t));
-  }
-  
-  // Returns the estimated tangent (a unit vector) at point t
-  PVector getTangent (float t) {
-    PVector tan = (t < 0.01) ?
-                   PVector.sub(get(t+0.01),get(t)) :
-                   PVector.sub(get(t),get(t-0.01));
-    tan.normalize();
-    return tan;
-  }
-  
-  // Draws key frames as circles and the curve 
-  // as n segments equally spaced in time
-  void draw(int n) {
-    pushStyle();
-    noFill();
-    float tickSize = 5;
-    float tMax = keyTime(nKeys()-1);
-    PVector p0 = get(0);
-    for (int i = 0; i < n; i++) {
-      float t = (float) i * tMax / (n-1);
-      PVector p = get(t);
-      PVector tan = getTangent(t);
-      tan.mult(tickSize);
-      line(p0.x,p0.y,p.x,p.y);
-      line(p.x-tan.y, p.y+tan.x,p.x+tan.y, p.y-tan.x);
-      p0 = p;
-    }
-    popStyle();
-    for (int i = 0; i < interp.nKeys(); i++) {
-      Property p = interp.keyProp(i);
-      ellipse(p.get(0), p.get(1), 10, 10);
-    }
-  }
-
-  void clear(){
-    interp.clear();
-  }
-}
-
-
 class State
 {
 	Context context;
@@ -1620,318 +1979,3 @@ class State
 	void drawInterface(){};
 }
 	
-public class StateContext {
-
-    private State myState;
-    private Context context;
-
-        /**
-         * Standard constructor
-         */
-    StateContext(Context _context) 
-    {
-        setState(new SelectState(_context));
-        this.context = _context;
-    }
-
-    public void setContext(Context _context){
-        this.context = _context;
-    }
-
-    public void setStateName(String nameState){
-        switch (nameState) {
-            case 'circle' :
-                myState = new CircleState(this.context);
-            break;   
-
-            case 'select' :
-                 myState = new SelectState(this.context);
-             break;   
-
-            case 'draw' :
-                  myState = new DrawningState(this.context);
-              break;      
-
-            default :
-                myState = new DrawningState(this.context);
-            break;    
-        }
-    }
-
-    /**
-     * Setter method for the state.
-     * Normally only called by classes implementing the State interface.
-     * 
-     * Devemos criar um método setState pra cada Estado
-     * @param NEW_STATE
-     */
-    public void setState(final State NEW_STATE) {
-        myState = NEW_STATE;
-    }
- 
-    /**
-     * Mouse Actions Methods
-     * @param  PVector mouse
-     */
-    void mousePressed()
-    {
-        // Seleciona o segmento em questão se for o mouse LEFT
-        PVector closestPoint = new PVector();
-        PVector q = new PVector(context.mouse.x, context.mouse.y);
-        int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
-        //int closestControlPointIndex  = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
-        PVector closestControlPoint = context.curve.getControlPoint(selectedSegment);
-
-        float distance = q.dist(closestPoint);
-
-        if(distance < 10 && !(myState instanceof OverSketchState) && !(myState instanceof EditingState)){
-          myState = new EditingState(this.context);
-        }
-
-        if(selectedSegment == context.curve.getNumberControlPoints() - 2 && distance < 10){
-            myState = new DrawningState(this.context);
-        }
-
-        myState.mousePressed();
-    }
-    void mouseDragged()
-    {
-        myState.mouseDragged();
-    }
-    void mouseReleased()
-    {
-        myState.mouseReleased();
-    }
-
-    void keyPressed(){
-        switch (context.key){
-            case 'z' :
-                this.context.curve.undo();
-            break;         
-
-            case 'r' :
-                this.context.curve.redo();
-            break;    
-
-            // Essa tecla é específica para cada estado, entao devemos implementá-la nas classes de State
-            case DELETE :
-              myState.keyPressed();
-            break;
-        }
-
-        myState.keyPressed();
-    }
-    
-    void draw()
-    {
-        background (255);
-        noFill();
-        
-        myState.draw();
-
-        if(context.isPlayed()){
-            context.refreshInterpolator();
-            float lastTime = context.lastTime();
-
-            if(lastTime == 0){
-                context.stop();
-            }else{
-                float t = frameCount%int(lastTime);
-                context.draw(t);
-            }
-
-
-        }else{
-            context.draw(0.0);
-        }
-    }
-}
-
-class Text extends Element{
-	PFont font;
-	String text;
-	color c;
-
-	Text(String fontName, float size, PVector _position, String text, color c)
-	{
-		super(_position);
-		font = this.loadFont(fontName, size);
-		this.text = text;
-		this.c = c;
-	}
-
-	void draw()
-	{
-		pushMatrix();
-			fill(this.c);
-			textFont(font);
-			text(text, position.x, position.y);
-		popMatrix();
-	}
-
-	private PFont loadFont(String fontName, float size)
-	{
-		return createFont(fontName, size);
-	}
-
-	void setText(String _text)
-	{
-		this.text = _text;
-	}
-
-	String getText()
-	{
-		return this.text;
-	}
-}
-static class Utils{
-  
-  static void printArrayPVector(PVector[] p)
-  {
-    for (int i=0;i<p.length-1;i++)
-      println(i+" "+p[i]);
-  }
-
-  static boolean mouseOverRect(PVector mouse, int x, int y, int w, int h) {
-  	return (mouse.x >= x && mouse.x <= x+w && mouse.y >= y && mouse.y <= y+h);
-  }
-
-  static void pvectorArrayCopy(PVector[] src, PVector[] dest){
-  	for (int i = 0; i<src.length; i++){
-  		dest[i] = src[i];
-  	}
-  }
-
-  static void print_r(int[] array){
-    for (int i = 0; i<array.length; i++){
-      println(array[i]);
-    }
-  }
-}
-
-void my_assert (boolean p) {
-  if (!p) println ("my_assertion failed");
-}
-
-/**
- AnimationApp.pde
- Author: Guilherme Herzog
- Created on: May 13
- **/
-
-PFont font; // it's a font
-float curveT;
-
-// Curve
-CurveCat curve;
-CurveCat decimedCurve;
-
-// Selection Box
-PVector mouseInit;
-PVector mouseFinal;
-
-// State Context
-StateContext stateContext;
-
-// Context
-Context context;
-
-// Colours
-color mainColor = #0066C8;
-color secondaryColor = #FF9700;
-color thirdColor = #3990E3;
-
-// Images
-PImage img;
-
-int width,height;
-
-Context getContext(){
-  return context;
-}
-
-stateContext getStateContext(){
-  return stateContext;
-}
-
-public void setup() 
-{
-  width = 800;
-  height = 600;
-  size(width, height);
-
-  smooth();
-
-  font = createFont("", 14);
-  curveT = 0;
-  img = loadImage("play.png");
-
-  // PVectors used to create the selection box
-  mouseInit = new PVector(0,0);
-  mouseFinal = new PVector(0,0);
-
-  curveTightness(curveT);
-
-  context = new Context();
-  update();
-  context.setSelectionBox(mouseInit, mouseFinal);
-
-  stateContext = new StateContext(context);
-  stateContext.setContext(context);
-}
-
-// TODO Mudar isso para um interface só usando o mouse
-void keyPressed() 
-{ 
-  update();
-  stateContext.keyPressed();
-}
-
-// Mouse press callback
-void mousePressed() 
-{
-  mouseInit.set(mouseX, mouseY);
-  mouseFinal.set(mouseX, mouseY);
-  update();
-  stateContext.mousePressed();
-}
-    
-void mouseReleased()
-{
-
-  update();
-  stateContext.mouseReleased();
-
-  // Resets dragged rectangle
-  mouseInit.set(0,0);
-  mouseFinal.set(0,0);
-  update();
-}
-
-// Mouse drag callback
-void mouseDragged () 
-{
-  update();
-  mouseFinal.set(mouseX, mouseY);
-  stateContext.mouseDragged();
-}
-
-
-void draw() 
-{
-  update();
-  stateContext.draw();
-}
-
-void update(){
-  context.updateContext(
-    new PVector(mouseX, mouseY),
-    new PVector(pmouseX, pmouseY), 
-    mouseButton,
-    keyCode, 
-    key,
-    mouseInit,
-    mouseFinal);
-}
-
-
