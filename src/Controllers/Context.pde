@@ -113,7 +113,7 @@ class Context{
 			t = this.t;
 		}
 
-		println("t: "+t);
+		// println("t: "+t);
 
 		for (SceneElement o : sceneElements) {
 			if(o == selectedElement){
