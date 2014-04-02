@@ -203,19 +203,21 @@ class CurveCat
          
       // }
 
+      boolean wasDecimed = false;
       for (int i = 1; i < getNumberControlPoints() - 1; ++i) {
         PVector tan1 = getTangent(i - 1);
         PVector tan2 = getTangent(i + 1);
 
         PVector result = PVector.sub(tan2, tan1);
-        if(result.mag() < tolerance){
+        if(result.mag() < 0.5){
           this.controlPoints.remove(i);
+          wasDecimed = true;
         }
+
 
       }
 
-      this.decimable = false;
-      println("test");
+      this.decimable = wasDecimed;
   }
 
   // Returns the estimated tangent (a unit vector) at point t
@@ -231,7 +233,7 @@ class CurveCat
 
     tan = PVector.sub(v2, v1);
 
-    tan.normalize();
+    //tan.normalize();
     return tan;
   }
 

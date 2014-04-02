@@ -277,9 +277,8 @@ class Context{
 				o.c = color(0,0,0);
 				o.curveColor = color(200,200,200);
 			}
-			o.draw(t);
-			println("calling draw with t:"+t);
 			o.drawCurve();
+			o.draw(t);
 		}
 
 		fill(0);
@@ -546,7 +545,7 @@ class CurveCat
   {
     controlPoints = new ArrayList<PVector>();
     decimable = true;
-    tolerance = 7;
+    tolerance = 100;
 
     history = new ArrayList<ArrayList<PVector>>();
   }
@@ -645,86 +644,118 @@ class CurveCat
   // Remove pontos de controle de uma curva criada pela lista p que possuam distancia menor que a tolerancia em relação aos pontos da nova curva.
   void decimeCurve(float tolerance)
   {
-      PVector a = new PVector();
-      PVector b = new PVector();
-      PVector c = new PVector();
-      PVector d = new PVector();
+      // PVector a = new PVector();
+      // PVector b = new PVector();
+      // PVector c = new PVector();
+      // PVector d = new PVector();
       
-      PVector a2 = new PVector();
-      PVector b2 = new PVector();
-      PVector c2 = new PVector();
-      PVector d2 = new PVector();
+      // PVector a2 = new PVector();
+      // PVector b2 = new PVector();
+      // PVector c2 = new PVector();
+      // PVector d2 = new PVector();
       
-      boolean remove;
+      // boolean remove;
      
-      int size = controlPoints.size() - 1;
+      // int size = controlPoints.size() - 1;
       
-      Segment segAux;
-      Segment segP;
-      ArrayList<PVector> pAux;
+      // Segment segAux;
+      // Segment segP;
+      // ArrayList<PVector> pAux;
+
+      // boolean wasDecimed = false;
+
+      // // Pego os vetores essenciais para a curva
+      // ArrayList<PVector> essentials = DouglasPeuckerReducing(controlPoints, 0.5);
+
+      // // Array que vai conter os vetores a serem testados
+      // ArrayList<PVector> testableControlPoints = (ArrayList<PVector>) controlPoints.clone();
+
+      // // Removendo os pontos essenciais dos testáveis
+      // for (int i = 0; i < essentials.size(); ++i) {
+      //   testableControlPoints.remove(essentials.get(i));
+      // }
+
+      // // Percorre os testáveis removendo e verificando com a tolerância.
+      // for(int i = 1; i < testableControlPoints.size() - 1; i++){
+
+      //    pAux = new ArrayList<PVector>(controlPoints.size());
+      //    pAux = (ArrayList<PVector>) controlPoints.clone();
+
+      //    // Pega o vetor e procura qual o indice dele nos controlPoints
+      //    int index = controlPoints.indexOf( testableControlPoints.get(i) );
+      //    pAux.remove(index);
+      //    segAux = getSegment(pAux,index-1);
+      //    remove = true;
+         
+      //    for (int j=0; j<=numberDivisions; j++) 
+      //    {
+      //       float t = (float)(j) / (float)(numberDivisions);
+      //       float tAux;
+      //       if (t < 0.5)
+      //       {
+      //            segP = getSegment(controlPoints,index-1);
+      //            tAux = t*2;     
+      //       } 
+      //       else 
+      //       {
+      //           segP = getSegment(controlPoints,index);
+      //           tAux = t*2 - 1;
+      //       }
+            
+      //       float x = curvePoint(segAux.a.x, segAux.b.x, segAux.c.x, segAux.d.x, t);
+      //       float y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, t);
+      //       PVector v1 = new PVector(x,y);
+
+      //       float x2 = curvePoint(segP.a.x, segP.b.x, segP.c.x, segP.d.x, tAux);
+      //       float y2 = curvePoint(segP.a.y, segP.b.y, segP.c.y, segP.d.y, tAux);
+      //       PVector v2 = new PVector(x2,y2);
+
+      //       float distance = v1.dist(v2);
+      //       if(distance >= tolerance){
+      //          remove = false;
+      //       }
+      //    }
+         
+      //    if(remove){
+      //      this.controlPoints.remove(index);
+      //      wasDecimed = true;
+      //    }
+         
+      // }
 
       boolean wasDecimed = false;
+      for (int i = 1; i < getNumberControlPoints() - 1; ++i) {
+        PVector tan1 = getTangent(i - 1);
+        PVector tan2 = getTangent(i + 1);
 
-      // Pego os vetores essenciais para a curva
-      ArrayList<PVector> essentials = DouglasPeuckerReducing(controlPoints, 0.5);
+        PVector result = PVector.sub(tan2, tan1);
+        println("result.mag(): "+result.mag());
+        if(result.mag() < 0.5){
+          this.controlPoints.remove(i);
+          wasDecimed = true;
+        }
 
-      // Array que vai conter os vetores a serem testados
-      ArrayList<PVector> testableControlPoints = (ArrayList<PVector>) controlPoints.clone();
 
-      // Removendo os pontos essenciais dos testáveis
-      for (int i = 0; i < essentials.size(); ++i) {
-        testableControlPoints.remove(essentials.get(i));
-      }
-
-      // Percorre os testáveis removendo e verificando com a tolerância.
-      for(int i = 1; i < testableControlPoints.size() - 1; i++){
-
-         pAux = new ArrayList<PVector>(controlPoints.size());
-         pAux = (ArrayList<PVector>) controlPoints.clone();
-
-         // Pega o vetor e procura qual o indice dele nos controlPoints
-         int index = controlPoints.indexOf( testableControlPoints.get(i) );
-         pAux.remove(index);
-         segAux = getSegment(pAux,index-1);
-         remove = true;
-         
-         for (int j=0; j<=numberDivisions; j++) 
-         {
-            float t = (float)(j) / (float)(numberDivisions);
-            float tAux;
-            if (t < 0.5)
-            {
-                 segP = getSegment(controlPoints,index-1);
-                 tAux = t*2;     
-            } 
-            else 
-            {
-                segP = getSegment(controlPoints,index);
-                tAux = t*2 - 1;
-            }
-            
-            float x = curvePoint(segAux.a.x, segAux.b.x, segAux.c.x, segAux.d.x, t);
-            float y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, t);
-            PVector v1 = new PVector(x,y);
-
-            float x2 = curvePoint(segP.a.x, segP.b.x, segP.c.x, segP.d.x, tAux);
-            float y2 = curvePoint(segP.a.y, segP.b.y, segP.c.y, segP.d.y, tAux);
-            PVector v2 = new PVector(x2,y2);
-
-            float distance = v1.dist(v2);
-            if(distance >= tolerance){
-               remove = false;
-            }
-         }
-         
-         if(remove){
-           this.controlPoints.remove(index);
-           wasDecimed = true;
-         }
-         
       }
 
       this.decimable = wasDecimed;
+  }
+
+  // Returns the estimated tangent (a unit vector) at point t
+  PVector getTangent (i) {
+    Segment segAux = getSegment(i);
+    float x = curvePoint(segAux.a.x, segAux.b.x, segAux.c.x, segAux.d.x, 0);
+    float y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, 0);
+    PVector v1 = new PVector(x,y);
+
+    x = curvePoint(segAux.a.x, segAux.b.x, segAux.c.x, segAux.d.x, 0.01);
+    y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, 0.01);
+    PVector v2 = new PVector(x,y);
+
+    tan = PVector.sub(v2, v1);
+
+    //tan.normalize();
+    return tan;
   }
 
   void decimeAll(){

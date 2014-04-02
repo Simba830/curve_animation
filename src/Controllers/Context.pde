@@ -123,7 +123,6 @@ class Context{
 			}
 			o.drawCurve();
 			o.draw(t);
-			println("calling draw with t:"+t);
 		}
 
 		fill(0);
