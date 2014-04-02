@@ -105,7 +105,11 @@ void mouseDragged ()
 void draw() 
 {
   update();
-  stateContext.draw();
+  try {
+    stateContext.draw();
+  } catch (Exception e) {
+    println("e.toSring(): "+e.toSring());
+  }
 }
 
 void update(){

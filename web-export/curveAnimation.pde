@@ -134,7 +134,11 @@ void mouseDragged ()
 void draw() 
 {
   update();
-  stateContext.draw();
+  try {
+    stateContext.draw();
+  } catch (Exception e) {
+    println("e.toSring(): "+e.toSring());
+  }
 }
 
 void update(){
@@ -164,7 +168,7 @@ class Context{
 	boolean playing;
 	ArrayList<SceneElement> sceneElements;
 	SceneElement selectedElement;
-	int t;
+	float time;
 
 	Context(){
 		selectedSegments = new int[0];
@@ -262,10 +266,8 @@ class Context{
 
 	void draw(float t){
 		if(t == 0){
-			t = this.t;
+			t = this.time;
 		}
-
-		println("t: "+t);
 
 		for (SceneElement o : sceneElements) {
 			if(o == selectedElement){
@@ -276,6 +278,7 @@ class Context{
 				o.curveColor = color(200,200,200);
 			}
 			o.draw(t);
+			println("calling draw with t:"+t);
 			o.drawCurve();
 		}
 
@@ -314,6 +317,7 @@ class Context{
 			SceneElement o = sceneElements.get(i);
 			if(o == selectedElement){
 				sceneElements.remove(i);
+				this.curve = new CurveCat();
 				return;
 			}
 		}
@@ -322,8 +326,8 @@ class Context{
 		stateContext.setStateName("select");
 	}
 
-	void alignTimes(int t){
-		this.t = t;
+	void alignTimes(float t){
+		this.time = t;
 	}
 }
 
@@ -762,6 +766,7 @@ class CurveCat
     try {
       controlPoints.set(index,q);    
     } catch (Exception e) {
+        println("e.toString(): "+e.toString());
         print("Erro ao setar ponto de controle");
     }
   }
@@ -857,6 +862,9 @@ class CurveCat
           bestSegment = i;
         else
           bestSegment = i + 1;
+
+        if(bestSegment >= controlPoints.size())
+            bestSegment = controlPoints.size() - 4;
 
         bestDistance = bestSegmentDistance;
       }
@@ -1502,6 +1510,8 @@ class DrawningState extends State {
         super.mouseReleased();
     	  // Retorna o estado de poder desenhar para FALSE
         canSketch = false;
+
+        context.refreshInterpolator();
     }
     public void mouseDragged()
     {	
@@ -1608,8 +1618,9 @@ class EditingState extends State {
           if(!selected){
             context.selectedSegments = new int[1];
             context.selectedSegments[0] = selectedSegment;
+            float myTime = context.curve.getControlPoint(selectedSegment).z;
+            context.alignTimes(myTime);
             selectedSegment = 0;
-            context.alignTimes(selectedSegment);
           }
 
           println("distanceControlPoint: "+distanceControlPoint);

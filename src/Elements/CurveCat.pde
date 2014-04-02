@@ -245,6 +245,7 @@ class CurveCat
     try {
       controlPoints.set(index,q);    
     } catch (Exception e) {
+        println("e.toString(): "+e.toString());
         print("Erro ao setar ponto de controle");
     }
   }
@@ -340,6 +341,9 @@ class CurveCat
           bestSegment = i;
         else
           bestSegment = i + 1;
+
+        if(bestSegment >= controlPoints.size())
+            bestSegment = controlPoints.size() - 4;
 
         bestDistance = bestSegmentDistance;
       }

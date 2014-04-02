@@ -30,6 +30,8 @@ class DrawningState extends State {
         super.mouseReleased();
     	  // Retorna o estado de poder desenhar para FALSE
         canSketch = false;
+
+        context.refreshInterpolator();
     }
     public void mouseDragged()
     {	

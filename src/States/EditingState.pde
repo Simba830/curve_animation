@@ -73,8 +73,9 @@ class EditingState extends State {
           if(!selected){
             context.selectedSegments = new int[1];
             context.selectedSegments[0] = selectedSegment;
+            float myTime = context.curve.getControlPoint(selectedSegment).z;
+            context.alignTimes(myTime);
             selectedSegment = 0;
-            context.alignTimes(context.curve.getControlPoint(selectedSegment));
           }
 
           println("distanceControlPoint: "+distanceControlPoint);

@@ -12,7 +12,7 @@ class Context{
 	boolean playing;
 	ArrayList<SceneElement> sceneElements;
 	SceneElement selectedElement;
-	int t;
+	float time;
 
 	Context(){
 		selectedSegments = new int[0];
@@ -110,10 +110,8 @@ class Context{
 
 	void draw(float t){
 		if(t == 0){
-			t = this.t;
+			t = this.time;
 		}
-
-		println("t: "+t);
 
 		for (SceneElement o : sceneElements) {
 			if(o == selectedElement){
@@ -123,8 +121,9 @@ class Context{
 				o.c = color(0,0,0);
 				o.curveColor = color(200,200,200);
 			}
-			o.draw(t);
 			o.drawCurve();
+			o.draw(t);
+			println("calling draw with t:"+t);
 		}
 
 		fill(0);
@@ -162,6 +161,7 @@ class Context{
 			SceneElement o = sceneElements.get(i);
 			if(o == selectedElement){
 				sceneElements.remove(i);
+				this.curve = new CurveCat();
 				return;
 			}
 		}
@@ -170,7 +170,7 @@ class Context{
 		stateContext.setStateName("select");
 	}
 
-	void alignTimes(int t){
-		this.t = t;
+	void alignTimes(float t){
+		this.time = t;
 	}
 }
