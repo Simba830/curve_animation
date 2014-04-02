@@ -203,20 +203,23 @@ class CurveCat
          
       // }
 
+      pAux = new ArrayList<PVector>(controlPoints.size());
+      pAux = (ArrayList<PVector>) controlPoints.clone();
+
       boolean wasDecimed = false;
-      for (int i = 1; i < getNumberControlPoints() - 1; ++i) {
+      for (int i = 1; i < getNumberControlPoints() - 2; ++i) {
         PVector tan1 = getTangent(i - 1);
         PVector tan2 = getTangent(i + 1);
 
         PVector result = PVector.sub(tan2, tan1);
-        if(result.mag() < 0.5){
-          this.controlPoints.remove(i);
+        // println("result.mag(): "+result.mag());
+        if(result.mag() < 0.01){
+          pAux.remove(i);
           wasDecimed = true;
         }
-
-
       }
 
+      this.controlPoints = pAux;
       this.decimable = wasDecimed;
   }
 
@@ -227,8 +230,8 @@ class CurveCat
     float y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, 0);
     PVector v1 = new PVector(x,y);
 
-    x = curvePoint(segAux.a.x, segAux.b.x, segAux.c.x, segAux.d.x, 0.01);
-    y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, 0.01);
+    x = curvePoint(segAux.a.x, segAux.b.x, segAux.c.x, segAux.d.x, 0.001);
+    y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, 0.001);
     PVector v2 = new PVector(x,y);
 
     tan = PVector.sub(v2, v1);

@@ -74,7 +74,7 @@ class EditingState extends State {
             context.selectedSegments = new int[1];
             context.selectedSegments[0] = selectedSegment;
             float myTime = context.curve.getControlPoint(selectedSegment).z;
-            context.alignTimes(myTime);
+            context.alignTimes(0);
             selectedSegment = 0;
           }
 
