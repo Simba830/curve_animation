@@ -1,0 +1,186 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/bin/nodejs', '/usr/bin/npm', 'install', 'grunt' ]
+2 info using npm@1.2.18
+3 info using node@v0.10.15
+4 verbose read json /lcg/home/gherzog/curveAnimation/package.json
+5 verbose read json /lcg/home/gherzog/curveAnimation/node_modules/grunt/package.json
+6 verbose read json /lcg/home/gherzog/curveAnimation/node_modules/grunt-contrib-concat/package.json
+7 verbose from cache /lcg/home/gherzog/curveAnimation/package.json
+8 verbose readDependencies using package.json deps
+9 verbose cache add [ 'grunt', null ]
+10 verbose cache add name=undefined spec="grunt" args=["grunt",null]
+11 verbose parsed url { protocol: null,
+11 verbose parsed url   slashes: null,
+11 verbose parsed url   auth: null,
+11 verbose parsed url   host: null,
+11 verbose parsed url   port: null,
+11 verbose parsed url   hostname: null,
+11 verbose parsed url   hash: null,
+11 verbose parsed url   search: null,
+11 verbose parsed url   query: null,
+11 verbose parsed url   pathname: 'grunt',
+11 verbose parsed url   path: 'grunt',
+11 verbose parsed url   href: 'grunt' }
+12 silly lockFile 20ff3fd8-grunt grunt
+13 verbose lock grunt /lcg/home/gherzog/.npm/20ff3fd8-grunt.lock
+14 silly lockFile 20ff3fd8-grunt grunt
+15 silly lockFile 20ff3fd8-grunt grunt
+16 verbose addNamed [ 'grunt', '' ]
+17 verbose addNamed [ null, '*' ]
+18 silly lockFile 55f1ff24-grunt grunt@
+19 verbose lock grunt@ /lcg/home/gherzog/.npm/55f1ff24-grunt.lock
+20 silly addNameRange { name: 'grunt', range: '*', hasData: false }
+21 verbose url raw grunt
+22 verbose url resolving [ 'https://registry.npmjs.org/', './grunt' ]
+23 verbose url resolved https://registry.npmjs.org/grunt
+24 info trying registry request attempt 1 at 19:53:37
+25 http GET https://registry.npmjs.org/grunt
+26 http 200 https://registry.npmjs.org/grunt
+27 silly registry.get cb [ 200,
+27 silly registry.get   { date: 'Mon, 24 Mar 2014 22:53:26 GMT',
+27 silly registry.get     server: 'CouchDB/1.5.0 (Erlang OTP/R14B04)',
+27 silly registry.get     etag: '"3LKDPG6FLRWO7O5Q56QVZM0OQ"',
+27 silly registry.get     'content-type': 'application/json',
+27 silly registry.get     via: '1.1 varnish',
+27 silly registry.get     'cache-control': 'max-age=1',
+27 silly registry.get     'content-length': '82448',
+27 silly registry.get     'accept-ranges': 'bytes',
+27 silly registry.get     age: '71',
+27 silly registry.get     'x-served-by': 'cache-v43-ASH, cache-jfk1029-JFK',
+27 silly registry.get     'x-cache': 'MISS, HIT',
+27 silly registry.get     'x-cache-hits': '0, 1',
+27 silly registry.get     'x-timer': 'S1395582920.326484203,VS0,VS-71,VE244,VE118685981',
+27 silly registry.get     vary: 'Accept',
+27 silly registry.get     'keep-alive': 'timeout=10, max=50',
+27 silly registry.get     connection: 'Keep-Alive' } ]
+28 silly addNameRange number 2 { name: 'grunt', range: '*', hasData: true }
+29 silly addNameRange versions [ 'grunt',
+29 silly addNameRange   [ '0.1.0',
+29 silly addNameRange     '0.1.1',
+29 silly addNameRange     '0.1.2',
+29 silly addNameRange     '0.2.0',
+29 silly addNameRange     '0.2.1',
+29 silly addNameRange     '0.2.2',
+29 silly addNameRange     '0.2.3',
+29 silly addNameRange     '0.2.4',
+29 silly addNameRange     '0.2.5',
+29 silly addNameRange     '0.2.6',
+29 silly addNameRange     '0.2.7',
+29 silly addNameRange     '0.2.8',
+29 silly addNameRange     '0.2.9',
+29 silly addNameRange     '0.2.10',
+29 silly addNameRange     '0.2.11',
+29 silly addNameRange     '0.2.12',
+29 silly addNameRange     '0.2.13',
+29 silly addNameRange     '0.2.14',
+29 silly addNameRange     '0.2.15',
+29 silly addNameRange     '0.3.0',
+29 silly addNameRange     '0.3.1',
+29 silly addNameRange     '0.3.2',
+29 silly addNameRange     '0.3.3',
+29 silly addNameRange     '0.3.4',
+29 silly addNameRange     '0.3.5',
+29 silly addNameRange     '0.3.6',
+29 silly addNameRange     '0.3.7',
+29 silly addNameRange     '0.3.8',
+29 silly addNameRange     '0.3.9',
+29 silly addNameRange     '0.3.10',
+29 silly addNameRange     '0.3.11',
+29 silly addNameRange     '0.3.12',
+29 silly addNameRange     '0.3.13',
+29 silly addNameRange     '0.3.14',
+29 silly addNameRange     '0.3.15',
+29 silly addNameRange     '0.3.16',
+29 silly addNameRange     '0.3.17',
+29 silly addNameRange     '0.4.0',
+29 silly addNameRange     '0.4.1',
+29 silly addNameRange     '0.4.2',
+29 silly addNameRange     '0.4.3',
+29 silly addNameRange     '0.4.4',
+29 silly addNameRange     '0.3.13-a',
+29 silly addNameRange     '0.4.0-a',
+29 silly addNameRange     '0.4.0-rc1',
+29 silly addNameRange     '0.4.0-rc2',
+29 silly addNameRange     '0.4.0-rc3',
+29 silly addNameRange     '0.4.0-rc4',
+29 silly addNameRange     '0.4.0-rc5',
+29 silly addNameRange     '0.4.0-rc6',
+29 silly addNameRange     '0.4.0-rc7',
+29 silly addNameRange     '0.4.0-rc8' ] ]
+30 verbose addNamed [ 'grunt', '0.4.4' ]
+31 verbose addNamed [ '0.4.4', '0.4.4' ]
+32 silly lockFile 6f9e9a40-grunt-0-4-4 grunt@0.4.4
+33 verbose lock grunt@0.4.4 /lcg/home/gherzog/.npm/6f9e9a40-grunt-0-4-4.lock
+34 silly lockFile e3269c2a--npmjs-org-grunt-grunt-0-4-4-tgz https://registry.npmjs.org/grunt/-/grunt-0.4.4.tgz
+35 verbose lock https://registry.npmjs.org/grunt/-/grunt-0.4.4.tgz /lcg/home/gherzog/.npm/e3269c2a--npmjs-org-grunt-grunt-0-4-4-tgz.lock
+36 verbose addRemoteTarball [ 'https://registry.npmjs.org/grunt/-/grunt-0.4.4.tgz',
+36 verbose addRemoteTarball   'f37fa46e2e52e37f9a0370542a74281c09c73f53' ]
+37 info retry fetch attempt 1 at 19:53:39
+38 verbose fetch to= /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/tmp.tgz
+39 http GET https://registry.npmjs.org/grunt/-/grunt-0.4.4.tgz
+40 http 200 https://registry.npmjs.org/grunt/-/grunt-0.4.4.tgz
+41 silly shasum updated bytes 25094
+42 info shasum f37fa46e2e52e37f9a0370542a74281c09c73f53
+42 info shasum /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/tmp.tgz
+43 verbose tar unpack /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/tmp.tgz
+44 silly lockFile e806db6f-19802-0-6990116250235587-package /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/package
+45 verbose lock /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/package /lcg/home/gherzog/.npm/e806db6f-19802-0-6990116250235587-package.lock
+46 silly lockFile 8517903f-19802-0-6990116250235587-tmp-tgz /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/tmp.tgz
+47 verbose lock /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/tmp.tgz /lcg/home/gherzog/.npm/8517903f-19802-0-6990116250235587-tmp-tgz.lock
+48 silly gunzTarPerm modes [ '755', '644' ]
+49 silly gunzTarPerm extractEntry package.json
+50 silly gunzTarPerm extractEntry .npmignore
+51 silly gunzTarPerm extractEntry README.md
+52 silly gunzTarPerm extractEntry LICENSE-MIT
+53 silly gunzTarPerm extractEntry internal-tasks/bump.js
+54 silly gunzTarPerm extractEntry internal-tasks/subgrunt.js
+55 silly gunzTarPerm extractEntry lib/grunt.js
+56 silly gunzTarPerm extractEntry lib/grunt/cli.js
+57 silly gunzTarPerm extractEntry lib/grunt/config.js
+58 silly gunzTarPerm extractEntry lib/grunt/event.js
+59 silly gunzTarPerm extractEntry lib/grunt/fail.js
+60 silly gunzTarPerm extractEntry lib/grunt/file.js
+61 silly gunzTarPerm extractEntry lib/grunt/help.js
+62 silly gunzTarPerm extractEntry lib/grunt/log.js
+63 silly gunzTarPerm extractEntry lib/grunt/option.js
+64 silly gunzTarPerm extractEntry lib/grunt/task.js
+65 silly gunzTarPerm extractEntry lib/grunt/template.js
+66 silly gunzTarPerm extractEntry lib/util/task.js
+67 verbose read json /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/package/package.json
+68 silly lockFile e806db6f-19802-0-6990116250235587-package /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/package
+69 silly lockFile e806db6f-19802-0-6990116250235587-package /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/package
+70 silly lockFile 8517903f-19802-0-6990116250235587-tmp-tgz /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/tmp.tgz
+71 silly lockFile 8517903f-19802-0-6990116250235587-tmp-tgz /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/tmp.tgz
+72 verbose from cache /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/package/package.json
+73 verbose tar pack [ '/lcg/home/gherzog/.npm/grunt/0.4.4/package.tgz',
+73 verbose tar pack   '/lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/package' ]
+74 verbose tarball /lcg/home/gherzog/.npm/grunt/0.4.4/package.tgz
+75 verbose folder /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/package
+76 silly lockFile e806db6f-19802-0-6990116250235587-package /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/package
+77 verbose lock /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/package /lcg/home/gherzog/.npm/e806db6f-19802-0-6990116250235587-package.lock
+78 silly lockFile 23a9dc3a-rzog-npm-grunt-0-4-4-package-tgz /lcg/home/gherzog/.npm/grunt/0.4.4/package.tgz
+79 verbose lock /lcg/home/gherzog/.npm/grunt/0.4.4/package.tgz /lcg/home/gherzog/.npm/23a9dc3a-rzog-npm-grunt-0-4-4-package-tgz.lock
+80 silly lockFile e806db6f-19802-0-6990116250235587-package /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/package
+81 silly lockFile e806db6f-19802-0-6990116250235587-package /lcg/home/gherzog/tmp/npm-10407/1395701619802-0.6990116250235587/package
+82 silly lockFile 23a9dc3a-rzog-npm-grunt-0-4-4-package-tgz /lcg/home/gherzog/.npm/grunt/0.4.4/package.tgz
+83 silly lockFile 23a9dc3a-rzog-npm-grunt-0-4-4-package-tgz /lcg/home/gherzog/.npm/grunt/0.4.4/package.tgz
+84 silly lockFile e3269c2a--npmjs-org-grunt-grunt-0-4-4-tgz https://registry.npmjs.org/grunt/-/grunt-0.4.4.tgz
+85 silly lockFile e3269c2a--npmjs-org-grunt-grunt-0-4-4-tgz https://registry.npmjs.org/grunt/-/grunt-0.4.4.tgz
+86 silly lockFile 6f9e9a40-grunt-0-4-4 grunt@0.4.4
+87 silly lockFile 6f9e9a40-grunt-0-4-4 grunt@0.4.4
+88 silly lockFile 55f1ff24-grunt grunt@
+89 silly lockFile 55f1ff24-grunt grunt@
+90 error Error: UNKNOWN, chown '/lcg/home/gherzog/.npm/grunt/0.4.4/package.tgz'
+91 error If you need help, you may report this log at:
+91 error     <http://bugs.debian.org/npm>
+91 error or use
+91 error     reportbug --attach /lcg/home/gherzog/curveAnimation/npm-debug.log npm
+92 error System Linux 3.11.0-13-generic
+93 error command "/usr/bin/nodejs" "/usr/bin/npm" "install" "grunt"
+94 error cwd /lcg/home/gherzog/curveAnimation
+95 error node -v v0.10.15
+96 error npm -v 1.2.18
+97 error path /lcg/home/gherzog/.npm/grunt/0.4.4/package.tgz
+98 error code UNKNOWN
+99 error errno -1
+100 verbose exit [ -1, true ]
