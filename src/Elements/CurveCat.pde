@@ -585,14 +585,18 @@ class CurveCat
   // Desenha elipses de acordo com os elementos do tipo PVector da lista p
   void drawControlPoints()
   {
-    fill(secondaryColor);
-    stroke(secondaryColor);
-    for (int i = 0; i < getNumberControlPoints(); i++) 
-    {
-      ellipse (controlPoints.get(i).x, controlPoints.get(i).y, 7, 7);
-      text("t: "+controlPoints.get(i).z, controlPoints.get(i).x + 10, controlPoints.get(i).y - 10);
-    } 
-    fill(255);
+    boolean haveCurve = (getNumberControlPoints()<4)?false:true;
+    console.log(getNumberControlPoints());
+    if (haveCurve){
+      fill(secondaryColor);
+      stroke(secondaryColor);
+      for (int i = 0; i < getNumberControlPoints(); i++) 
+      {
+        ellipse (controlPoints.get(i).x, controlPoints.get(i).y, 7, 7);
+        text("t: "+controlPoints.get(i).z, controlPoints.get(i).x + 10, controlPoints.get(i).y - 10);
+      } 
+      fill(255);
+    }
   }
   void drawControlPoint(int i)
   {

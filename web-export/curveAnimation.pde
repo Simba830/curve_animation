@@ -390,7 +390,6 @@ public class StateContext {
         PVector q = new PVector(context.mouse.x, context.mouse.y);
         int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
 
-        console.log(selectedSegment);
         //int closestControlPointIndex  = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
         PVector closestControlPoint = context.curve.getControlPoint(selectedSegment);
 
@@ -399,8 +398,11 @@ public class StateContext {
         if(distance < 10 && !(myState instanceof OverSketchState) && !(myState instanceof EditingState)){
           myState = new EditingState(this.context);
         }
-
-        if(selectedSegment == context.curve.getNumberControlPoints() - 2 && distance < 10){
+        
+        //console.log("Numero de Pontos de Controle:"+context.curve.getNumberControlPoints());
+        //console.log("Pontos Selecionados"+selectedSegment);
+        
+        if(selectedSegment == context.curve.getNumberControlPoints() - 1 && distance < 10){
             myState = new DrawningState(this.context);
         }
 
@@ -1105,14 +1107,18 @@ class CurveCat
   // Desenha elipses de acordo com os elementos do tipo PVector da lista p
   void drawControlPoints()
   {
-    fill(secondaryColor);
-    stroke(secondaryColor);
-    for (int i = 0; i < getNumberControlPoints(); i++) 
-    {
-      ellipse (controlPoints.get(i).x, controlPoints.get(i).y, 7, 7);
-      text("t: "+controlPoints.get(i).z, controlPoints.get(i).x + 10, controlPoints.get(i).y - 10);
-    } 
-    fill(255);
+    boolean haveCurve = (getNumberControlPoints()<4)?false:true;
+    console.log(getNumberControlPoints());
+    if (haveCurve){
+      fill(secondaryColor);
+      stroke(secondaryColor);
+      for (int i = 0; i < getNumberControlPoints(); i++) 
+      {
+        ellipse (controlPoints.get(i).x, controlPoints.get(i).y, 7, 7);
+        text("t: "+controlPoints.get(i).z, controlPoints.get(i).x + 10, controlPoints.get(i).y - 10);
+      } 
+      fill(255);
+    }
   }
   void drawControlPoint(int i)
   {
@@ -1589,7 +1595,7 @@ class DrawningState extends State {
     {
         super.mouseReleased();
     	  // Retorna o estado de poder desenhar para FALSE
-        canSketch = false;
+        //canSketch = false;
 
         context.refreshInterpolator();
     }
@@ -1669,7 +1675,7 @@ class EditingState extends State {
       {
         // Seleciona o segmento em questão se for o mouse LEFT
         PVector closestPoint = new PVector();
-        PVector q = new PVector(context.mouse.x, context.mouse.y);
+        PVector q = new PVector(context.mouse.x, context.mouse.y,0);
         int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
         //int closestControlPointIndex  = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
         PVector closestControlPoint = context.curve.getControlPoint(selectedSegment);
@@ -1699,13 +1705,14 @@ class EditingState extends State {
             context.selectedSegments = new int[1];
             context.selectedSegments[0] = selectedSegment;
             float myTime = context.curve.getControlPoint(selectedSegment).z;
-            context.alignTimes(0);
+            context.alignTimes(myTime);
             selectedSegment = 0;
           }
 
           println("distanceControlPoint: "+distanceControlPoint);
           if(distanceControlPoint > 50){
-              context.curve.insertPoint(q, context.selectedSegments[selectedSegment]);
+              //PVector d1 = context.curve.getControlPoint(selectedSegment);
+              //context.curve.insertPoint(q, context.selectedSegments[selectedSegment]);
               // context.selectedSegments[selectedSegment]++;
           }
         }  
@@ -1780,7 +1787,6 @@ class EditingState extends State {
 
     public void draw()
     {
-        context.curve.drawControlPoints();
         if(context.selectedSegments.length == 0)
         {
             // Desenha caixa de seleção com Alpha 50
@@ -1792,14 +1798,9 @@ class EditingState extends State {
             context.mouseFinal.y - context.mouseInit.y);
         }
 
-        // Draw control points;
-        if(context.selectedSegments.length > 0)
-        {
-            for (int i = 0; i<context.selectedSegments.length; i++)
-            {
-                context.curve.drawControlPoint(context.selectedSegments[i]);
-            }
-        }
+        // Draw control points if have a curve;
+        context.curve.drawControlPoints();
+        
     }
 
     public void drawInterface()

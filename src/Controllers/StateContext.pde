@@ -58,7 +58,6 @@ public class StateContext {
         PVector q = new PVector(context.mouse.x, context.mouse.y);
         int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
 
-        console.log(selectedSegment);
         //int closestControlPointIndex  = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
         PVector closestControlPoint = context.curve.getControlPoint(selectedSegment);
 
@@ -67,8 +66,11 @@ public class StateContext {
         if(distance < 10 && !(myState instanceof OverSketchState) && !(myState instanceof EditingState)){
           myState = new EditingState(this.context);
         }
-
-        if(selectedSegment == context.curve.getNumberControlPoints() - 2 && distance < 10){
+        
+        //console.log("Numero de Pontos de Controle:"+context.curve.getNumberControlPoints());
+        //console.log("Pontos Selecionados"+selectedSegment);
+        
+        if(selectedSegment == context.curve.getNumberControlPoints() - 1 && distance < 10){
             myState = new DrawningState(this.context);
         }
 

@@ -44,7 +44,7 @@ class EditingState extends State {
       {
         // Seleciona o segmento em questão se for o mouse LEFT
         PVector closestPoint = new PVector();
-        PVector q = new PVector(context.mouse.x, context.mouse.y);
+        PVector q = new PVector(context.mouse.x, context.mouse.y,0);
         int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
         //int closestControlPointIndex  = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
         PVector closestControlPoint = context.curve.getControlPoint(selectedSegment);
@@ -74,13 +74,14 @@ class EditingState extends State {
             context.selectedSegments = new int[1];
             context.selectedSegments[0] = selectedSegment;
             float myTime = context.curve.getControlPoint(selectedSegment).z;
-            context.alignTimes(0);
+            context.alignTimes(myTime);
             selectedSegment = 0;
           }
 
           println("distanceControlPoint: "+distanceControlPoint);
           if(distanceControlPoint > 50){
-              context.curve.insertPoint(q, context.selectedSegments[selectedSegment]);
+              //PVector d1 = context.curve.getControlPoint(selectedSegment);
+              //context.curve.insertPoint(q, context.selectedSegments[selectedSegment]);
               // context.selectedSegments[selectedSegment]++;
           }
         }  
@@ -155,7 +156,6 @@ class EditingState extends State {
 
     public void draw()
     {
-        context.curve.drawControlPoints();
         if(context.selectedSegments.length == 0)
         {
             // Desenha caixa de seleção com Alpha 50
@@ -167,14 +167,9 @@ class EditingState extends State {
             context.mouseFinal.y - context.mouseInit.y);
         }
 
-        // Draw control points;
-        if(context.selectedSegments.length > 0)
-        {
-            for (int i = 0; i<context.selectedSegments.length; i++)
-            {
-                context.curve.drawControlPoint(context.selectedSegments[i]);
-            }
-        }
+        // Draw control points if have a curve;
+        context.curve.drawControlPoints();
+        
     }
 
     public void drawInterface()
