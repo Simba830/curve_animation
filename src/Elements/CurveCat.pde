@@ -70,18 +70,21 @@ class CurveCat
       }
     }
 
+    println("maxDistance: "+maxDistance);
+    println("epsilon: "+epsilon);
     if(maxDistance > epsilon){
       ArrayList<int> results1, results2;
 
       // Subdivide os calculos e passa apenas os indices, poupando trabalho para criar vetor auxiliar.
-      results1 = DouglasPeuckerReducing(cpoints,index,end-1, epsilon);
+      results1 = DouglasPeuckerReducingInt(cpoints,index,end-1, epsilon);
 
-      results2 = DouglasPeuckerReducing(cpoints,1,index, epsilon);
+      results2 = DouglasPeuckerReducingInt(cpoints,1,index, epsilon);
 
       // Concatenando dois arrays, por que tinha que ser tão difícil ? Custava retornar o array novo ?
       results1.addAll(results2);
       result = (ArrayList<int>) results1.clone();
-    }else{
+    }
+    else{
       result = cpoints;
     }
 
@@ -101,7 +104,6 @@ class CurveCat
         index = i;
       }
     }
-
     if(maxDistance > epsilon){
       ArrayList<PVector> results1, results2;
 
@@ -177,13 +179,12 @@ class CurveCat
       // Pega o tempo inicial
       int t0 = millis();
       // Pego os vetores essenciais para a curva
-      ArrayList<int> essentialsIndex = DouglasPeuckerReducingInt(controlPoints,0,size, tolerance);
-      ArrayList<PVector> essentials = new ArrayList<PVector>;
-      // Pega a lista de indices essenciais e depois cria um vetor com esse indices.
-      for (int i = 0; i < essentialsIndex.size();i++)
-        essentials.add(controlPoints.get(essentialsIndex.get(i)));
-
-      //ArrayList<PVector> essentials = DouglasPeuckerReducing(controlPoints,0.1);
+      // ArrayList<int> essentialsIndex = DouglasPeuckerReducingInt(controlPoints,0,size, 0.1);
+      // ArrayList<PVector> essentials = new ArrayList<PVector>;
+      // // Pega a lista de indices essenciais e depois cria um vetor com esse indices.
+      // for (int i = 0; i < essentialsIndex.size();i++)
+      //   essentials.add(controlPoints.get(essentialsIndex.get(i)));
+      ArrayList<PVector> essentials = DouglasPeuckerReducing(controlPoints,100);
       
       // Pega o tempo final
       int t1Douglas = millis();
@@ -200,6 +201,12 @@ class CurveCat
       // Removendo os pontos essenciais dos testáveis
       for (int i = 0; i < essentials.size(); ++i) {
         testableControlPoints.remove(essentials.get(i));
+      }
+
+      // Adiciona os essenciais no final da lista de testáveis em ordem de prioridade do menos importante pro mais importante.
+      for (int i = essentials.size(); i >= 0; --i)
+      {
+        testableControlPoints.add(essentials.get(i));
       }
 
       // Percorre os testáveis removendo e verificando com a tolerância.
