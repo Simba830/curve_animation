@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/guiherzog/curveAnimation",
   "devDependencies": {
-    "grunt-contrib-concat": "^0.3.0"
+    "grunt-contrib-concat": "^0.3.0",
+    "grunt-contrib-watch": "^0.6.1"
   }
 }

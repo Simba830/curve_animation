@@ -33,12 +33,7 @@ void my_assert (boolean p) {
  Created on: May 13
  **/
 
-PFont font; // it's a font
 float curveT;
-
-// Curve
-CurveCat curve;
-CurveCat decimedCurve;
 
 // Selection Box
 PVector mouseInit;
@@ -55,9 +50,7 @@ color mainColor = #0066C8;
 color secondaryColor = #FF9700;
 color thirdColor = #3990E3;
 
-// Images
-PImage img;
-
+// Canvas Size
 int width,height;
 
 Context getContext(){
@@ -76,9 +69,7 @@ public void setup()
 
   smooth();
 
-  font = createFont("", 14);
   curveT = 0;
-  img = loadImage("play.png");
 
   // PVectors used to create the selection box
   mouseInit = new PVector(0,0);
@@ -92,6 +83,8 @@ public void setup()
 
   stateContext = new StateContext(context);
   stateContext.setContext(context);
+
+  println("Setuping application");
 }
 
 // TODO Mudar isso para um interface só usando o mouse
