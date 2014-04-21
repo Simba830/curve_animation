@@ -124,24 +124,31 @@ class EditingState extends State {
 
             // Soma aos elementos selecionados
             for (int i = -this.cpsMovimenteds; i< this.cpsMovimenteds; i++){
+
+              if(context.selectedSegments[0] + i < 0){
+                continue;
+              }
+
+              if(context.selectedSegments[0] + i >= context.curve.getNumberControlPoints()){
+                return;
+              }
+
               float tdx;
               float tdy;
               if( i != 0){
-                tdx = dx/(5*abs(i));
-                tdy = dy/(5*abs(i));
+                tdx = dx/(2*abs(i));
+                tdy = dy/(2*abs(i));
               }else{
                 tdx = dx;
                 tdy = dy;
               }
 
               PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[0] + i);
-              context.curve.setPoint(new PVector(controlPoint.x + tdx, controlPoint.y + tdy, controlPoint.z), context.selectedSegments[0] + i);
+              context.curve.setPoint( new PVector(controlPoint.x + tdx, controlPoint.y + tdy, controlPoint.z) , context.selectedSegments[0] + i);
             }
 
           }
         }
-
-        context.refreshInterpolator();
     }
 
     public void keyPressed(){

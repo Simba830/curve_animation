@@ -54,8 +54,6 @@ public void setup()
 
   stateContext = new StateContext(context);
   stateContext.setContext(context);
-
-  println("Setuping application");
 }
 
 // TODO Mudar isso para um interface só usando o mouse
@@ -101,7 +99,8 @@ void draw()
   try {
     stateContext.draw();
   } catch (Exception e) {
-    println("e.toSring(): "+e.toSring());
+    println("e.toString(): "+e.toString());
+    e.printStackTrace();
   }
 }
 

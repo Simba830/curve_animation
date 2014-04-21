@@ -56,6 +56,7 @@ class CurveCat
   { 
          return getSegment(controlPoints,i);
   }
+
  // Método que retorna os principais controlPoints que são essenciais para a curva
  // Passamos como paramêtros os indices do vetor, e o vetor.
   ArrayList<int> DouglasPeuckerReducingInt(ArrayList<PVector> cpoints,int index, int end, float epsilon){
@@ -90,6 +91,7 @@ class CurveCat
 
     return result;
   }
+
   // Método que retorna os principais controlPoints que são essenciais para a curva
   ArrayList<PVector> DouglasPeuckerReducing(ArrayList<PVector> cpoints, float epsilon){
     float maxDistance = 0, distance = 0;
@@ -195,7 +197,6 @@ class CurveCat
 
       // Array que vai conter os vetores a serem testados
       ArrayList<PVector> testableControlPoints = (ArrayList<PVector>) controlPoints.clone();
-
 
       t0 = millis();
       // Removendo os pontos essenciais dos testáveis
@@ -579,7 +580,6 @@ class CurveCat
   void drawControlPoints()
   {
     boolean haveCurve = (getNumberControlPoints()<4)?false:true;
-    console.log(getNumberControlPoints());
     if (haveCurve){
       fill(secondaryColor);
       stroke(secondaryColor);
