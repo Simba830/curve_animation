@@ -25,7 +25,7 @@ class CurveCat
   {
     controlPoints = new ArrayList<Property>();
     decimable = true;
-    tolerance = 100;
+    tolerance = 10;
 
     history = new ArrayList<ArrayList<Property>>();
   }
@@ -134,7 +134,7 @@ class CurveCat
     PVector tmp = (PVector) segEnd.get();
     tmp.sub(segBegin);
 
-    int numberDivisions = 100;
+    int numberDivisions = this.numberDivisions;
     float delta = tmp.mag()/numberDivisions;
 
     float distance = 99999;
@@ -177,7 +177,7 @@ class CurveCat
       // Pega o tempo inicial
       int t0 = millis();
       // Pego os vetores essenciais para a curva
-      ArrayList<int> essentialsIndex = DouglasPeuckerReducingInt(controlPoints,0,size, 0.01);
+      ArrayList<int> essentialsIndex = DouglasPeuckerReducingInt(controlPoints,0,size, tolerance);
       ArrayList<PVector> essentials = new ArrayList<PVector>;
       // Pega a lista de indices essenciais e depois cria um vetor com esse indices.
       for (int i = 0; i < essentialsIndex.size();i++)
