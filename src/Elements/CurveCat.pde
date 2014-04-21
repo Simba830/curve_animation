@@ -27,7 +27,7 @@ class CurveCat
     decimable = true;
     tolerance = 100;
 
-    history = new ArrayList<ArrayList<PVector>>();
+    history = new ArrayList<ArrayList<Property>>();
   }
 
   void clear()
@@ -134,7 +134,7 @@ class CurveCat
     PVector tmp = (PVector) segEnd.get();
     tmp.sub(segBegin);
 
-    int numberDivisions = 1000;
+    int numberDivisions = 100;
     float delta = tmp.mag()/numberDivisions;
 
     float distance = 99999;
@@ -190,11 +190,13 @@ class CurveCat
 
       int totalTimeDouglas = t1Douglas - t0;
       // Exibe o tempo total gasto em Douglas Peucker
-      console.log("Tempo de processamento Douglas Peucker: "+totalTimeDouglas+" ms");
+      println("Tempo de processamento Douglas Peucker: "+totalTimeDouglas+" ms");
 
       // Array que vai conter os vetores a serem testados
       ArrayList<PVector> testableControlPoints = (ArrayList<PVector>) controlPoints.clone();
 
+
+      t0 = millis();
       // Removendo os pontos essenciais dos testáveis
       for (int i = 0; i < essentials.size(); ++i) {
         testableControlPoints.remove(essentials.get(i));
@@ -308,7 +310,9 @@ class CurveCat
   void setPoint(PVector q, int index)
   {
     try {
-      controlPoints.set(index,q);    
+      controlPoints.set(index,q); 
+
+      println("controlPoints: "+ controlPoints.get(index));   
     } catch (Exception e) {
         println("e.toString(): "+e.toString());
         print("Erro ao setar ponto de controle");

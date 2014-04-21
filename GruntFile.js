@@ -16,6 +16,8 @@ module.exports = function(grunt) {
 	          files: [
 	            //watched files
 	            'src/**/*.pde',
+	            'web-export/**/*.css',
+	            'web-export/**/*.js'
 	            ],   
 	          tasks: ['concat'],     //tasks to run
 	          options: {
