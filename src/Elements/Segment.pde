@@ -1,7 +1,7 @@
 class Segment{
-   PVector a,b,c,d;
+   Property a,b,c,d;
   
-   Segment(PVector _a, PVector _b, PVector _c, PVector _d){
+   Segment(Property _a, Property _b, Property _c, Property _d){
       a = _a;
       b = _b;
       c = _c;

@@ -557,12 +557,12 @@ class CurveCat
       controlPoints.remove(index);
   }
 
-  Segment getSegment(ArrayList<PVector> pAux, int i)
+  Segment getSegment(ArrayList<Property> pAux, int i)
   { 
-         PVector a = i >= 1 ? pAux.get(i-1) : pAux.get(0);
-         PVector b = pAux.get(i);
-         PVector c = pAux.get(i+1);
-         PVector d = i+2 < pAux.size() ? pAux.get(i+2) : pAux.get(i+1);
+         Property a = i >= 1 ? pAux.get(i-1) : pAux.get(0);
+         Property b = pAux.get(i);
+         Property c = pAux.get(i+1);
+         Property d = i+2 < pAux.size() ? pAux.get(i+2) : pAux.get(i+1);
          return new Segment(a,b,c,d);
   }
 
@@ -573,7 +573,7 @@ class CurveCat
 
  // Método que retorna os principais controlPoints que são essenciais para a curva
  // Passamos como paramêtros os indices do vetor, e o vetor.
-  ArrayList<int> DouglasPeuckerReducingInt(ArrayList<PVector> cpoints,int index, int end, float epsilon){
+  ArrayList<int> DouglasPeuckerReducingInt(ArrayList<Property> cpoints,int index, int end, float epsilon){
     float maxDistance = 0, distance = 0;
     ArrayList<int> result;
 
@@ -607,11 +607,11 @@ class CurveCat
   }
 
   // Método que retorna os principais controlPoints que são essenciais para a curva
-  ArrayList<PVector> DouglasPeuckerReducing(ArrayList<PVector> cpoints, float epsilon){
+  ArrayList<Property> DouglasPeuckerReducing(ArrayList<Property> cpoints, float epsilon){
     float maxDistance = 0, distance = 0;
     int index = 0;
     int end = cpoints.size();
-    ArrayList<PVector> result;
+    ArrayList<Property> result;
 
     for (int i = 2; i < end - 1; ++i) {
       distance = shortestDistanceToSegment(cpoints.get(i), cpoints.get(1), cpoints.get(end - 1));
@@ -621,17 +621,17 @@ class CurveCat
       }
     }
     if(maxDistance > epsilon){
-      ArrayList<PVector> results1, results2;
+      ArrayList<Property> results1, results2;
 
       // Fiz isso aqui porque não posso modificar o cpoints
-      ArrayList<PVector> tmp = new ArrayList<PVector>();
+      ArrayList<Property> tmp = new ArrayList<Property>();
       for (int i = index; i < end - 1; ++i) {
           tmp.add(cpoints.get(i));
       }
       results1 = DouglasPeuckerReducing(tmp, epsilon);
 
       // Fiz isso aqui porque não posso modificar o cpoints
-      tmp = new ArrayList<PVector>();
+      tmp = new ArrayList<Property>();
       for (int i = 1; i < index; ++i) {
           tmp.add(cpoints.get(i));
       }
@@ -639,7 +639,7 @@ class CurveCat
 
       // Concatenando dois arrays, por que tinha que ser tão difícil ? Custava retornar o array novo ?
       results1.addAll(results2);
-      result = (ArrayList<PVector>) results1.clone();
+      result = (ArrayList<Property>) results1.clone();
     }else{
       result = cpoints;
     }
@@ -655,7 +655,7 @@ class CurveCat
     int numberDivisions = this.numberDivisions;
     float delta = tmp.mag()/numberDivisions;
 
-    float distance = 99999;
+    float distance = 9999;
 
     for (int i = 0; i < numberDivisions; ++i) {
         tmp = segEnd.get();
@@ -688,7 +688,7 @@ class CurveCat
       
       Segment segAux;
       Segment segP;
-      ArrayList<PVector> pAux;
+      ArrayList<Property> pAux;
 
       boolean wasDecimed = false;
 
@@ -696,11 +696,11 @@ class CurveCat
       int t0 = millis();
       // Pego os vetores essenciais para a curva
       // ArrayList<int> essentialsIndex = DouglasPeuckerReducingInt(controlPoints,0,size, 0.1);
-      // ArrayList<PVector> essentials = new ArrayList<PVector>;
+      // ArrayList<Property> essentials = new ArrayList<Property>;
       // // Pega a lista de indices essenciais e depois cria um vetor com esse indices.
       // for (int i = 0; i < essentialsIndex.size();i++)
       //   essentials.add(controlPoints.get(essentialsIndex.get(i)));
-      ArrayList<PVector> essentials = DouglasPeuckerReducing(controlPoints,100);
+      ArrayList<Property> essentials = DouglasPeuckerReducing(controlPoints,100);
       
       // Pega o tempo final
       int t1Douglas = millis();
@@ -710,14 +710,14 @@ class CurveCat
       println("Tempo de processamento Douglas Peucker: "+totalTimeDouglas+" ms");
 
       // Array que vai conter os vetores a serem testados
-      ArrayList<PVector> testableControlPoints = (ArrayList<PVector>) controlPoints.clone();
+      ArrayList<Property> testableControlPoints = (ArrayList<Property>) controlPoints.clone();
 
       t0 = millis();
       // Removendo os pontos essenciais dos testáveis
       for (int i = 0; i < essentials.size(); ++i) {
         testableControlPoints.remove(essentials.get(i));
       }
-
+      println("essentials.size(): "+essentials.size());
       // Adiciona os essenciais no final da lista de testáveis em ordem de prioridade do menos importante pro mais importante.
       for (int i = essentials.size(); i >= 0; --i)
       {
@@ -727,8 +727,8 @@ class CurveCat
       // Percorre os testáveis removendo e verificando com a tolerância.
       for(int i = 1; i < testableControlPoints.size() - 1; i++){
 
-         pAux = new ArrayList<PVector>(controlPoints.size());
-         pAux = (ArrayList<PVector>) controlPoints.clone();
+         pAux = new ArrayList<Property>(controlPoints.size());
+         pAux = (ArrayList<Property>) controlPoints.clone();
 
          // Pega o vetor e procura qual o indice dele nos controlPoints
          int index = controlPoints.indexOf( testableControlPoints.get(i) );
@@ -751,9 +751,9 @@ class CurveCat
                 tAux = t*2 - 1;
             }
             
-            float x = curvePoint(segAux.a.x, segAux.b.x, segAux.c.x, segAux.d.x, t);
-            float y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, t);
-            PVector v1 = new PVector(x,y);
+            float x1 = curvePoint(segAux.a.get(0), segAux.b.get(0), segAux.c.get(0), segAux.d.get(0), t);
+            float y1 = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, t);
+            PVector v1 = new PVector(x1,y1);
 
             float x2 = curvePoint(segP.a.x, segP.b.x, segP.c.x, segP.d.x, tAux);
             float y2 = curvePoint(segP.a.y, segP.b.y, segP.c.y, segP.d.y, tAux);
@@ -882,7 +882,7 @@ class CurveCat
   // Retorna o indice do segmento da curva onde o ponto mais proximo de q foi 
   // encontrado. As coordenadas do ponto mais proximo são guardadas em r
   // 
-  int findClosestPoint (ArrayList<PVector> cps, PVector q, PVector r) {
+  int findClosestPoint (ArrayList<Property> cps, PVector q, PVector r) {
 
     // Inicia com -1 para saber se deu certo
     int bestSegment = -1;
@@ -1043,7 +1043,7 @@ class CurveCat
       if(history.get(history.size() - 1).equals(controlPoints))
         return;
     }
-    ArrayList<PVector> branch = (ArrayList<PVector>) controlPoints.clone();
+    ArrayList<Property> branch = (ArrayList<Property>) controlPoints.clone();
     history.add(branch);
     historyIndex++;
   }
@@ -1110,20 +1110,20 @@ class CurveCat
     fill(mainColor);
     stroke(mainColor);
     if (controlPoints.size() > i && i>-1)
-      ellipse(controlPoints.get(i).x, controlPoints.get(i).y, 10, 10);
+      ellipse(controlPoints.get(i).get(x), controlPoints.get(i).get(y), 10, 10);
   }
 
   CurveCat clone(){
     CurveCat aux = new CurveCat();
-    aux.controlPoints = (ArrayList<PVector>) controlPoints.clone();
+    aux.controlPoints = (ArrayList<Property>) controlPoints.clone();
     return aux;
   }
 
   String toString(){
     String curve = "Curve: { ControlPoints: [";
     for (int i = 0; i<this.getNumberControlPoints(); i++){
-      PVector aux = this.getControlPoint(i);
-      curve += "("+aux.x+", "+aux.y+"),";
+      Property aux = this.getControlPoint(i);
+      curve += "("+aux.x()+","+aux.y()+"),";
     }
     curve += "]";
     curve += "}";
@@ -1187,9 +1187,9 @@ class SceneElement
 }
 
 class Segment{
-   PVector a,b,c,d;
+   Property a,b,c,d;
   
-   Segment(PVector _a, PVector _b, PVector _c, PVector _d){
+   Segment(Property _a, Property _b, Property _c, Property _d){
       a = _a;
       b = _b;
       c = _c;
@@ -1383,6 +1383,15 @@ class Property {
     my_assert (i>=0);
     if (i >= size()) return 0.0;
     return prop.get(i);
+  }
+
+  Float x()
+  {
+    return prop.get(0);
+  }
+  Float y()
+  {
+    return prop.get(0);
   }
 };
 
