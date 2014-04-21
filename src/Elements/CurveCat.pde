@@ -311,8 +311,6 @@ class CurveCat
   {
     try {
       controlPoints.set(index,q); 
-
-      println("controlPoints: "+ controlPoints.get(index));   
     } catch (Exception e) {
         println("e.toString(): "+e.toString());
         print("Erro ao setar ponto de controle");

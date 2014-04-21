@@ -10,82 +10,81 @@ class EditingState extends State {
 
     public void mousePressed() 
     {
-        if(context.mouseButton == RIGHT){
+      if(context.mouseButton == RIGHT){
 
-            // Verfica se tem nenhum element selecionado
-            if(context.selectedSegments.length == 0)
+          // Verfica se tem nenhum element selecionado
+          if(context.selectedSegments.length == 0)
+          {
+            // Create a variable for the closestpoint
+            PVector closestPoint = new PVector();
+
+            //Vector that
+            PVector q = new PVector(context.mouse.x, context.mouse.y);
+
+            // Context finde the closest point gives the selectedSegment
+            int selectedSegment = context.curve.findClosestPoint(context.curve.controlPoints, q, closestPoint);
+
+            float distance = q.dist(closestPoint);
+            if (distance < distanceToSelect)
             {
-              // Create a variable for the closestpoint
-              PVector closestPoint = new PVector();
-
-              //Vector that
-              PVector q = new PVector(context.mouse.x, context.mouse.y);
-
-              // Context finde the closest point gives the selectedSegment
-              int selectedSegment = context.curve.findClosestPoint(context.curve.controlPoints, q, closestPoint);
-
-              float distance = q.dist(closestPoint);
-              if (distance < distanceToSelect)
-              {
-               context.selectedSegments = new int[1];
-               context.selectedSegments[0] = selectedSegment;
-              }
+             context.selectedSegments = new int[1];
+             context.selectedSegments[0] = selectedSegment;
             }
+          }
 
-            // Remove todos os segmentos selecionados
-            for (int i = context.selectedSegments.length - 1; i>=0; i--){
-              context.curve.removeElement(context.selectedSegments[i]);
-            }
+          // Remove todos os segmentos selecionados
+          for (int i = context.selectedSegments.length - 1; i>=0; i--){
+            context.curve.removeElement(context.selectedSegments[i]);
+          }
 
-            // Remove a seleção
+          // Remove a seleção
+          context.diselect();
+    }
+    else
+    {
+      // Seleciona o segmento em questão se for o mouse LEFT
+      PVector closestPoint = new PVector();
+      PVector q = new PVector(context.mouse.x, context.mouse.y,0);
+      int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
+      //int closestControlPointIndex  = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
+      PVector closestControlPoint = context.curve.getControlPoint(selectedSegment);
+
+      float distanceControlPoint = q.dist(closestControlPoint);
+      float distance = q.dist(closestPoint);
+
+      // Verifica se a distancia é maior do que o limite para selecionar
+      if(distance > distanceToSelect)
+      {
             context.diselect();
+            this.context.selectedSegments = new int[0];
       }
       else
       {
-        // Seleciona o segmento em questão se for o mouse LEFT
-        PVector closestPoint = new PVector();
-        PVector q = new PVector(context.mouse.x, context.mouse.y,0);
-        int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
-        //int closestControlPointIndex  = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
-        PVector closestControlPoint = context.curve.getControlPoint(selectedSegment);
-
-        float distanceControlPoint = q.dist(closestControlPoint);
-        float distance = q.dist(closestPoint);
-
-        // Verifica se a distancia é maior do que o limite para selecionar
-        if(distance > distanceToSelect)
-        {
-              context.diselect();
-              this.context.selectedSegments = new int[0];
+        boolean selected = false;
+        
+        for (int i = 0; i<context.selectedSegments.length; i++){
+          if(selectedSegment == context.selectedSegments[i]){
+            selected = true;
+            selectedSegment = i;
+            break;
+          }
         }
-        else
-        {
-          boolean selected = false;
-          
-          for (int i = 0; i<context.selectedSegments.length; i++){
-            if(selectedSegment == context.selectedSegments[i]){
-              selected = true;
-              selectedSegment = i;
-              break;
-            }
-          }
 
-          if(!selected){
-            context.selectedSegments = new int[1];
-            context.selectedSegments[0] = selectedSegment;
-            float myTime = context.curve.getControlPoint(selectedSegment).z;
-            context.alignTimes(myTime);
-            selectedSegment = 0;
-          }
+        if(!selected){
+          context.selectedSegments = new int[1];
+          context.selectedSegments[0] = selectedSegment;
+          float myTime = context.curve.getControlPoint(selectedSegment).z;
+          context.alignTimes(myTime);
+          selectedSegment = 0;
+        }
 
-          println("distanceControlPoint: "+distanceControlPoint);
-          if(distanceControlPoint > 50){
-              //PVector d1 = context.curve.getControlPoint(selectedSegment);
-              //context.curve.insertPoint(q, context.selectedSegments[selectedSegment]);
-              // context.selectedSegments[selectedSegment]++;
-          }
-        }  
-      }
+        if(distanceControlPoint > 50){
+            //PVector d1 = context.curve.getControlPoint(selectedSegment);
+            //context.curve.insertPoint(q, context.selectedSegments[selectedSegment]);
+            // context.selectedSegments[selectedSegment]++;
+        }
+      }  
+    }
     }
 
     public void mouseReleased() 
