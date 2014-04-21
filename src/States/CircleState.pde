@@ -35,9 +35,4 @@ class CircleState extends State {
     {
 
   	}
-
-    public void drawInterface()
-    {
-
-    }
 }

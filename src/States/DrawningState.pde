@@ -57,9 +57,4 @@ class DrawningState extends State {
     {
     	
   	}
-
-    public void drawInterface()
-    {
-
-    }
 }

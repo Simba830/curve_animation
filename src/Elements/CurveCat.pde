@@ -4,10 +4,10 @@
 class CurveCat
 {
   // Control points
-  ArrayList<PVector> controlPoints;
+  ArrayList<Property> controlPoints;
 
   // History of the curve
-  ArrayList<ArrayList<PVector>> history;
+  ArrayList<ArrayList<Property>> history;
   int historyIndex = -1;
 
   // If it can be decimed
@@ -23,7 +23,7 @@ class CurveCat
 
   CurveCat() 
   {
-    controlPoints = new ArrayList<PVector>();
+    controlPoints = new ArrayList<Property>();
     decimable = true;
     tolerance = 100;
 
@@ -34,7 +34,7 @@ class CurveCat
   {
     saveCurve();
     decimable = true;
-    controlPoints = new ArrayList<PVector>();
+    controlPoints = new ArrayList<Property>();
   }
 
   void removeElement(int index){
@@ -248,25 +248,9 @@ class CurveCat
          
       }
 
+      // Calculating the time of processing of the decime
       int totalTimeDecime = millis() - t0;
-      console.log("Tempo de processamento do decimeCurve: "+totalTimeDecime+" ms");
-      // pAux = new ArrayList<PVector>(controlPoints.size());
-      // pAux = (ArrayList<PVector>) controlPoints.clone();
-
-      // boolean wasDecimed = false;
-      // for (int i = 1; i < getNumberControlPoints() - 2; ++i) {
-      //   PVector tan1 = getTangent(i - 1);
-      //   PVector tan2 = getTangent(i + 1);
-
-      //   PVector result = PVector.sub(tan2, tan1);
-      //   // println("result.mag(): "+result.mag());
-      //   if(result.mag() < 0.005){
-      //     pAux.remove(i);
-      //     wasDecimed = true;
-      //   }
-      // }
-
-      //this.controlPoints = pAux;
+      println("Tempo de processamento do decimeCurve: "+totalTimeDecime+" ms");
       this.decimable = wasDecimed;
   }
 

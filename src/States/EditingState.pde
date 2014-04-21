@@ -171,17 +171,4 @@ class EditingState extends State {
         context.curve.drawControlPoints();
         
     }
-
-    public void drawInterface()
-    {
-        int posX = width-80;
-        int posY = height-20;
-
-        fill(secondaryColor);
-        stroke(secondaryColor);
-        rect(posX-10,posY-20,80,30);
-        fill(255);
-        text("Editing", posX, posY);
-    }
- 
 }

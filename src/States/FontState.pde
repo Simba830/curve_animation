@@ -40,9 +40,4 @@ class FontState extends State {
         this.text.draw();
       }
   	}
-
-    public void drawInterface()
-    {
-
-    }
 }

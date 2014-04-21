@@ -31,6 +31,5 @@ class State
 
 	};
 	void draw(){};
-	void drawInterface(){};
 }
 	

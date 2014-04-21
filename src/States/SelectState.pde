@@ -33,9 +33,4 @@ class SelectState extends State
     {
 
     }
-
-    public void drawInterface()
-    {
-
-    }
 }
