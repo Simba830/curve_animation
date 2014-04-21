@@ -83,8 +83,6 @@ public void setup()
 
   stateContext = new StateContext(context);
   stateContext.setContext(context);
-
-  println("Setuping application");
 }
 
 // TODO Mudar isso para um interface só usando o mouse
@@ -130,7 +128,8 @@ void draw()
   try {
     stateContext.draw();
   } catch (Exception e) {
-    println("e.toSring(): "+e.toSring());
+    println("e.toString(): "+e.toString());
+    e.printStackTrace();
   }
 }
 
@@ -571,6 +570,7 @@ class CurveCat
   { 
          return getSegment(controlPoints,i);
   }
+
  // Método que retorna os principais controlPoints que são essenciais para a curva
  // Passamos como paramêtros os indices do vetor, e o vetor.
   ArrayList<int> DouglasPeuckerReducingInt(ArrayList<PVector> cpoints,int index, int end, float epsilon){
@@ -602,6 +602,7 @@ class CurveCat
 
     return result;
   }
+
   // Método que retorna os principais controlPoints que são essenciais para a curva
   ArrayList<PVector> DouglasPeuckerReducing(ArrayList<PVector> cpoints, float epsilon){
     float maxDistance = 0, distance = 0;
@@ -709,7 +710,6 @@ class CurveCat
 
       // Array que vai conter os vetores a serem testados
       ArrayList<PVector> testableControlPoints = (ArrayList<PVector>) controlPoints.clone();
-
 
       t0 = millis();
       // Removendo os pontos essenciais dos testáveis
@@ -1087,7 +1087,6 @@ class CurveCat
   void drawControlPoints()
   {
     boolean haveCurve = (getNumberControlPoints()<4)?false:true;
-    console.log(getNumberControlPoints());
     if (haveCurve){
       fill(secondaryColor);
       stroke(secondaryColor);
@@ -1724,24 +1723,31 @@ class EditingState extends State {
 
             // Soma aos elementos selecionados
             for (int i = -this.cpsMovimenteds; i< this.cpsMovimenteds; i++){
+
+              if(context.selectedSegments[0] + i < 0){
+                continue;
+              }
+
+              if(context.selectedSegments[0] + i >= context.curve.getNumberControlPoints()){
+                return;
+              }
+
               float tdx;
               float tdy;
               if( i != 0){
-                tdx = dx/(5*abs(i));
-                tdy = dy/(5*abs(i));
+                tdx = dx/(2*abs(i));
+                tdy = dy/(2*abs(i));
               }else{
                 tdx = dx;
                 tdy = dy;
               }
 
               PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[0] + i);
-              context.curve.setPoint(new PVector(controlPoint.x + tdx, controlPoint.y + tdy, controlPoint.z), context.selectedSegments[0] + i);
+              context.curve.setPoint( new PVector(controlPoint.x + tdx, controlPoint.y + tdy, controlPoint.z) , context.selectedSegments[0] + i);
             }
 
           }
         }
-
-        context.refreshInterpolator();
     }
 
     public void keyPressed(){

@@ -6,7 +6,7 @@ module.exports = function(grunt) {
 
 			},
 			dist: {
-				src: ['src/*.pde', 'src/*/*.pde'],
+				src: ['src/*.pde', 'src/**/*.pde'],
 				dest: 'web-export/curveAnimation.pde'
 			}
 		},
@@ -16,6 +16,7 @@ module.exports = function(grunt) {
 	          files: [
 	            //watched files
 	            'src/**/*.pde',
+	            'src/*.pde',
 	            'web-export/**/*.css',
 	            'web-export/**/*.js'
 	            ],   
