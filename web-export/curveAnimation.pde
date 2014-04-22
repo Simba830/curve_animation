@@ -648,8 +648,8 @@ class CurveCat
   }
 
   // Método para percorrer um segmento de reta que começa em segBegin e terminar em segEnd vendo qual menor distancia para o vetor cpoint
-  float shortestDistanceToSegment(PVector cpoint, PVector segBegin, PVector segEnd){
-    PVector tmp = (PVector) segEnd.get();
+  float shortestDistanceToSegment(Property cpoint, Property segBegin, Property segEnd){
+    Property tmp = (Property) segEnd.get();
     tmp.sub(segBegin);
 
     int numberDivisions = this.numberDivisions;
@@ -672,15 +672,15 @@ class CurveCat
   // Remove pontos de controle de uma curva criada pela lista p que possuam distancia menor que a tolerancia em relação aos pontos da nova curva.
   void decimeCurve(float tolerance)
   {
-      PVector a = new PVector();
-      PVector b = new PVector();
-      PVector c = new PVector();
-      PVector d = new PVector();
+      Property a = new Property();
+      Property b = new Property();
+      Property c = new Property();
+      Property d = new Property();
       
-      PVector a2 = new PVector();
-      PVector b2 = new PVector();
-      PVector c2 = new PVector();
-      PVector d2 = new PVector();
+      Property a2 = new Property();
+      Property b2 = new Property();
+      Property c2 = new Property();
+      Property d2 = new Property();
       
       boolean remove;
      
@@ -725,7 +725,7 @@ class CurveCat
       }
 
       // Percorre os testáveis removendo e verificando com a tolerância.
-      for(int i = 1; i < testableControlPoints.size() - 1; i++){
+      for(int i = 0; i < testableControlPoints.size() - 1; i++){
 
          pAux = new ArrayList<Property>(controlPoints.size());
          pAux = (ArrayList<Property>) controlPoints.clone();
@@ -751,12 +751,13 @@ class CurveCat
                 tAux = t*2 - 1;
             }
             
+            println("segAux: "+segAux.a.x);
             float x1 = curvePoint(segAux.a.get(0), segAux.b.get(0), segAux.c.get(0), segAux.d.get(0), t);
-            float y1 = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, t);
+            float y1 = curvePoint(segAux.a.get(1), segAux.b.get(1), segAux.c.get(1), segAux.d.get(1), t);
             PVector v1 = new PVector(x1,y1);
 
-            float x2 = curvePoint(segP.a.x, segP.b.x, segP.c.x, segP.d.x, tAux);
-            float y2 = curvePoint(segP.a.y, segP.b.y, segP.c.y, segP.d.y, tAux);
+            float x2 = curvePoint(segP.a.get(0), segP.b.get(0), segP.c.get(0), segP.d.get(0), tAux);
+            float y2 = curvePoint(segP.a.get(1), segP.b.get(1), segP.c.get(1), segP.d.get(1), tAux);
             PVector v2 = new PVector(x2,y2);
 
             float distance = v1.dist(v2);
@@ -816,20 +817,20 @@ class CurveCat
   } 
 
   // Insere o ponto q entre index-1 e index
-  void insertPoint(PVector q, int index){
+  void insertPoint(Property q, int index){
     saveCurve();
     controlPoints.add(index,q);
     this.decimable = true;
   }
 
-  void insertPoint(PVector q){
+  void insertPoint(Property q){
     saveCurve();
     controlPoints.add(q);
     this.decimable = true;
   }
 
   // Altera o valor do elemento index da lista p para q
-  void setPoint(PVector q, int index)
+  void setPoint(Property q, int index)
   {
     try {
       controlPoints.set(index,q); 
@@ -845,13 +846,13 @@ class CurveCat
     if (controlPoints.size() > index && index >-1)
       return controlPoints.get(index);
     else
-      return new PVector(0,0);
+      return new Property(0,0);
   }
   
   // Retorna o indice do ponto de controle mais próximo de q. Caso
   // este não esteja a uma distancia minima especificada por minDistance,
   // retorna -1
-  int findControlPoint(PVector q)
+  int findControlPoint(Property q)
   {
     int op=-1;
     float bestDist = 100000;
@@ -875,7 +876,7 @@ class CurveCat
 
   // Outra interface para findControlPoint, passando as coordenadas do mouse
   int findControlPoint () {
-    return findControlPoint (mouseX, mouseY);
+    return findControlPoint (new Property (mouseX, mouseY));
   }
 
   //
@@ -942,7 +943,7 @@ class CurveCat
 
   int[] getControlPointsBetween(PVector init, PVector pFinal){
     PVector aux;
-
+    Println("getControlPointsBetween()");
     ArrayList<Integer> result = new ArrayList<Integer>();
     for (int i = 0; i<controlPoints.size() ; i++){
       PVector controlPoint = controlPoints.get(i);
@@ -971,23 +972,7 @@ class CurveCat
   // Retorna o tamanho de uma curva dados uma lista de pontos de controle
   float curveLength()
   {
-    float curveLength = 0;
-    for (int i = 0; i < getNumberControlPoints()-1; i++) {
-      Segment seg = getSegment(i);
-
-      for (int j=0; j<=numberDivisions; j++) 
-      {
-        float t = (float)(j) / (float)(numberDivisions);
-        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
-        t = (float)(j+1) / (float)(numberDivisions);
-        float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-        float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
-        float distance = dist(x, y, x2, y2);
-        curveLength += distance;
-      }
-    }
-    return (float)curveLength;
+    return curveLengthBetweenControlPoints(0,getNumberControlPoints()-1);
   }
 
   float curveLengthBetweenControlPoints(int pBegin, int pEnd)
@@ -1024,7 +1009,7 @@ class CurveCat
         float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
         float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
 
-        aux.insertPoint(new PVector(x,y), index);
+        aux.insertPoint(new Property(x,y), index);
         index++;
       }
     }
@@ -1080,6 +1065,13 @@ class CurveCat
     strokeCap(ROUND);
     for (int i = 0; i < getNumberControlPoints() - 1; i++) {
       Segment seg = getSegment(i);
+
+      beginShape();
+        curveVertex(seg.a.get(0), seg.a.get(1));
+        curveVertex(seg.b.get(0), seg.b.get(1));
+        curveVertex(seg.c.get(0), seg.c.get(1));
+        curveVertex(seg.d.get(0), seg.d.get(1));
+      endShape();
 
       beginShape();
         curveVertex(seg.a.x, seg.a.y);
@@ -1187,19 +1179,15 @@ class SceneElement
 }
 
 class Segment{
-   Property a,b,c,d;
+   public Property a,b,c,d;
   
    Segment(Property _a, Property _b, Property _c, Property _d){
-      a = _a;
-      b = _b;
-      c = _c;
-      d = _d;
+      this.a = _a;
+      this.b = _b;
+      this.c = _c;
+      this.d = _d;
    } 
-   
-   Segment(){
-   
-   }
-  
+
 }
 
 class Text extends Element{

@@ -1,15 +1,11 @@
 class Segment{
-   Property a,b,c,d;
+   public Property a,b,c,d;
   
    Segment(Property _a, Property _b, Property _c, Property _d){
-      a = _a;
-      b = _b;
-      c = _c;
-      d = _d;
+      this.a = _a;
+      this.b = _b;
+      this.c = _c;
+      this.d = _d;
    } 
-   
-   Segment(){
-   
-   }
-  
+
 }
