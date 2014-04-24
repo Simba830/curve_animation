@@ -29,15 +29,11 @@ void my_assert (boolean p) {
 
 /**
  AnimationApp.pde
- Author: Guilherme Herzog
+ Author: Guilherme Herzog e João Carvalho
  Created on: May 13
  **/
 
-float curveT;
 
-// Selection Box
-PVector mouseInit;
-PVector mouseFinal;
 
 // State Context
 StateContext stateContext;
@@ -53,14 +49,6 @@ color thirdColor = #3990E3;
 // Canvas Size
 int width,height;
 
-Context getContext(){
-  return context;
-}
-
-stateContext getStateContext(){
-  return stateContext;
-}
-
 public void setup() 
 {
   width = 800;
@@ -69,22 +57,19 @@ public void setup()
 
   smooth();
 
-  curveT = 0;
-
-  // PVectors used to create the selection box
-  mouseInit = new PVector(0,0);
-  mouseFinal = new PVector(0,0);
-
-  curveTightness(curveT);
-
   context = new Context();
   update();
-  context.setSelectionBox(mouseInit, mouseFinal);
-
   stateContext = new StateContext(context);
   stateContext.setContext(context);
 }
 
+Context getContext(){
+  return context;
+}
+
+stateContext getStateContext(){
+  return stateContext;
+}
 // TODO Mudar isso para um interface só usando o mouse
 void keyPressed() 
 { 
@@ -95,8 +80,6 @@ void keyPressed()
 // Mouse press callback
 void mousePressed() 
 {
-  mouseInit.set(mouseX, mouseY);
-  mouseFinal.set(mouseX, mouseY);
   update();
   stateContext.mousePressed();
 }
@@ -106,18 +89,12 @@ void mouseReleased()
 
   update();
   stateContext.mouseReleased();
-
-  // Resets dragged rectangle
-  mouseInit.set(0,0);
-  mouseFinal.set(0,0);
-  update();
 }
 
 // Mouse drag callback
 void mouseDragged () 
 {
   update();
-  mouseFinal.set(mouseX, mouseY);
   stateContext.mouseDragged();
 }
 
@@ -128,7 +105,7 @@ void draw()
   try {
     stateContext.draw();
   } catch (Exception e) {
-    println("e.toString(): "+e.toString());
+    println("Falha no Draw \ne.toString(): "+e.toString());
     e.printStackTrace();
   }
 }
@@ -139,9 +116,7 @@ void update(){
     new PVector(pmouseX, pmouseY), 
     mouseButton,
     keyCode, 
-    key,
-    mouseInit,
-    mouseFinal);
+    key);
 }
 
 
@@ -174,25 +149,19 @@ class Context{
 		selectedElement = null;
 	}
 
-	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
-		PVector _mouseInit, PVector _mouseFinal){
+	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key){
 		this.mouse = mouse;
 		this.pMouse = pmouse;
 		this.keyCode = keyCode;
 		this.key = key;
 		this.mouseButton = _mouseButton;
-		this.mouseInit = _mouseInit;
-		this.mouseFinal = _mouseFinal;
+		
 	}
 
 	void setMouseCount(int _mouseCount){
 		this.mouseCount = _mouseCount;
 	}
 
-	void setSelectionBox(PVector ini, PVector _final){
-		this.mouseInit = ini;
-		this.mouseFinal = _final;
-	}
 
 	void print(){
 		println("Context[");
@@ -326,6 +295,11 @@ public class StateContext {
 
     private State myState;
     private Context context;
+    
+    // Selection Box
+    PVector mouseInit;
+    PVector mouseFinal;
+
 
         /**
          * Standard constructor
@@ -377,6 +351,9 @@ public class StateContext {
      */
     void mousePressed()
     {
+        // Inicializa os ponteiros para o retangulo de seleção.
+        mouseInit.set(mouseX, mouseY);
+        mouseFinal.set(mouseX, mouseY);
         // Seleciona o segmento em questão se for o mouse LEFT
         PVector closestPoint = new PVector();
         PVector q = new PVector(context.mouse.x, context.mouse.y);
@@ -402,11 +379,20 @@ public class StateContext {
     }
     void mouseDragged()
     {
+        // Cria a caixa de seleção independente do State da aplicação
+        mouseFinal.set(mouseX, mouseY);
+        context.setSelectionBox(mouseInit, mouseFinal);
         myState.mouseDragged();
     }
     void mouseReleased()
     {
+        
+        // Resets dragged rectangle
+        mouseInit.set(0,0);
+        mouseFinal.set(0,0);
+        
         myState.mouseReleased();
+
     }
 
     void keyPressed(){
@@ -751,7 +737,7 @@ class CurveCat
                 tAux = t*2 - 1;
             }
             
-            println("segAux: "+segAux.a.x);
+            println("segAux: "+typeof(segAux));
             float x1 = curvePoint(segAux.a.get(0), segAux.b.get(0), segAux.c.get(0), segAux.d.get(0), t);
             float y1 = curvePoint(segAux.a.get(1), segAux.b.get(1), segAux.c.get(1), segAux.d.get(1), t);
             PVector v1 = new PVector(x1,y1);
@@ -943,7 +929,7 @@ class CurveCat
 
   int[] getControlPointsBetween(PVector init, PVector pFinal){
     PVector aux;
-    Println("getControlPointsBetween()");
+    println("getControlPointsBetween()");
     ArrayList<Integer> result = new ArrayList<Integer>();
     for (int i = 0; i<controlPoints.size() ; i++){
       PVector controlPoint = controlPoints.get(i);
@@ -1587,7 +1573,7 @@ class DrawningState extends State {
 
       if (canSketch){
         context.mouse.add(new PVector(0,0,t));
-  		  context.curve.insertPoint(context.mouse, context.curve.getNumberControlPoints());
+  		  context.curve.insertPoint((Property)context.mouse, context.curve.getNumberControlPoints());
       }
     }
 
@@ -1604,7 +1590,6 @@ class DrawningState extends State {
 class EditingState extends State {
 
     int cpsMovimenteds = 5;
-
     PVector originalPositionDragged;
     
     EditingState(Context context){
@@ -1613,6 +1598,7 @@ class EditingState extends State {
 
     public void mousePressed() 
     {
+
         if(context.mouseButton == RIGHT){
 
             // Verfica se tem nenhum element selecionado
@@ -1699,6 +1685,7 @@ class EditingState extends State {
         }
 
         context.refreshInterpolator();
+        
     }
 
     public void mouseDragged()
@@ -1999,7 +1986,6 @@ class State
   	}
 
 	void mousePressed(){
-
 	};
 	void mouseDragged(){
 

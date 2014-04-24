@@ -237,7 +237,7 @@ class CurveCat
                 tAux = t*2 - 1;
             }
             
-            println("segAux: "+typeof(segAux));
+            println("segAux: "+segAux.a.x);
             float x1 = curvePoint(segAux.a.get(0), segAux.b.get(0), segAux.c.get(0), segAux.d.get(0), t);
             float y1 = curvePoint(segAux.a.get(1), segAux.b.get(1), segAux.c.get(1), segAux.d.get(1), t);
             PVector v1 = new PVector(x1,y1);
@@ -429,7 +429,7 @@ class CurveCat
 
   int[] getControlPointsBetween(PVector init, PVector pFinal){
     PVector aux;
-    println("getControlPointsBetween()");
+    Println("getControlPointsBetween()");
     ArrayList<Integer> result = new ArrayList<Integer>();
     for (int i = 0; i<controlPoints.size() ; i++){
       PVector controlPoint = controlPoints.get(i);
