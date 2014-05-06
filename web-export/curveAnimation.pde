@@ -514,22 +514,22 @@ class Circle extends SceneElement{
 class CurveCat
 {
   // Control points
-  ArrayList<Property> controlPoints;
+  private ArrayList<Property> controlPoints;
 
   // History of the curve
-  ArrayList<ArrayList<Property>> history;
-  int historyIndex = -1;
+  private ArrayList<ArrayList<Property>> history;
+  private int historyIndex = -1;
 
   // If it can be decimed
-  boolean decimable;
-  float tolerance;
+  private boolean decimable;
+  private float tolerance;
 
   // Number of points that the curve can be show
-  int numberDivisions = 100; 
+  private int numberDivisions = 100; 
 
   // Min Ditance wich can be in the curve
-  float minDistance = 5;
-  color strokeColor = color(0);
+  private float minDistance = 5;
+  private color strokeColor = color(0);
 
   CurveCat() 
   {
@@ -709,13 +709,14 @@ class CurveCat
       println("Tempo de processamento Douglas Peucker: "+totalTimeDouglas+" ms");
 
       // Array que vai conter os vetores a serem testados
-      ArrayList<PVector> testableControlPoints = (ArrayList<PVector>) controlPoints.clone();
+      ArrayList<Property> testableControlPoints = (ArrayList<Property>) controlPoints.clone();
 
       t0 = millis();
       // Removendo os pontos essenciais dos testáveis
       for (int i = 0; i < essentials.size(); ++i) {
         testableControlPoints.remove(essentials.get(i));
       }
+      
       println("essentials.size(): "+essentials.size());
       // Adiciona os essenciais no final da lista de testáveis em ordem de prioridade do menos importante pro mais importante.
       for (int i = essentials.size(); i >= 0; --i)
@@ -882,7 +883,7 @@ class CurveCat
   // Retorna o indice do segmento da curva onde o ponto mais proximo de q foi 
   // encontrado. As coordenadas do ponto mais proximo são guardadas em r
   // 
-  int findClosestPoint (ArrayList<PVector> cps, PVector q, PVector r) {
+  int findClosestPoint (ArrayList<Property> cps, PVector q, PVector r) {
 
     // Inicia com -1 para saber se deu certo
     int bestSegment = -1;
@@ -902,7 +903,8 @@ class CurveCat
       Segment seg = getSegment(i);
 
       // Criando vetor de resultado
-      PVector result = new PVector();
+      Property result = new Property();
+      result.setDimension(3);
 
       // Para o número de divisões faça
       for (int j=0; j<=numberDivisions; j++) 
@@ -920,7 +922,9 @@ class CurveCat
         // Se for o primeiro coloca como melhor distancia
         if (j == 0 || distance < bestSegmentDistance) {
           bestSegmentDistance = distance;
-          result.set(x, y, 0);
+          result.set(0, x);
+          result.set(1, y);
+          result.set(2, 0);
           timeBestSegment = t;
         }
       }
@@ -940,12 +944,12 @@ class CurveCat
     return bestSegment;
   }
 
-  int[] getControlPointsBetween(PVector init, PVector pFinal){
-    PVector aux;
+  int[] getControlPointsBetween(Property init, Property pFinal){
+    Property aux;
     println("getControlPointsBetween()");
     ArrayList<Integer> result = new ArrayList<Integer>();
     for (int i = 0; i<controlPoints.size() ; i++){
-      PVector controlPoint = controlPoints.get(i);
+      Property controlPoint = controlPoints.get(i);
 
       float dist1 = controlPoint.dist(init);
       float dist2 = controlPoint.dist(pFinal);
@@ -1005,10 +1009,14 @@ class CurveCat
       for (int j=0; j<=numberDivisions; j++) 
       {
         float t = (float)(j) / (float)(numberDivisions);
-        float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-        float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
 
-        aux.insertPoint(new PVector(x,y), index);
+        Property aux = new Property();
+        aux.setDimension(seg.a.size());
+        for (int i = 0; i < seg.a.size(); ++i) {
+          aux.set(i, curvePoint(seg.a.get(i), seg.b.get(i), seg.c.get(i), seg.d.get(i), t))
+        }
+
+        aux.insertPoint(aux, index);
         index++;
       }
     }
@@ -1027,7 +1035,7 @@ class CurveCat
       if(history.get(history.size() - 1).equals(controlPoints))
         return;
     }
-    ArrayList<PVector> branch = (ArrayList<PVector>) controlPoints.clone();
+    ArrayList<Property> branch = (ArrayList<Property>) controlPoints.clone();
     history.add(branch);
     historyIndex++;
   }
@@ -1377,8 +1385,8 @@ class Property {
   }
 
   Property sub(Property operand){
-    if( this.size() != operand.size())
-      throw new Exception("Property with diferents dimensions.");
+    // if( this.size() != operand.size())
+    //   throw new Exception("Property with diferents dimensions.");
 
     Property result = new Property();
     result.setDimension(this.size());
@@ -1399,8 +1407,8 @@ class Property {
   }
 
   Property add(Property operand){
-    if( this.size() != operand.size())
-      throw new Exception("Property with diferents dimensions.");
+    // if( this.size() != operand.size())
+    //   throw new Exception("Property with diferents dimensions.");
 
     Property result = new Property();
     result.setDimension(this.size());
