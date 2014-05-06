@@ -608,13 +608,14 @@ class CurveCat
 
   // Método que retorna os principais controlPoints que são essenciais para a curva
   ArrayList<Property> DouglasPeuckerReducing(ArrayList<Property> cpoints, float epsilon){
+    console.log(cpoints.toArray());
     float maxDistance = 0, distance = 0;
     int index = 0;
     int end = cpoints.size();
     ArrayList<Property> result;
 
     for (int i = 2; i < end - 1; ++i) {
-      distance = shortestDistanceToSegment(cpoints.get(i), cpoints.get(1), cpoints.get(end - 1));
+      distance = shortestDistanceToSegment(cpoints.get(i), cpoints.get(0), cpoints.get(end - 1));
       if( distance > maxDistance){
         maxDistance = distance;
         index = i;
@@ -649,7 +650,8 @@ class CurveCat
 
   // Método para percorrer um segmento de reta que começa em segBegin e terminar em segEnd vendo qual menor distancia para o vetor cpoint
   float shortestDistanceToSegment(Property cpoint, Property segBegin, Property segEnd){
-    Property tmp = segEnd.clone();
+    console.log(segEnd);
+    Property tmp = ((Property) segEnd).clone();
     tmp.sub(segBegin);
 
     int numberDivisions = this.numberDivisions;
@@ -821,13 +823,13 @@ class CurveCat
   } 
 
   // Insere o ponto q entre index-1 e index
-  void insertPoint(PVector q, int index){
+  void insertPoint(Property q, int index){
     saveCurve();
     controlPoints.add(index,q);
     this.decimable = true;
   }
 
-  void insertPoint(PVector q){
+  void insertPoint(Property q){
     saveCurve();
     controlPoints.add(q);
     this.decimable = true;
@@ -1410,7 +1412,7 @@ class Property {
     return sqrt(result);
   }
 
-  Property add(Property operand){
+  Property adc(Property operand){
     // if( this.size() != operand.size())
     //   throw new Exception("Property with diferents dimensions.");
 
@@ -1429,7 +1431,7 @@ class Property {
     }
   }
 
-  void clone(){
+  Property clone(){
     Property result = new Property();
     result.setDimension(this.size());
     for (int i = 0; i < this.size(); ++i) {
@@ -1631,7 +1633,7 @@ class DrawningState extends State {
       else { canSketch = false; }
         
       if (canSketch){
-        this.context.curve.insertPoint(this.context.mouse);
+        this.context.curve.insertPoint(new Property(this.context.mouse.x, this.context.mouse.y));
       }
     }
     
@@ -1654,7 +1656,7 @@ class DrawningState extends State {
 
       if (canSketch){
         context.mouse.add(new PVector(0,0,t));
-  		  context.curve.insertPoint((Property)context.mouse, context.curve.getNumberControlPoints());
+  		  context.curve.insertPoint( new Property(context.mouse.x, context.mouse.y, context.mouse.z), context.curve.getNumberControlPoints());
       }
     }
 
