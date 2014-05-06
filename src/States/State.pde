@@ -18,7 +18,6 @@ class State
   	}
 
 	void mousePressed(){
-
 	};
 	void mouseDragged(){
 

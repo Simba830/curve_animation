@@ -1,14 +1,10 @@
 /**
  AnimationApp.pde
- Author: Guilherme Herzog
+ Author: Guilherme Herzog e João Carvalho
  Created on: May 13
  **/
 
-float curveT;
 
-// Selection Box
-PVector mouseInit;
-PVector mouseFinal;
 
 // State Context
 StateContext stateContext;
@@ -24,14 +20,6 @@ color thirdColor = #3990E3;
 // Canvas Size
 int width,height;
 
-Context getContext(){
-  return context;
-}
-
-stateContext getStateContext(){
-  return stateContext;
-}
-
 public void setup() 
 {
   width = 800;
@@ -40,22 +28,19 @@ public void setup()
 
   smooth();
 
-  curveT = 0;
-
-  // PVectors used to create the selection box
-  mouseInit = new PVector(0,0);
-  mouseFinal = new PVector(0,0);
-
-  curveTightness(curveT);
-
   context = new Context();
   update();
-  context.setSelectionBox(mouseInit, mouseFinal);
-
   stateContext = new StateContext(context);
   stateContext.setContext(context);
 }
 
+Context getContext(){
+  return context;
+}
+
+stateContext getStateContext(){
+  return stateContext;
+}
 // TODO Mudar isso para um interface só usando o mouse
 void keyPressed() 
 { 
@@ -66,8 +51,6 @@ void keyPressed()
 // Mouse press callback
 void mousePressed() 
 {
-  mouseInit.set(mouseX, mouseY);
-  mouseFinal.set(mouseX, mouseY);
   update();
   stateContext.mousePressed();
 }
@@ -77,18 +60,12 @@ void mouseReleased()
 
   update();
   stateContext.mouseReleased();
-
-  // Resets dragged rectangle
-  mouseInit.set(0,0);
-  mouseFinal.set(0,0);
-  update();
 }
 
 // Mouse drag callback
 void mouseDragged () 
 {
   update();
-  mouseFinal.set(mouseX, mouseY);
   stateContext.mouseDragged();
 }
 
@@ -99,7 +76,7 @@ void draw()
   try {
     stateContext.draw();
   } catch (Exception e) {
-    println("e.toString(): "+e.toString());
+    println("Falha no Draw \ne.toString(): "+e.toString());
     e.printStackTrace();
   }
 }
@@ -110,9 +87,7 @@ void update(){
     new PVector(pmouseX, pmouseY), 
     mouseButton,
     keyCode, 
-    key,
-    mouseInit,
-    mouseFinal);
+    key);
 }
 
 

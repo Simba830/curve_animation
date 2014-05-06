@@ -2,6 +2,11 @@ public class StateContext {
 
     private State myState;
     private Context context;
+    
+    // Selection Box
+    PVector mouseInit;
+    PVector mouseFinal;
+
 
         /**
          * Standard constructor
@@ -57,6 +62,9 @@ public class StateContext {
      */
     void mousePressed()
     {
+        // Inicializa os ponteiros para o retangulo de seleção.
+        mouseInit.set(mouseX, mouseY);
+        mouseFinal.set(mouseX, mouseY);
         // Seleciona o segmento em questão se for o mouse LEFT
         PVector closestPoint = new PVector();
         PVector q = new PVector(context.mouse.x, context.mouse.y);
@@ -82,11 +90,20 @@ public class StateContext {
     }
     void mouseDragged()
     {
+        // Cria a caixa de seleção independente do State da aplicação
+        mouseFinal.set(mouseX, mouseY);
+        context.setSelectionBox(mouseInit, mouseFinal);
         myState.mouseDragged();
     }
     void mouseReleased()
     {
+        
+        // Resets dragged rectangle
+        mouseInit.set(0,0);
+        mouseFinal.set(0,0);
+        
         myState.mouseReleased();
+
     }
 
     void keyPressed(){

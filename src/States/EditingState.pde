@@ -1,7 +1,6 @@
 class EditingState extends State {
 
     int cpsMovimenteds = 5;
-
     PVector originalPositionDragged;
     
     EditingState(Context context){
@@ -10,6 +9,7 @@ class EditingState extends State {
 
     public void mousePressed() 
     {
+
         if(context.mouseButton == RIGHT){
 
             // Verfica se tem nenhum element selecionado
@@ -96,6 +96,7 @@ class EditingState extends State {
         }
 
         context.refreshInterpolator();
+        
     }
 
     public void mouseDragged()

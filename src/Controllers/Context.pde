@@ -26,25 +26,19 @@ class Context{
 		selectedElement = null;
 	}
 
-	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
-		PVector _mouseInit, PVector _mouseFinal){
+	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key){
 		this.mouse = mouse;
 		this.pMouse = pmouse;
 		this.keyCode = keyCode;
 		this.key = key;
 		this.mouseButton = _mouseButton;
-		this.mouseInit = _mouseInit;
-		this.mouseFinal = _mouseFinal;
+		
 	}
 
 	void setMouseCount(int _mouseCount){
 		this.mouseCount = _mouseCount;
 	}
 
-	void setSelectionBox(PVector ini, PVector _final){
-		this.mouseInit = ini;
-		this.mouseFinal = _final;
-	}
 
 	void print(){
 		println("Context[");

@@ -62,5 +62,14 @@ class Property {
     if (i >= size()) return 0.0;
     return prop.get(i);
   }
+
+  Float x()
+  {
+    return prop.get(0);
+  }
+  Float y()
+  {
+    return prop.get(0);
+  }
 };
 
