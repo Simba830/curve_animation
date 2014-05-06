@@ -64,8 +64,8 @@ class Property {
   }
 
   Property sub(Property operand){
-    if( this.size() != operand.size())
-      throw new Exception("Property with diferents dimensions.");
+    // if( this.size() != operand.size())
+    //   throw new Exception("Property with diferents dimensions.");
 
     Property result = new Property();
     result.setDimension(this.size());
@@ -86,8 +86,8 @@ class Property {
   }
 
   Property add(Property operand){
-    if( this.size() != operand.size())
-      throw new Exception("Property with diferents dimensions.");
+    // if( this.size() != operand.size())
+    //   throw new Exception("Property with diferents dimensions.");
 
     Property result = new Property();
     result.setDimension(this.size());

@@ -518,22 +518,22 @@ class Circle extends SceneElement{
 class CurveCat
 {
   // Control points
-  ArrayList<Property> controlPoints;
+  private ArrayList<Property> controlPoints;
 
   // History of the curve
-  ArrayList<ArrayList<Property>> history;
-  int historyIndex = -1;
+  private ArrayList<ArrayList<Property>> history;
+  private int historyIndex = -1;
 
   // If it can be decimed
-  boolean decimable;
-  float tolerance;
+  private boolean decimable;
+  private float tolerance;
 
   // Number of points that the curve can be show
-  int numberDivisions = 100; 
+  private int numberDivisions = 100; 
 
   // Min Ditance wich can be in the curve
-  float minDistance = 5;
-  color strokeColor = color(0);
+  private float minDistance = 5;
+  private color strokeColor = color(0);
 
   CurveCat() 
   {
@@ -713,13 +713,14 @@ class CurveCat
       println("Tempo de processamento Douglas Peucker: "+totalTimeDouglas+" ms");
 
       // Array que vai conter os vetores a serem testados
-      ArrayList<PVector> testableControlPoints = (ArrayList<PVector>) controlPoints.clone();
+      ArrayList<Property> testableControlPoints = (ArrayList<Property>) controlPoints.clone();
 
       t0 = millis();
       // Removendo os pontos essenciais dos testáveis
       for (int i = 0; i < essentials.size(); ++i) {
         testableControlPoints.remove(essentials.get(i));
       }
+      
       println("essentials.size(): "+essentials.size());
       // Adiciona os essenciais no final da lista de testáveis em ordem de prioridade do menos importante pro mais importante.
       for (int i = essentials.size(); i >= 0; --i)
@@ -1388,8 +1389,8 @@ class Property {
   }
 
   Property sub(Property operand){
-    if( this.size() != operand.size())
-      throw new Exception("Property with diferents dimensions.");
+    // if( this.size() != operand.size())
+    //   throw new Exception("Property with diferents dimensions.");
 
     Property result = new Property();
     result.setDimension(this.size());
@@ -1410,8 +1411,8 @@ class Property {
   }
 
   Property add(Property operand){
-    if( this.size() != operand.size())
-      throw new Exception("Property with diferents dimensions.");
+    // if( this.size() != operand.size())
+    //   throw new Exception("Property with diferents dimensions.");
 
     Property result = new Property();
     result.setDimension(this.size());
