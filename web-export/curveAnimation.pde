@@ -49,6 +49,8 @@ int width,height;
 
 public void setup() 
 {
+  try {
+    
   width = 800;
   height = 600;
   size(width, height);
@@ -59,6 +61,9 @@ public void setup()
   update();
   stateContext = new StateContext(context);
   stateContext.setContext(context);
+  } catch (Exception e) {
+    console.log(e);  
+  }
 }
 
 Context getContext(){
@@ -71,36 +76,51 @@ stateContext getStateContext(){
 // TODO Mudar isso para um interface só usando o mouse
 void keyPressed() 
 { 
-  update();
-  stateContext.keyPressed();
+  try {
+    update();
+    stateContext.keyPressed();
+  } catch (Exception e) {
+    console.log(e);  
+  }
 }
 
 // Mouse press callback
 void mousePressed() 
 {
-  update();
-  stateContext.mousePressed();
+  try {
+    update();
+    stateContext.mousePressed();
+  } catch (Exception e) {
+    console.log(e);  
+  }
 }
     
 void mouseReleased()
 {
-
-  update();
-  stateContext.mouseReleased();
+  try {
+    update();
+    stateContext.mouseReleased();
+  } catch (Exception e) {
+    console.log(e);
+  }
 }
 
 // Mouse drag callback
 void mouseDragged () 
 {
-  update();
-  stateContext.mouseDragged();
+  try {
+    update();
+    stateContext.mouseDragged();
+  } catch (Exception e) {
+    console.log(e);
+  }
 }
 
 
 void draw() 
 {
-  update();
   try {
+    update();
     stateContext.draw();
   } catch (Exception e) {
     println("Falha no Draw \ne.toString(): "+e.toString());
@@ -608,8 +628,6 @@ class CurveCat
 
   // Método que retorna os principais controlPoints que são essenciais para a curva
   ArrayList<Property> DouglasPeuckerReducing(ArrayList<Property> cpoints, float epsilon){
-    try {
-      
     float maxDistance = 0, distance = 0;
     int index = 0;
     int end = cpoints.size();
@@ -648,11 +666,6 @@ class CurveCat
     }
 
     return result;
-    } catch (Exception e) {
-      console.log(e);   
-    } finally {
-      return new ArrayList<Property>();
-    }
   }
 
   // Método para percorrer um segmento de reta que começa em segBegin e terminar em segEnd vendo qual menor distancia para o vetor cpoint

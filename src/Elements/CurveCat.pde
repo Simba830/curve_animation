@@ -94,8 +94,6 @@ class CurveCat
 
   // Método que retorna os principais controlPoints que são essenciais para a curva
   ArrayList<Property> DouglasPeuckerReducing(ArrayList<Property> cpoints, float epsilon){
-    try {
-      
     float maxDistance = 0, distance = 0;
     int index = 0;
     int end = cpoints.size();
@@ -134,11 +132,6 @@ class CurveCat
     }
 
     return result;
-    } catch (Exception e) {
-      console.log(e);   
-    } finally {
-      return new ArrayList<Property>();
-    }
   }
 
   // Método para percorrer um segmento de reta que começa em segBegin e terminar em segEnd vendo qual menor distancia para o vetor cpoint
