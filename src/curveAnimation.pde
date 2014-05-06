@@ -4,8 +4,6 @@
  Created on: May 13
  **/
 
-
-
 // State Context
 StateContext stateContext;
 

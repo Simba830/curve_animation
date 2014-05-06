@@ -15,6 +15,8 @@ public class StateContext {
     {
         setState(new SelectState(_context));
         this.context = _context;
+        mouseInit = new PVector(0,0);
+        mouseFinal = new PVector(0,0);
     }
 
     public void setContext(Context _context){
@@ -88,6 +90,7 @@ public class StateContext {
 
         myState.mousePressed();
     }
+    
     void mouseDragged()
     {
         // Cria a caixa de seleção independente do State da aplicação

@@ -29,15 +29,9 @@ void my_assert (boolean p) {
 
 /**
  AnimationApp.pde
- Author: Guilherme Herzog
+ Author: Guilherme Herzog e João Carvalho
  Created on: May 13
  **/
-
-float curveT;
-
-// Selection Box
-PVector mouseInit;
-PVector mouseFinal;
 
 // State Context
 StateContext stateContext;
@@ -53,14 +47,6 @@ color thirdColor = #3990E3;
 // Canvas Size
 int width,height;
 
-Context getContext(){
-  return context;
-}
-
-stateContext getStateContext(){
-  return stateContext;
-}
-
 public void setup() 
 {
   width = 800;
@@ -69,22 +55,19 @@ public void setup()
 
   smooth();
 
-  curveT = 0;
-
-  // PVectors used to create the selection box
-  mouseInit = new PVector(0,0);
-  mouseFinal = new PVector(0,0);
-
-  curveTightness(curveT);
-
   context = new Context();
   update();
-  context.setSelectionBox(mouseInit, mouseFinal);
-
   stateContext = new StateContext(context);
   stateContext.setContext(context);
 }
 
+Context getContext(){
+  return context;
+}
+
+stateContext getStateContext(){
+  return stateContext;
+}
 // TODO Mudar isso para um interface só usando o mouse
 void keyPressed() 
 { 
@@ -95,8 +78,6 @@ void keyPressed()
 // Mouse press callback
 void mousePressed() 
 {
-  mouseInit.set(mouseX, mouseY);
-  mouseFinal.set(mouseX, mouseY);
   update();
   stateContext.mousePressed();
 }
@@ -106,18 +87,12 @@ void mouseReleased()
 
   update();
   stateContext.mouseReleased();
-
-  // Resets dragged rectangle
-  mouseInit.set(0,0);
-  mouseFinal.set(0,0);
-  update();
 }
 
 // Mouse drag callback
 void mouseDragged () 
 {
   update();
-  mouseFinal.set(mouseX, mouseY);
   stateContext.mouseDragged();
 }
 
@@ -128,7 +103,7 @@ void draw()
   try {
     stateContext.draw();
   } catch (Exception e) {
-    println("e.toString(): "+e.toString());
+    println("Falha no Draw \ne.toString(): "+e.toString());
     e.printStackTrace();
   }
 }
@@ -139,9 +114,7 @@ void update(){
     new PVector(pmouseX, pmouseY), 
     mouseButton,
     keyCode, 
-    key,
-    mouseInit,
-    mouseFinal);
+    key);
 }
 
 
@@ -174,25 +147,19 @@ class Context{
 		selectedElement = null;
 	}
 
-	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key,
-		PVector _mouseInit, PVector _mouseFinal){
+	void updateContext(PVector mouse, PVector pmouse, int _mouseButton, int keyCode, char key){
 		this.mouse = mouse;
 		this.pMouse = pmouse;
 		this.keyCode = keyCode;
 		this.key = key;
 		this.mouseButton = _mouseButton;
-		this.mouseInit = _mouseInit;
-		this.mouseFinal = _mouseFinal;
+		
 	}
 
 	void setMouseCount(int _mouseCount){
 		this.mouseCount = _mouseCount;
 	}
 
-	void setSelectionBox(PVector ini, PVector _final){
-		this.mouseInit = ini;
-		this.mouseFinal = _final;
-	}
 
 	void print(){
 		println("Context[");
@@ -320,12 +287,22 @@ class Context{
 	void alignTimes(float t){
 		this.time = t;
 	}
+
+	void setSelectionBox(PVector mouseInit, PVector mouseFinal){
+		this.mouseInit = mouseInit;
+		this.mouseFinal = mouseFinal;
+	}
 }
 
 public class StateContext {
 
     private State myState;
     private Context context;
+    
+    // Selection Box
+    PVector mouseInit;
+    PVector mouseFinal;
+
 
         /**
          * Standard constructor
@@ -334,6 +311,8 @@ public class StateContext {
     {
         setState(new SelectState(_context));
         this.context = _context;
+        mouseInit = new PVector(0,0);
+        mouseFinal = new PVector(0,0);
     }
 
     public void setContext(Context _context){
@@ -381,6 +360,9 @@ public class StateContext {
      */
     void mousePressed()
     {
+        // Inicializa os ponteiros para o retangulo de seleção.
+        mouseInit.set(mouseX, mouseY);
+        mouseFinal.set(mouseX, mouseY);
         // Seleciona o segmento em questão se for o mouse LEFT
         PVector closestPoint = new PVector();
         PVector q = new PVector(context.mouse.x, context.mouse.y);
@@ -404,13 +386,23 @@ public class StateContext {
 
         myState.mousePressed();
     }
+    
     void mouseDragged()
     {
+        // Cria a caixa de seleção independente do State da aplicação
+        mouseFinal.set(mouseX, mouseY);
+        context.setSelectionBox(mouseInit, mouseFinal);
         myState.mouseDragged();
     }
     void mouseReleased()
     {
+        
+        // Resets dragged rectangle
+        mouseInit.set(0,0);
+        mouseFinal.set(0,0);
+        
         myState.mouseReleased();
+
     }
 
     void keyPressed(){
@@ -543,7 +535,7 @@ class CurveCat
   {
     controlPoints = new ArrayList<Property>();
     decimable = true;
-    tolerance = 1000;
+    tolerance = 10;
 
     history = new ArrayList<ArrayList<Property>>();
   }
@@ -577,7 +569,7 @@ class CurveCat
 
  // Método que retorna os principais controlPoints que são essenciais para a curva
  // Passamos como paramêtros os indices do vetor, e o vetor.
-  ArrayList<int> DouglasPeuckerReducingInt(ArrayList<PVector> cpoints,int index, int end, float epsilon){
+  ArrayList<int> DouglasPeuckerReducingInt(ArrayList<Property> cpoints,int index, int end, float epsilon){
     float maxDistance = 0, distance = 0;
     ArrayList<int> result;
 
@@ -611,11 +603,11 @@ class CurveCat
   }
 
   // Método que retorna os principais controlPoints que são essenciais para a curva
-  ArrayList<PVector> DouglasPeuckerReducing(ArrayList<PVector> cpoints, float epsilon){
+  ArrayList<Property> DouglasPeuckerReducing(ArrayList<Property> cpoints, float epsilon){
     float maxDistance = 0, distance = 0;
     int index = 0;
     int end = cpoints.size();
-    ArrayList<PVector> result;
+    ArrayList<Property> result;
 
     for (int i = 2; i < end - 1; ++i) {
       distance = shortestDistanceToSegment(cpoints.get(i), cpoints.get(1), cpoints.get(end - 1));
@@ -625,17 +617,17 @@ class CurveCat
       }
     }
     if(maxDistance > epsilon){
-      ArrayList<PVector> results1, results2;
+      ArrayList<Property> results1, results2;
 
       // Fiz isso aqui porque não posso modificar o cpoints
-      ArrayList<PVector> tmp = new ArrayList<PVector>();
+      ArrayList<Property> tmp = new ArrayList<Property>();
       for (int i = index; i < end - 1; ++i) {
           tmp.add(cpoints.get(i));
       }
       results1 = DouglasPeuckerReducing(tmp, epsilon);
 
       // Fiz isso aqui porque não posso modificar o cpoints
-      tmp = new ArrayList<PVector>();
+      tmp = new ArrayList<Property>();
       for (int i = 1; i < index; ++i) {
           tmp.add(cpoints.get(i));
       }
@@ -643,7 +635,7 @@ class CurveCat
 
       // Concatenando dois arrays, por que tinha que ser tão difícil ? Custava retornar o array novo ?
       results1.addAll(results2);
-      result = (ArrayList<PVector>) results1.clone();
+      result = (ArrayList<Property>) results1.clone();
     }else{
       result = cpoints;
     }
@@ -652,19 +644,19 @@ class CurveCat
   }
 
   // Método para percorrer um segmento de reta que começa em segBegin e terminar em segEnd vendo qual menor distancia para o vetor cpoint
-  float shortestDistanceToSegment(PVector cpoint, PVector segBegin, PVector segEnd){
-    PVector tmp = (PVector) segEnd.get();
+  float shortestDistanceToSegment(Property cpoint, Property segBegin, Property segEnd){
+    Property tmp = segEnd.clone();
     tmp.sub(segBegin);
 
     int numberDivisions = this.numberDivisions;
     float delta = tmp.mag()/numberDivisions;
 
-    float distance = 99999;
+    float distance = 9999;
 
     for (int i = 0; i < numberDivisions; ++i) {
-        tmp = segEnd.get();
+        tmp = segEnd.clone();
         tmp.mult(i*delta);
-        tmp = PVector.add(segBegin, tmp);
+        tmp = tmp.add(segBegin);
         if(tmp.dist(cpoint) < distance){
           distance = tmp.dist(cpoint);
         }
@@ -673,18 +665,21 @@ class CurveCat
     return distance;
   }
 
+
+  // PAREI AQUI ! 
+
   // Remove pontos de controle de uma curva criada pela lista p que possuam distancia menor que a tolerancia em relação aos pontos da nova curva.
   void decimeCurve(float tolerance)
   {
-      PVector a = new PVector();
-      PVector b = new PVector();
-      PVector c = new PVector();
-      PVector d = new PVector();
+      Property a = new Property();
+      Property b = new Property();
+      Property c = new Property();
+      Property d = new Property();
       
-      PVector a2 = new PVector();
-      PVector b2 = new PVector();
-      PVector c2 = new PVector();
-      PVector d2 = new PVector();
+      Property a2 = new Property();
+      Property b2 = new Property();
+      Property c2 = new Property();
+      Property d2 = new Property();
       
       boolean remove;
      
@@ -692,7 +687,7 @@ class CurveCat
       
       Segment segAux;
       Segment segP;
-      ArrayList<PVector> pAux;
+      ArrayList<Property> pAux;
 
       boolean wasDecimed = false;
 
@@ -700,12 +695,12 @@ class CurveCat
       int t0 = millis();
       // Pego os vetores essenciais para a curva
       // ArrayList<int> essentialsIndex = DouglasPeuckerReducingInt(controlPoints,0,size, 0.1);
-      // ArrayList<PVector> essentials = new ArrayList<PVector>;
+      // ArrayList<Property> essentials = new ArrayList<Property>;
       // // Pega a lista de indices essenciais e depois cria um vetor com esse indices.
       // for (int i = 0; i < essentialsIndex.size();i++)
       //   essentials.add(controlPoints.get(essentialsIndex.get(i)));
-      ArrayList<PVector> essentials = DouglasPeuckerReducing(controlPoints, 1/(tolerance));
-
+      ArrayList<Property> essentials = DouglasPeuckerReducing(controlPoints,100);
+      
       // Pega o tempo final
       int t1Douglas = millis();
 
@@ -721,7 +716,7 @@ class CurveCat
       for (int i = 0; i < essentials.size(); ++i) {
         testableControlPoints.remove(essentials.get(i));
       }
-
+      println("essentials.size(): "+essentials.size());
       // Adiciona os essenciais no final da lista de testáveis em ordem de prioridade do menos importante pro mais importante.
       for (int i = essentials.size(); i >= 0; --i)
       {
@@ -729,7 +724,7 @@ class CurveCat
       }
 
       // Percorre os testáveis removendo e verificando com a tolerância.
-      for(int i = 1; i < testableControlPoints.size() - 1; i++){
+      for(int i = 0; i < testableControlPoints.size() - 1; i++){
 
          pAux = new ArrayList<PVector>(controlPoints.size());
          pAux = (ArrayList<PVector>) controlPoints.clone();
@@ -755,12 +750,13 @@ class CurveCat
                 tAux = t*2 - 1;
             }
             
-            float x = curvePoint(segAux.a.x, segAux.b.x, segAux.c.x, segAux.d.x, t);
-            float y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, t);
-            PVector v1 = new PVector(x,y);
+            println("segAux: "+typeof(segAux));
+            float x1 = curvePoint(segAux.a.get(0), segAux.b.get(0), segAux.c.get(0), segAux.d.get(0), t);
+            float y1 = curvePoint(segAux.a.get(1), segAux.b.get(1), segAux.c.get(1), segAux.d.get(1), t);
+            PVector v1 = new PVector(x1,y1);
 
-            float x2 = curvePoint(segP.a.x, segP.b.x, segP.c.x, segP.d.x, tAux);
-            float y2 = curvePoint(segP.a.y, segP.b.y, segP.c.y, segP.d.y, tAux);
+            float x2 = curvePoint(segP.a.get(0), segP.b.get(0), segP.c.get(0), segP.d.get(0), tAux);
+            float y2 = curvePoint(segP.a.get(1), segP.b.get(1), segP.c.get(1), segP.d.get(1), tAux);
             PVector v2 = new PVector(x2,y2);
 
             float distance = v1.dist(v2);
@@ -773,6 +769,7 @@ class CurveCat
            this.controlPoints.remove(index);
            wasDecimed = true;
          }
+         
       }
 
       // Calculating the time of processing of the decime
@@ -784,12 +781,12 @@ class CurveCat
   // Returns the estimated tangent (a unit vector) at point t
   PVector getTangent (i) {
     Segment segAux = getSegment(i);
-    float x = curvePoint(segAux.a.x, segAux.b.x, segAux.c.x, segAux.d.x, 0);
-    float y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, 0);
+    float x = curvePoint(segAux.a.get(0), segAux.b.get(0), segAux.c.get(0), segAux.d.get(0), 0);
+    float y = curvePoint(segAux.a.get(1), segAux.b.get(1), segAux.c.get(1), segAux.d.get(1), 0);
     PVector v1 = new PVector(x,y);
 
-    x = curvePoint(segAux.a.x, segAux.b.x, segAux.c.x, segAux.d.x, 0.001);
-    y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, 0.001);
+    x = curvePoint(segAux.a.get(0), segAux.b.get(0), segAux.c.get(0), segAux.d.get(0), 0.001);
+    y = curvePoint(segAux.a.get(1), segAux.b.get(1), segAux.c.get(1), segAux.d.get(1), 0.001);
     PVector v2 = new PVector(x,y);
 
     tan = PVector.sub(v2, v1);
@@ -878,7 +875,7 @@ class CurveCat
 
   // Outra interface para findControlPoint, passando as coordenadas do mouse
   int findControlPoint () {
-    return findControlPoint (mouseX, mouseY);
+    return findControlPoint (new PVector (mouseX, mouseY));
   }
 
   //
@@ -914,11 +911,11 @@ class CurveCat
         float t = (float)(j) / (float)(numberDivisions);
 
         //Pega o x e y
-        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+        float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+        float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
 
         // Calcula distancia entre o vetor q e o x e y
-        float distance = dist(x, y, q.x, q.y);
+        float distance = dist(x, y, q.get(0), q.get(1));
 
         // Se for o primeiro coloca como melhor distancia
         if (j == 0 || distance < bestSegmentDistance) {
@@ -928,7 +925,7 @@ class CurveCat
         }
       }
       if (bestSegmentDistance < bestDistance) {
-        r.set (result.x, result.y, 0);
+        r.set (result.get(0), result.get(1), 0);
         if(timeBestSegment < 0.5)
           bestSegment = i;
         else
@@ -945,7 +942,7 @@ class CurveCat
 
   int[] getControlPointsBetween(PVector init, PVector pFinal){
     PVector aux;
-
+    println("getControlPointsBetween()");
     ArrayList<Integer> result = new ArrayList<Integer>();
     for (int i = 0; i<controlPoints.size() ; i++){
       PVector controlPoint = controlPoints.get(i);
@@ -974,23 +971,7 @@ class CurveCat
   // Retorna o tamanho de uma curva dados uma lista de pontos de controle
   float curveLength()
   {
-    float curveLength = 0;
-    for (int i = 0; i < getNumberControlPoints()-1; i++) {
-      Segment seg = getSegment(i);
-
-      for (int j=0; j<=numberDivisions; j++) 
-      {
-        float t = (float)(j) / (float)(numberDivisions);
-        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
-        t = (float)(j+1) / (float)(numberDivisions);
-        float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-        float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
-        float distance = dist(x, y, x2, y2);
-        curveLength += distance;
-      }
-    }
-    return (float)curveLength;
+    return curveLengthBetweenControlPoints(0,getNumberControlPoints()-1);
   }
 
   float curveLengthBetweenControlPoints(int pBegin, int pEnd)
@@ -1002,11 +983,11 @@ class CurveCat
       for (int j=0; j<=numberDivisions; j++) 
       {
         float t = (float)(j) / (float)(numberDivisions);
-        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+        float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+        float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
         t = (float)(j+1) / (float)(numberDivisions);
-        float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-        float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+        float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+        float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
         float distance = dist(x, y, x2, y2);
         curveLength += distance;
       }
@@ -1024,8 +1005,8 @@ class CurveCat
       for (int j=0; j<=numberDivisions; j++) 
       {
         float t = (float)(j) / (float)(numberDivisions);
-        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+        float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+        float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
 
         aux.insertPoint(new PVector(x,y), index);
         index++;
@@ -1085,10 +1066,17 @@ class CurveCat
       Segment seg = getSegment(i);
 
       beginShape();
-        curveVertex(seg.a.x, seg.a.y);
-        curveVertex(seg.b.x, seg.b.y);
-        curveVertex(seg.c.x, seg.c.y);
-        curveVertex(seg.d.x, seg.d.y);
+        curveVertex(seg.a.get(0), seg.a.get(1));
+        curveVertex(seg.b.get(0), seg.b.get(1));
+        curveVertex(seg.c.get(0), seg.c.get(1));
+        curveVertex(seg.d.get(0), seg.d.get(1));
+      endShape();
+
+      beginShape();
+        curveVertex(seg.a.get(0), seg.a.get(1));
+        curveVertex(seg.b.get(0), seg.b.get(1));
+        curveVertex(seg.c.get(0), seg.c.get(1));
+        curveVertex(seg.d.get(0), seg.d.get(1));
       endShape();
     }
   }
@@ -1096,37 +1084,41 @@ class CurveCat
   // Desenha elipses de acordo com os elementos do tipo PVector da lista p
   void drawControlPoints()
   {
-    boolean haveCurve = (getNumberControlPoints()<4)?false:true;
-    if (haveCurve){
+    if ( !(getNumberControlPoints()<4) ){
       fill(secondaryColor);
       stroke(secondaryColor);
       for (int i = 0; i < getNumberControlPoints(); i++) 
       {
-        ellipse (controlPoints.get(i).x, controlPoints.get(i).y, 7, 7);
-        text("t: "+controlPoints.get(i).z, controlPoints.get(i).x + 10, controlPoints.get(i).y - 10);
+        ellipse (controlPoints.get(i).get(0), controlPoints.get(i).get(1), 7, 7);
+        text("t: "+controlPoints.get(i).z, controlPoints.get(i).get(0) + 10, controlPoints.get(i).get(1) - 10);
       } 
       fill(255);
     }
   }
+
   void drawControlPoint(int i)
   {
     fill(mainColor);
     stroke(mainColor);
     if (controlPoints.size() > i && i>-1)
-      ellipse(controlPoints.get(i).x, controlPoints.get(i).y, 10, 10);
+      ellipse(controlPoints.get(i).get(0), controlPoints.get(i).get(1), 10, 10);
   }
 
   CurveCat clone(){
     CurveCat aux = new CurveCat();
-    aux.controlPoints = (ArrayList<PVector>) controlPoints.clone();
+    aux.controlPoints = (ArrayList<Property>) controlPoints.clone();
     return aux;
   }
 
   String toString(){
     String curve = "Curve: { ControlPoints: [";
     for (int i = 0; i<this.getNumberControlPoints(); i++){
-      PVector aux = this.getControlPoint(i);
-      curve += "("+aux.x+", "+aux.y+"),";
+      Property aux = this.getControlPoint(i);
+      curve += "(";
+      for (int i = 0; i < aux.size(); ++i) {
+        curve += aux.get(i)+", ";
+      }
+      curve += "),";
     }
     curve += "]";
     curve += "}";
@@ -1190,19 +1182,15 @@ class SceneElement
 }
 
 class Segment{
-   PVector a,b,c,d;
+   public Property a,b,c,d;
   
-   Segment(PVector _a, PVector _b, PVector _c, PVector _d){
-      a = _a;
-      b = _b;
-      c = _c;
-      d = _d;
+   Segment(Property _a, Property _b, Property _c, Property _d){
+      this.a = _a;
+      this.b = _b;
+      this.c = _c;
+      this.d = _d;
    } 
-   
-   Segment(){
-   
-   }
-  
+
 }
 
 class Text extends Element{
@@ -1387,6 +1375,63 @@ class Property {
     if (i >= size()) return 0.0;
     return prop.get(i);
   }
+
+  Property sub(Property operand){
+    if( this.size() != operand.size())
+      throw new Exception("Property with diferents dimensions.");
+
+    Property result = new Property();
+    result.setDimension(this.size());
+    for (int i = 0; i < this.size(); ++i) {
+      result.set(i, this.get(i) - operand.get(i));
+    }
+
+    return result;
+  }
+
+  float mag(){
+    float result = 0;
+    for (int i = 0; i < this.size(); ++i) {
+      result += pow(get(i), 2);
+    }
+
+    return sqrt(result);
+  }
+
+  Property add(Property operand){
+    if( this.size() != operand.size())
+      throw new Exception("Property with diferents dimensions.");
+
+    Property result = new Property();
+    result.setDimension(this.size());
+    for (int i = 0; i < this.size(); ++i) {
+      result.set(i, this.get(i) + operand.get(i));
+    }
+
+    return result;
+  }
+
+  void mult(float constant){
+    for (int i = 0; i < this.size(); ++i) {
+      this.set(i, this.get(i)*constant);
+    }
+  }
+
+  void clone(){
+    Property result = new Property();
+    result.setDimension(this.size());
+    for (int i = 0; i < this.size(); ++i) {
+      result.set(i, this.get(i));
+    }
+
+    return result;
+  }
+
+  float dist(Property operand){
+    return (operand.sub(this)).mag();
+  }
+
+
 };
 
 
@@ -1557,6 +1602,7 @@ class DrawningState extends State {
       super(_context);
 
       context.curve.decimeAll();
+      // Adding a comentary
     }
 
     public void mousePressed() 
@@ -1593,7 +1639,7 @@ class DrawningState extends State {
 
       if (canSketch){
         context.mouse.add(new PVector(0,0,t));
-  		  context.curve.insertPoint(context.mouse, context.curve.getNumberControlPoints());
+  		  context.curve.insertPoint((Property)context.mouse, context.curve.getNumberControlPoints());
       }
     }
 
@@ -1610,7 +1656,6 @@ class DrawningState extends State {
 class EditingState extends State {
 
     int cpsMovimenteds = 5;
-
     PVector originalPositionDragged;
     
     EditingState(Context context){
@@ -1619,6 +1664,7 @@ class EditingState extends State {
 
     public void mousePressed() 
     {
+
         if(context.mouseButton == RIGHT){
 
             // Verfica se tem nenhum element selecionado
@@ -1705,6 +1751,7 @@ class EditingState extends State {
         }
 
         context.refreshInterpolator();
+        
     }
 
     public void mouseDragged()
@@ -2005,7 +2052,6 @@ class State
   	}
 
 	void mousePressed(){
-
 	};
 	void mouseDragged(){
 

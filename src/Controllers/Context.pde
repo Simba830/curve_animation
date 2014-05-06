@@ -166,4 +166,9 @@ class Context{
 	void alignTimes(float t){
 		this.time = t;
 	}
+
+	void setSelectionBox(PVector mouseInit, PVector mouseFinal){
+		this.mouseInit = mouseInit;
+		this.mouseFinal = mouseFinal;
+	}
 }

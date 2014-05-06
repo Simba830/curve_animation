@@ -8,6 +8,7 @@ class DrawningState extends State {
       super(_context);
 
       context.curve.decimeAll();
+      // Adding a comentary
     }
 
     public void mousePressed() 

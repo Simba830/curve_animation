@@ -63,13 +63,61 @@ class Property {
     return prop.get(i);
   }
 
-  Float x()
-  {
-    return prop.get(0);
+  Property sub(Property operand){
+    if( this.size() != operand.size())
+      throw new Exception("Property with diferents dimensions.");
+
+    Property result = new Property();
+    result.setDimension(this.size());
+    for (int i = 0; i < this.size(); ++i) {
+      result.set(i, this.get(i) - operand.get(i));
+    }
+
+    return result;
   }
-  Float y()
-  {
-    return prop.get(0);
+
+  float mag(){
+    float result = 0;
+    for (int i = 0; i < this.size(); ++i) {
+      result += pow(get(i), 2);
+    }
+
+    return sqrt(result);
   }
+
+  Property add(Property operand){
+    if( this.size() != operand.size())
+      throw new Exception("Property with diferents dimensions.");
+
+    Property result = new Property();
+    result.setDimension(this.size());
+    for (int i = 0; i < this.size(); ++i) {
+      result.set(i, this.get(i) + operand.get(i));
+    }
+
+    return result;
+  }
+
+  void mult(float constant){
+    for (int i = 0; i < this.size(); ++i) {
+      this.set(i, this.get(i)*constant);
+    }
+  }
+
+  void clone(){
+    Property result = new Property();
+    result.setDimension(this.size());
+    for (int i = 0; i < this.size(); ++i) {
+      result.set(i, this.get(i));
+    }
+
+    return result;
+  }
+
+  float dist(Property operand){
+    return (operand.sub(this)).mag();
+  }
+
+
 };
 

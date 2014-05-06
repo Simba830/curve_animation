@@ -43,12 +43,12 @@ class CurveCat
       controlPoints.remove(index);
   }
 
-  Segment getSegment(ArrayList<Property> pAux, int i)
+  Segment getSegment(ArrayList<PVector> pAux, int i)
   { 
-         Property a = i >= 1 ? pAux.get(i-1) : pAux.get(0);
-         Property b = pAux.get(i);
-         Property c = pAux.get(i+1);
-         Property d = i+2 < pAux.size() ? pAux.get(i+2) : pAux.get(i+1);
+         PVector a = i >= 1 ? pAux.get(i-1) : pAux.get(0);
+         PVector b = pAux.get(i);
+         PVector c = pAux.get(i+1);
+         PVector d = i+2 < pAux.size() ? pAux.get(i+2) : pAux.get(i+1);
          return new Segment(a,b,c,d);
   }
 
@@ -135,7 +135,7 @@ class CurveCat
 
   // Método para percorrer um segmento de reta que começa em segBegin e terminar em segEnd vendo qual menor distancia para o vetor cpoint
   float shortestDistanceToSegment(Property cpoint, Property segBegin, Property segEnd){
-    Property tmp = (Property) segEnd.get();
+    Property tmp = segEnd.clone();
     tmp.sub(segBegin);
 
     int numberDivisions = this.numberDivisions;
@@ -144,9 +144,9 @@ class CurveCat
     float distance = 9999;
 
     for (int i = 0; i < numberDivisions; ++i) {
-        tmp = segEnd.get();
+        tmp = segEnd.clone();
         tmp.mult(i*delta);
-        tmp = PVector.add(segBegin, tmp);
+        tmp = tmp.add(segBegin);
         if(tmp.dist(cpoint) < distance){
           distance = tmp.dist(cpoint);
         }
@@ -154,6 +154,9 @@ class CurveCat
 
     return distance;
   }
+
+
+  // PAREI AQUI ! 
 
   // Remove pontos de controle de uma curva criada pela lista p que possuam distancia menor que a tolerancia em relação aos pontos da nova curva.
   void decimeCurve(float tolerance)
@@ -196,7 +199,7 @@ class CurveCat
       println("Tempo de processamento Douglas Peucker: "+totalTimeDouglas+" ms");
 
       // Array que vai conter os vetores a serem testados
-      ArrayList<Property> testableControlPoints = (ArrayList<Property>) controlPoints.clone();
+      ArrayList<PVector> testableControlPoints = (ArrayList<PVector>) controlPoints.clone();
 
       t0 = millis();
       // Removendo os pontos essenciais dos testáveis
@@ -213,8 +216,8 @@ class CurveCat
       // Percorre os testáveis removendo e verificando com a tolerância.
       for(int i = 0; i < testableControlPoints.size() - 1; i++){
 
-         pAux = new ArrayList<Property>(controlPoints.size());
-         pAux = (ArrayList<Property>) controlPoints.clone();
+         pAux = new ArrayList<PVector>(controlPoints.size());
+         pAux = (ArrayList<PVector>) controlPoints.clone();
 
          // Pega o vetor e procura qual o indice dele nos controlPoints
          int index = controlPoints.indexOf( testableControlPoints.get(i) );
@@ -268,12 +271,12 @@ class CurveCat
   // Returns the estimated tangent (a unit vector) at point t
   PVector getTangent (i) {
     Segment segAux = getSegment(i);
-    float x = curvePoint(segAux.a.x, segAux.b.x, segAux.c.x, segAux.d.x, 0);
-    float y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, 0);
+    float x = curvePoint(segAux.a.get(0), segAux.b.get(0), segAux.c.get(0), segAux.d.get(0), 0);
+    float y = curvePoint(segAux.a.get(1), segAux.b.get(1), segAux.c.get(1), segAux.d.get(1), 0);
     PVector v1 = new PVector(x,y);
 
-    x = curvePoint(segAux.a.x, segAux.b.x, segAux.c.x, segAux.d.x, 0.001);
-    y = curvePoint(segAux.a.y, segAux.b.y, segAux.c.y, segAux.d.y, 0.001);
+    x = curvePoint(segAux.a.get(0), segAux.b.get(0), segAux.c.get(0), segAux.d.get(0), 0.001);
+    y = curvePoint(segAux.a.get(1), segAux.b.get(1), segAux.c.get(1), segAux.d.get(1), 0.001);
     PVector v2 = new PVector(x,y);
 
     tan = PVector.sub(v2, v1);
@@ -303,20 +306,20 @@ class CurveCat
   } 
 
   // Insere o ponto q entre index-1 e index
-  void insertPoint(Property q, int index){
+  void insertPoint(PVector q, int index){
     saveCurve();
     controlPoints.add(index,q);
     this.decimable = true;
   }
 
-  void insertPoint(Property q){
+  void insertPoint(PVector q){
     saveCurve();
     controlPoints.add(q);
     this.decimable = true;
   }
 
   // Altera o valor do elemento index da lista p para q
-  void setPoint(Property q, int index)
+  void setPoint(PVector q, int index)
   {
     try {
       controlPoints.set(index,q); 
@@ -332,13 +335,13 @@ class CurveCat
     if (controlPoints.size() > index && index >-1)
       return controlPoints.get(index);
     else
-      return new Property(0,0);
+      return new PVector(0,0);
   }
   
   // Retorna o indice do ponto de controle mais próximo de q. Caso
   // este não esteja a uma distancia minima especificada por minDistance,
   // retorna -1
-  int findControlPoint(Property q)
+  int findControlPoint(PVector q)
   {
     int op=-1;
     float bestDist = 100000;
@@ -362,14 +365,14 @@ class CurveCat
 
   // Outra interface para findControlPoint, passando as coordenadas do mouse
   int findControlPoint () {
-    return findControlPoint (new Property (mouseX, mouseY));
+    return findControlPoint (new PVector (mouseX, mouseY));
   }
 
   //
   // Retorna o indice do segmento da curva onde o ponto mais proximo de q foi 
   // encontrado. As coordenadas do ponto mais proximo são guardadas em r
   // 
-  int findClosestPoint (ArrayList<Property> cps, PVector q, PVector r) {
+  int findClosestPoint (ArrayList<PVector> cps, PVector q, PVector r) {
 
     // Inicia com -1 para saber se deu certo
     int bestSegment = -1;
@@ -398,11 +401,11 @@ class CurveCat
         float t = (float)(j) / (float)(numberDivisions);
 
         //Pega o x e y
-        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+        float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+        float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
 
         // Calcula distancia entre o vetor q e o x e y
-        float distance = dist(x, y, q.x, q.y);
+        float distance = dist(x, y, q.get(0), q.get(1));
 
         // Se for o primeiro coloca como melhor distancia
         if (j == 0 || distance < bestSegmentDistance) {
@@ -412,7 +415,7 @@ class CurveCat
         }
       }
       if (bestSegmentDistance < bestDistance) {
-        r.set (result.x, result.y, 0);
+        r.set (result.get(0), result.get(1), 0);
         if(timeBestSegment < 0.5)
           bestSegment = i;
         else
@@ -470,11 +473,11 @@ class CurveCat
       for (int j=0; j<=numberDivisions; j++) 
       {
         float t = (float)(j) / (float)(numberDivisions);
-        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+        float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+        float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
         t = (float)(j+1) / (float)(numberDivisions);
-        float x2 = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-        float y2 = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+        float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+        float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
         float distance = dist(x, y, x2, y2);
         curveLength += distance;
       }
@@ -492,10 +495,10 @@ class CurveCat
       for (int j=0; j<=numberDivisions; j++) 
       {
         float t = (float)(j) / (float)(numberDivisions);
-        float x = curvePoint(seg.a.x, seg.b.x, seg.c.x, seg.d.x, t);
-        float y = curvePoint(seg.a.y, seg.b.y, seg.c.y, seg.d.y, t);
+        float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+        float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
 
-        aux.insertPoint(new Property(x,y), index);
+        aux.insertPoint(new PVector(x,y), index);
         index++;
       }
     }
@@ -514,7 +517,7 @@ class CurveCat
       if(history.get(history.size() - 1).equals(controlPoints))
         return;
     }
-    ArrayList<Property> branch = (ArrayList<Property>) controlPoints.clone();
+    ArrayList<PVector> branch = (ArrayList<PVector>) controlPoints.clone();
     history.add(branch);
     historyIndex++;
   }
@@ -560,10 +563,10 @@ class CurveCat
       endShape();
 
       beginShape();
-        curveVertex(seg.a.x, seg.a.y);
-        curveVertex(seg.b.x, seg.b.y);
-        curveVertex(seg.c.x, seg.c.y);
-        curveVertex(seg.d.x, seg.d.y);
+        curveVertex(seg.a.get(0), seg.a.get(1));
+        curveVertex(seg.b.get(0), seg.b.get(1));
+        curveVertex(seg.c.get(0), seg.c.get(1));
+        curveVertex(seg.d.get(0), seg.d.get(1));
       endShape();
     }
   }
@@ -571,24 +574,24 @@ class CurveCat
   // Desenha elipses de acordo com os elementos do tipo PVector da lista p
   void drawControlPoints()
   {
-    boolean haveCurve = (getNumberControlPoints()<4)?false:true;
-    if (haveCurve){
+    if ( !(getNumberControlPoints()<4) ){
       fill(secondaryColor);
       stroke(secondaryColor);
       for (int i = 0; i < getNumberControlPoints(); i++) 
       {
-        ellipse (controlPoints.get(i).x, controlPoints.get(i).y, 7, 7);
-        text("t: "+controlPoints.get(i).z, controlPoints.get(i).x + 10, controlPoints.get(i).y - 10);
+        ellipse (controlPoints.get(i).get(0), controlPoints.get(i).get(1), 7, 7);
+        text("t: "+controlPoints.get(i).z, controlPoints.get(i).get(0) + 10, controlPoints.get(i).get(1) - 10);
       } 
       fill(255);
     }
   }
+
   void drawControlPoint(int i)
   {
     fill(mainColor);
     stroke(mainColor);
     if (controlPoints.size() > i && i>-1)
-      ellipse(controlPoints.get(i).get(x), controlPoints.get(i).get(y), 10, 10);
+      ellipse(controlPoints.get(i).get(0), controlPoints.get(i).get(1), 10, 10);
   }
 
   CurveCat clone(){
@@ -601,7 +604,11 @@ class CurveCat
     String curve = "Curve: { ControlPoints: [";
     for (int i = 0; i<this.getNumberControlPoints(); i++){
       Property aux = this.getControlPoint(i);
-      curve += "("+aux.x()+","+aux.y()+"),";
+      curve += "(";
+      for (int i = 0; i < aux.size(); ++i) {
+        curve += aux.get(i)+", ";
+      }
+      curve += "),";
     }
     curve += "]";
     curve += "}";
