@@ -352,7 +352,11 @@ public class StateContext {
 
             case 'draw' :
                   myState = new DrawningState(this.context);
-              break;      
+              break;  
+
+            case 'time' :
+                  myState = new TimeEditingState(this.context);
+              break;          
 
             default :
                 myState = new DrawningState(this.context);
@@ -539,7 +543,7 @@ class CurveCat
   {
     controlPoints = new ArrayList<Property>();
     decimable = true;
-    tolerance = 10;
+    tolerance = 1000;
 
     history = new ArrayList<ArrayList<Property>>();
   }
@@ -700,8 +704,8 @@ class CurveCat
       // // Pega a lista de indices essenciais e depois cria um vetor com esse indices.
       // for (int i = 0; i < essentialsIndex.size();i++)
       //   essentials.add(controlPoints.get(essentialsIndex.get(i)));
-      ArrayList<PVector> essentials = DouglasPeuckerReducing(controlPoints,100);
-      
+      ArrayList<PVector> essentials = DouglasPeuckerReducing(controlPoints, 1/(tolerance));
+
       // Pega o tempo final
       int t1Douglas = millis();
 
@@ -769,7 +773,6 @@ class CurveCat
            this.controlPoints.remove(index);
            wasDecimed = true;
          }
-         
       }
 
       // Calculating the time of processing of the decime
@@ -2017,3 +2020,46 @@ class State
 	void draw(){};
 }
 	
+class TimeEditingState extends State {
+
+    float timeSpacing = 2;
+    SceneElement element;
+    
+    TimeEditingState(Context context){
+      super(context);
+      element = context.getSelectedElement();
+    }
+
+    public void mousePressed() 
+    {
+
+    }
+
+    public void mouseReleased() 
+    {
+
+    }
+
+    public void mouseDragged()
+    {
+
+    }
+
+    public void keyPressed(){
+
+    }
+
+    public void draw()
+    {
+      for (int i = 0; i < element.lastTime(); ++i) {
+        if(i % timeSpacing == 0){
+          println("test");
+          PVector pos = element.pos.get(i);
+          println("pos: "+pos);
+          fill(mainColor);
+          stroke(mainColor);
+          //ellipse(pos.x, pos.y, 10, 10);
+        }
+      }
+    }
+}

@@ -25,7 +25,7 @@ class CurveCat
   {
     controlPoints = new ArrayList<Property>();
     decimable = true;
-    tolerance = 10;
+    tolerance = 1000;
 
     history = new ArrayList<ArrayList<Property>>();
   }
@@ -186,8 +186,8 @@ class CurveCat
       // // Pega a lista de indices essenciais e depois cria um vetor com esse indices.
       // for (int i = 0; i < essentialsIndex.size();i++)
       //   essentials.add(controlPoints.get(essentialsIndex.get(i)));
-      ArrayList<PVector> essentials = DouglasPeuckerReducing(controlPoints,100);
-      
+      ArrayList<PVector> essentials = DouglasPeuckerReducing(controlPoints, 1/(tolerance));
+
       // Pega o tempo final
       int t1Douglas = millis();
 
@@ -255,7 +255,6 @@ class CurveCat
            this.controlPoints.remove(index);
            wasDecimed = true;
          }
-         
       }
 
       // Calculating the time of processing of the decime

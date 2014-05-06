@@ -28,7 +28,11 @@ public class StateContext {
 
             case 'draw' :
                   myState = new DrawningState(this.context);
-              break;      
+              break;  
+
+            case 'time' :
+                  myState = new TimeEditingState(this.context);
+              break;          
 
             default :
                 myState = new DrawningState(this.context);
