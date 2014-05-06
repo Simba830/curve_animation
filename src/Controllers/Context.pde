@@ -171,4 +171,8 @@ class Context{
 		this.mouseInit = mouseInit;
 		this.mouseFinal = mouseFinal;
 	}
+	PVector getpMouse()
+	{
+		return this.pMouse;
+	}
 }

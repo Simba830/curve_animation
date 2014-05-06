@@ -6,8 +6,10 @@ class CircleState extends State {
 
     public void mousePressed() 
     {
-    	Circle c = new Circle(20,20);
-    	context.addElement(c);	
+        Circle c = new Circle(20,20);
+        println("Instanciando Circle...");
+        console.log("Instanciando Circle...");
+        context.addElement(c);  
         context.setSelectedElement(c);
     }
 
@@ -15,8 +17,9 @@ class CircleState extends State {
         Circle c = context.getSelectedElement();
         PVector pos = c.pos.get(0);
 
-        float dx = abs(context.pMouse.x - pos.x);
-        float dy = abs(context.pMouse.y - pos.y);
+        PVector pMouse = context.getpMouse();
+        float dx = abs(pMouse.x - pos.x);
+        float dy = abs(pMouse.y - pos.y);
 
         c.setWidth(dx);
         c.setHeight(dx);
