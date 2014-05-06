@@ -22,7 +22,7 @@ class DrawningState extends State {
       else { canSketch = false; }
         
       if (canSketch){
-        this.context.curve.insertPoint(this.context.mouse);
+        this.context.curve.insertPoint(new Property(this.context.mouse.x, this.context.mouse.y));
       }
     }
     
@@ -45,7 +45,7 @@ class DrawningState extends State {
 
       if (canSketch){
         context.mouse.add(new PVector(0,0,t));
-  		  context.curve.insertPoint((Property)context.mouse, context.curve.getNumberControlPoints());
+  		  context.curve.insertPoint( new Property(context.mouse.x, context.mouse.y, context.mouse.z), context.curve.getNumberControlPoints());
       }
     }
 

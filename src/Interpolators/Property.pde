@@ -85,7 +85,7 @@ class Property {
     return sqrt(result);
   }
 
-  Property add(Property operand){
+  Property adc(Property operand){
     // if( this.size() != operand.size())
     //   throw new Exception("Property with diferents dimensions.");
 
@@ -104,7 +104,7 @@ class Property {
     }
   }
 
-  void clone(){
+  Property clone(){
     Property result = new Property();
     result.setDimension(this.size());
     for (int i = 0; i < this.size(); ++i) {
