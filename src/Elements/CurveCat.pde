@@ -94,7 +94,8 @@ class CurveCat
 
   // Método que retorna os principais controlPoints que são essenciais para a curva
   ArrayList<Property> DouglasPeuckerReducing(ArrayList<Property> cpoints, float epsilon){
-    console.log(cpoints.toArray());
+    try {
+      
     float maxDistance = 0, distance = 0;
     int index = 0;
     int end = cpoints.size();
@@ -119,6 +120,7 @@ class CurveCat
 
       // Fiz isso aqui porque não posso modificar o cpoints
       tmp = new ArrayList<Property>();
+      console.log(tmp);
       for (int i = 1; i < index; ++i) {
           tmp.add(cpoints.get(i));
       }
@@ -132,12 +134,16 @@ class CurveCat
     }
 
     return result;
+    } catch (Exception e) {
+      console.log(e);   
+    } finally {
+      return new ArrayList<Property>();
+    }
   }
 
   // Método para percorrer um segmento de reta que começa em segBegin e terminar em segEnd vendo qual menor distancia para o vetor cpoint
   float shortestDistanceToSegment(Property cpoint, Property segBegin, Property segEnd){
-    console.log(segEnd);
-    Property tmp = ((Property) segEnd).clone();
+    Property tmp = (Property) segEnd.clone();
     tmp.sub(segBegin);
 
     int numberDivisions = this.numberDivisions;
@@ -146,9 +152,9 @@ class CurveCat
     float distance = 9999;
 
     for (int i = 0; i < numberDivisions; ++i) {
-        tmp = segEnd.clone();
+        tmp = (Property) segEnd.clone();
         tmp.mult(i*delta);
-        tmp = tmp.add(segBegin);
+        tmp = tmp.adc(segBegin);
         if(tmp.dist(cpoint) < distance){
           distance = tmp.dist(cpoint);
         }
@@ -157,8 +163,6 @@ class CurveCat
     return distance;
   }
 
-
-  // PAREI AQUI ! 
 
   // Remove pontos de controle de uma curva criada pela lista p que possuam distancia menor que a tolerancia em relação aos pontos da nova curva.
   void decimeCurve(float tolerance)
