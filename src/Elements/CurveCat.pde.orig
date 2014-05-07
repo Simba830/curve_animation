@@ -219,8 +219,13 @@ class CurveCat
       // // Pega a lista de indices essenciais e depois cria um vetor com esse indices.
       // for (int i = 0; i < essentialsIndex.size();i++)
       //   essentials.add(controlPoints.get(essentialsIndex.get(i)));
+<<<<<<< HEAD
+      //ArrayList<Property> essentials = DouglasPeuckerReducing(controlPoints,1);
+      
+=======
       ArrayList<Property> essentials = DouglasPeuckerReducing(controlPoints,5);
       console.log(essentials.toArray());
+>>>>>>> 65bd6af7c458da45ac64c5521481e48d4b306a45
       // Pega o tempo final
       int t1Douglas = millis();
 

@@ -45,8 +45,10 @@ class CurveCat
 
   Segment getSegment(ArrayList<Property> pAux, int i)
   { 
+         //console.log(i);
          Property a = i >= 1 ? pAux.get(i-1) : pAux.get(0);
          Property b = pAux.get(i);
+         //console.log(b);
          Property c = pAux.get(i+1);
          Property d = i+2 < pAux.size() ? pAux.get(i+2) : pAux.get(i+1);
          return new Segment(a,b,c,d);
@@ -58,10 +60,11 @@ class CurveCat
   }
 
   // Método que retorna os principais controlPoints que são essenciais para a curva
-  ArrayList<Property> DouglasPeuckerReducingOld(ArrayList<Property> pList, float epsilon){
+  ArrayList<Property> DouglasPeuckerReducing(ArrayList<Property> pList, float epsilon){
     float maxDistance = 0, distance = 0;
     int index = 0;
     int end = pList.size();
+    console.log(end);
     ArrayList<Property> result;
 
     for (int i = 2; i <= end - 1; ++i) {
@@ -105,7 +108,7 @@ class CurveCat
     Property firstPoint = pList.get(0);
     Property lastPoint = pList.get(pList.size()-1);
     ArrayList<Property> result;
-    //console.log("Usando novo DouglasPeuckerReducing");
+    
     if (pList.size() < 3)
         return pList;
     
@@ -113,7 +116,7 @@ class CurveCat
     float maxDistance = 0, distance = 0;
     
     for (int i = 1; i <= pList.size() - 1; ++i) {
-      distance = findPerpendicularDistance(pList.get(i), firstPoint, lastPoint);
+      distance = shortestDistanceToSegment(pList.get(i), firstPoint, lastPoint);
       if( distance > maxDistance){
         maxDistance = distance;
         index = i;
@@ -124,7 +127,7 @@ class CurveCat
 
       // Fiz isso aqui porque não posso modificar o pList
       ArrayList<Property> tmp = new ArrayList<Property>();
-      for (int i = 1; i <= index+1; ++i) {
+      for (int i = 1; i <= index; ++i) {
           tmp.add(pList.get(i));
       }
       results1 = DouglasPeuckerReducing(tmp, epsilon);
@@ -132,7 +135,7 @@ class CurveCat
       // Fiz isso aqui porque não posso modificar o pList
       tmp = new ArrayList<Property>();
       //console.log(tmp);
-      for (int i = index; i <= pList.size() -1 ; ++i) {
+      for (int i = index; i <= end; ++i) {
           tmp.add(pList.get(i));
       }
       results2 = DouglasPeuckerReducing(tmp, epsilon);
@@ -171,22 +174,6 @@ class CurveCat
     return distance;
   }
 
-  float findPerpendicularDistance(p, p1,p2) {
-    // if start and end point are on the same x the distance is the difference in X.
-    float result;
-    float slope;
-    float intercept;
-    if (p1.get(0) == p2.get(0)){
-        result=abs(p.get(0)-p1.get(0));
-    }else{
-        slope = (p2.get(1) - p1.get(1)) / (p2.get(0) - p1.get(0));
-        intercept = p1.get(1) - (slope * p1.get(0));
-        result = abs(slope * p.get(0) - p.get(1) + intercept) / sqrt(pow(slope, 2) + 1);
-    }
-    console.log(result);
-    return result;
-  }
-
 
   // Remove pontos de controle de uma curva criada pela lista p que possuam distancia menor que a tolerancia em relação aos pontos da nova curva.
   void decimeCurve(float tolerance)
@@ -219,25 +206,25 @@ class CurveCat
       // // Pega a lista de indices essenciais e depois cria um vetor com esse indices.
       // for (int i = 0; i < essentialsIndex.size();i++)
       //   essentials.add(controlPoints.get(essentialsIndex.get(i)));
-      ArrayList<Property> essentials = DouglasPeuckerReducing(controlPoints,5);
-      console.log(essentials.toArray());
+      ArrayList<Property> essentials = DouglasPeuckerReducing(controlPoints,1);
+      
       // Pega o tempo final
       int t1Douglas = millis();
 
       int totalTimeDouglas = t1Douglas - t0;
       // Exibe o tempo total gasto em Douglas Peucker
-      // console.log("Tempo de processamento Douglas Peucker: "+totalTimeDouglas+" ms");
+      println("Tempo de processamento Douglas Peucker: "+totalTimeDouglas+" ms");
 
       // Array que vai conter os vetores a serem testados
       ArrayList<Property> testableControlPoints = (ArrayList<Property>) controlPoints.clone();
 
       t0 = millis();
       // Removendo os pontos essenciais dos testáveis
-      // for (int i = 0; i < essentials.size(); ++i) {
-      //   testableControlPoints.remove(essentials.get(i));
-      // }
+      for (int i = 0; i < essentials.size(); ++i) {
+        testableControlPoints.remove(essentials.get(i));
+      }
       
-      // console.log("essentials.size(): "+essentials.size());
+      println("essentials.size(): "+essentials.size());
       // Adiciona os essenciais no final da lista de testáveis em ordem de prioridade do menos importante pro mais importante.
       /*for (int i = essentials.size(); i >= 0; --i)
       {
@@ -245,7 +232,7 @@ class CurveCat
       }*/
 
       // Percorre os testáveis removendo e verificando com a tolerância.
-      for(int i = 1; i < testableControlPoints.size() - 1; i++){
+      for(int i = 0; i < testableControlPoints.size() - 1; i++){
 
          pAux = new ArrayList<Property>(controlPoints.size());
 
@@ -257,6 +244,8 @@ class CurveCat
 
          //console.log(index);
          segAux = getSegment(pAux,index-1);
+         console.log(segAux);
+         console.log(i);
          remove = true;
          
          for (int j=0; j<=numberDivisions; j++) 
@@ -297,7 +286,7 @@ class CurveCat
 
       // Calculating the time of processing of the decime
       int totalTimeDecime = millis() - t0;
-      console.log("Tempo de processamento do decimeCurve: "+totalTimeDecime+" ms");
+      println("Tempo de processamento do decimeCurve: "+totalTimeDecime+" ms");
       this.decimable = wasDecimed;
   }
 
@@ -357,7 +346,7 @@ class CurveCat
     try {
       controlPoints.set(index,q); 
     } catch (Exception e) {
-        console.log("e.toString(): "+e.toString());
+        println("e.toString(): "+e.toString());
         print("Erro ao setar ponto de controle");
     }
   }
@@ -439,7 +428,7 @@ class CurveCat
         float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
 
         // Calcula distancia entre o vetor q e o x e y
-        float distance = dist(x, y, q.x, q.y);
+        float distance = dist(x, y, q.get(0), q.get(1));
 
         // Se for o primeiro coloca como melhor distancia
         if (j == 0 || distance < bestSegmentDistance) {
@@ -468,7 +457,7 @@ class CurveCat
 
   int[] getControlPointsBetween(Property init, Property pFinal){
     Property aux;
-    console.log("getControlPointsBetween()");
+    println("getControlPointsBetween()");
     ArrayList<Integer> result = new ArrayList<Integer>();
     for (int i = 0; i<controlPoints.size() ; i++){
       Property controlPoint = controlPoints.get(i);
@@ -620,7 +609,7 @@ class CurveCat
       for (int i = 0; i < getNumberControlPoints(); i++) 
       {
         ellipse (controlPoints.get(i).get(0), controlPoints.get(i).get(1), 7, 7);
-        text("t: "+controlPoints.get(i).get(2), controlPoints.get(i).get(0) + 10, controlPoints.get(i).get(1) - 10);
+        text("t: "+controlPoints.get(i).z, controlPoints.get(i).get(0) + 10, controlPoints.get(i).get(1) - 10);
       } 
       fill(255);
     }
