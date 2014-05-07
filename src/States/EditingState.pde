@@ -96,7 +96,6 @@ class EditingState extends State {
         }
 
         context.refreshInterpolator();
-        
     }
 
     public void mouseDragged()
@@ -114,8 +113,8 @@ class EditingState extends State {
 
             // Soma aos elementos selecionados
             for (int i = 0; i<context.selectedSegments.length; i++){
-              PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[i]);
-              context.curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy, controlPoint.z), context.selectedSegments[i]);
+              Property controlPoint = context.curve.getControlPoint(context.selectedSegments[i]);
+              context.curve.setPoint(new Property(controlPoint.getX() + dx, controlPoint.getY() + dy, controlPoint.getT()), context.selectedSegments[i]);
             }
           }else if(context.selectedSegments.length == 1){
 
@@ -144,8 +143,8 @@ class EditingState extends State {
                 tdy = dy;
               }
 
-              PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[0] + i);
-              context.curve.setPoint( new PVector(controlPoint.x + tdx, controlPoint.y + tdy, controlPoint.z) , context.selectedSegments[0] + i);
+              Property controlPoint = context.curve.getControlPoint(context.selectedSegments[0] + i);
+              context.curve.setPoint( new Property(controlPoint.getX() + tdx, controlPoint.getY() + tdy, controlPoint.getT()) , context.selectedSegments[0] + i);
             }
 
           }
@@ -153,13 +152,13 @@ class EditingState extends State {
     }
 
     public void keyPressed(){
-      if(context.selectedSegments.length != 0){
-        for (int i = context.selectedSegments.length - 1; i>=0; i--){
-          context.curve.removeElement(context.selectedSegments[i]);
-        }
+      // if(context.selectedSegments.length != 0){
+      //   for (int i = context.selectedSegments.length - 1; i>=0; i--){
+      //     context.curve.removeElement(context.selectedSegments[i]);
+      //   }
 
-        context.diselect();  
-      }
+      //   context.diselect();  
+      // }
     }
 
     public void draw()

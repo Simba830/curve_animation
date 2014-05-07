@@ -2,7 +2,7 @@
 // multidimensional point
 class Property {
   
-  ArrayList<Float> prop = new ArrayList<Float>();
+  private ArrayList<Float> prop = new ArrayList<Float>();
   
   // An empty property
   Property() {
@@ -116,6 +116,18 @@ class Property {
 
   float dist(Property operand){
     return (operand.sub(this)).mag();
+  }
+
+  float getX(){
+    return this.get(0);
+  }
+
+  float getY(){
+    return this.get(1);
+  }
+
+  float getT(){
+    return this.get(2);
   }
 
 

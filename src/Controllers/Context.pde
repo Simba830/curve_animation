@@ -1,18 +1,18 @@
 class Context{
-	PVector mouse;
-	PVector pMouse;
-	int mouseButton;
-	int keyCode;
-	char key;
-	CurveCat curve;
-	PVector mouseInit;
-	PVector mouseFinal;
-	int[] selectedSegments;
-	int mouseCount;
-	boolean playing;
-	ArrayList<SceneElement> sceneElements;
-	SceneElement selectedElement;
-	float time;
+	private PVector mouse;
+	private PVector pMouse;
+	private int mouseButton;
+	private int keyCode;
+	private char key;
+	private CurveCat curve;
+	private PVector mouseInit;
+	private PVector mouseFinal;
+	private int[] selectedSegments;
+	private int mouseCount;
+	private boolean playing;
+	private ArrayList<SceneElement> sceneElements;
+	private SceneElement selectedElement;
+	private float time;
 
 	Context(){
 		selectedSegments = new int[0];
@@ -32,7 +32,6 @@ class Context{
 		this.keyCode = keyCode;
 		this.key = key;
 		this.mouseButton = _mouseButton;
-		
 	}
 
 	void setMouseCount(int _mouseCount){
@@ -41,13 +40,13 @@ class Context{
 
 
 	void print(){
-		println("Context[");
-		println("this.mouse: "+this.mouse+",");
-		println("this.pMouse: "+this.pMouse+",");
-		println("this.keyCode: "+this.keyCode+",");
-		println("this.key: "+this.key+",");
+		console.log("Context[");
+		console.log("this.mouse: "+this.mouse+",");
+		console.log("this.pMouse: "+this.pMouse+",");
+		console.log("this.keyCode: "+this.keyCode+",");
+		console.log("this.key: "+this.key+",");
 		Utils.print_r(selectedSegments);
-		println("elements"+sceneElements);
+		console.log("elements"+sceneElements);
 	}
 
 	void diselect(){
@@ -78,7 +77,7 @@ class Context{
 			return;
 		}
 
-		PVector p;
+		Property p;
 
 		for (SceneElement o : sceneElements) {
 			o.pos.clear();
@@ -86,7 +85,7 @@ class Context{
 			for (int i = 0; i< o.curve.getNumberControlPoints(); i++){
 				p = o.curve.getControlPoint(i);
 
-				o.pos.set(p.z, p);
+				o.pos.set(p.getT(), new PVector(p.getX(), p.getY()));
 			}
 		}
 
@@ -171,6 +170,7 @@ class Context{
 		this.mouseInit = mouseInit;
 		this.mouseFinal = mouseFinal;
 	}
+	
 	PVector getpMouse()
 	{
 		return this.pMouse;

@@ -140,20 +140,20 @@ void update(){
 
 
 class Context{
-	PVector mouse;
-	PVector pMouse;
-	int mouseButton;
-	int keyCode;
-	char key;
-	CurveCat curve;
-	PVector mouseInit;
-	PVector mouseFinal;
-	int[] selectedSegments;
-	int mouseCount;
-	boolean playing;
-	ArrayList<SceneElement> sceneElements;
-	SceneElement selectedElement;
-	float time;
+	private PVector mouse;
+	private PVector pMouse;
+	private int mouseButton;
+	private int keyCode;
+	private char key;
+	private CurveCat curve;
+	private PVector mouseInit;
+	private PVector mouseFinal;
+	private int[] selectedSegments;
+	private int mouseCount;
+	private boolean playing;
+	private ArrayList<SceneElement> sceneElements;
+	private SceneElement selectedElement;
+	private float time;
 
 	Context(){
 		selectedSegments = new int[0];
@@ -173,7 +173,6 @@ class Context{
 		this.keyCode = keyCode;
 		this.key = key;
 		this.mouseButton = _mouseButton;
-		
 	}
 
 	void setMouseCount(int _mouseCount){
@@ -182,13 +181,13 @@ class Context{
 
 
 	void print(){
-		println("Context[");
-		println("this.mouse: "+this.mouse+",");
-		println("this.pMouse: "+this.pMouse+",");
-		println("this.keyCode: "+this.keyCode+",");
-		println("this.key: "+this.key+",");
+		console.log("Context[");
+		console.log("this.mouse: "+this.mouse+",");
+		console.log("this.pMouse: "+this.pMouse+",");
+		console.log("this.keyCode: "+this.keyCode+",");
+		console.log("this.key: "+this.key+",");
 		Utils.print_r(selectedSegments);
-		println("elements"+sceneElements);
+		console.log("elements"+sceneElements);
 	}
 
 	void diselect(){
@@ -219,7 +218,7 @@ class Context{
 			return;
 		}
 
-		PVector p;
+		Property p;
 
 		for (SceneElement o : sceneElements) {
 			o.pos.clear();
@@ -227,7 +226,7 @@ class Context{
 			for (int i = 0; i< o.curve.getNumberControlPoints(); i++){
 				p = o.curve.getControlPoint(i);
 
-				o.pos.set(p.z, p);
+				o.pos.set(p.getT(), new PVector(p.getX(), p.getY()));
 			}
 		}
 
@@ -312,6 +311,7 @@ class Context{
 		this.mouseInit = mouseInit;
 		this.mouseFinal = mouseFinal;
 	}
+	
 	PVector getpMouse()
 	{
 		return this.pMouse;
@@ -579,10 +579,8 @@ class CurveCat
 
   Segment getSegment(ArrayList<Property> pAux, int i)
   { 
-         //console.log(i);
          Property a = i >= 1 ? pAux.get(i-1) : pAux.get(0);
          Property b = pAux.get(i);
-         //console.log(b);
          Property c = pAux.get(i+1);
          Property d = i+2 < pAux.size() ? pAux.get(i+2) : pAux.get(i+1);
          return new Segment(a,b,c,d);
@@ -598,7 +596,6 @@ class CurveCat
     float maxDistance = 0, distance = 0;
     int index = 0;
     int end = pList.size();
-    console.log(end);
     ArrayList<Property> result;
 
     for (int i = 2; i <= end - 1; ++i) {
@@ -740,25 +737,25 @@ class CurveCat
       // // Pega a lista de indices essenciais e depois cria um vetor com esse indices.
       // for (int i = 0; i < essentialsIndex.size();i++)
       //   essentials.add(controlPoints.get(essentialsIndex.get(i)));
-      ArrayList<Property> essentials = DouglasPeuckerReducing(controlPoints,1);
+      //ArrayList<Property> essentials = DouglasPeuckerReducing(controlPoints,1);
       
       // Pega o tempo final
       int t1Douglas = millis();
 
       int totalTimeDouglas = t1Douglas - t0;
       // Exibe o tempo total gasto em Douglas Peucker
-      println("Tempo de processamento Douglas Peucker: "+totalTimeDouglas+" ms");
+      // console.log("Tempo de processamento Douglas Peucker: "+totalTimeDouglas+" ms");
 
       // Array que vai conter os vetores a serem testados
       ArrayList<Property> testableControlPoints = (ArrayList<Property>) controlPoints.clone();
 
       t0 = millis();
       // Removendo os pontos essenciais dos testáveis
-      for (int i = 0; i < essentials.size(); ++i) {
-        testableControlPoints.remove(essentials.get(i));
-      }
+      // for (int i = 0; i < essentials.size(); ++i) {
+      //   testableControlPoints.remove(essentials.get(i));
+      // }
       
-      println("essentials.size(): "+essentials.size());
+      // console.log("essentials.size(): "+essentials.size());
       // Adiciona os essenciais no final da lista de testáveis em ordem de prioridade do menos importante pro mais importante.
       /*for (int i = essentials.size(); i >= 0; --i)
       {
@@ -766,7 +763,7 @@ class CurveCat
       }*/
 
       // Percorre os testáveis removendo e verificando com a tolerância.
-      for(int i = 0; i < testableControlPoints.size() - 1; i++){
+      for(int i = 1; i < testableControlPoints.size() - 1; i++){
 
          pAux = new ArrayList<Property>(controlPoints.size());
 
@@ -778,8 +775,6 @@ class CurveCat
 
          //console.log(index);
          segAux = getSegment(pAux,index-1);
-         console.log(segAux);
-         console.log(i);
          remove = true;
          
          for (int j=0; j<=numberDivisions; j++) 
@@ -820,7 +815,7 @@ class CurveCat
 
       // Calculating the time of processing of the decime
       int totalTimeDecime = millis() - t0;
-      println("Tempo de processamento do decimeCurve: "+totalTimeDecime+" ms");
+      console.log("Tempo de processamento do decimeCurve: "+totalTimeDecime+" ms");
       this.decimable = wasDecimed;
   }
 
@@ -880,7 +875,7 @@ class CurveCat
     try {
       controlPoints.set(index,q); 
     } catch (Exception e) {
-        println("e.toString(): "+e.toString());
+        console.log("e.toString(): "+e.toString());
         print("Erro ao setar ponto de controle");
     }
   }
@@ -962,7 +957,7 @@ class CurveCat
         float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
 
         // Calcula distancia entre o vetor q e o x e y
-        float distance = dist(x, y, q.get(0), q.get(1));
+        float distance = dist(x, y, q.x, q.y);
 
         // Se for o primeiro coloca como melhor distancia
         if (j == 0 || distance < bestSegmentDistance) {
@@ -991,7 +986,7 @@ class CurveCat
 
   int[] getControlPointsBetween(Property init, Property pFinal){
     Property aux;
-    println("getControlPointsBetween()");
+    console.log("getControlPointsBetween()");
     ArrayList<Integer> result = new ArrayList<Integer>();
     for (int i = 0; i<controlPoints.size() ; i++){
       Property controlPoint = controlPoints.get(i);
@@ -1143,7 +1138,7 @@ class CurveCat
       for (int i = 0; i < getNumberControlPoints(); i++) 
       {
         ellipse (controlPoints.get(i).get(0), controlPoints.get(i).get(1), 7, 7);
-        text("t: "+controlPoints.get(i).z, controlPoints.get(i).get(0) + 10, controlPoints.get(i).get(1) - 10);
+        text("t: "+controlPoints.get(i).get(2), controlPoints.get(i).get(0) + 10, controlPoints.get(i).get(1) - 10);
       } 
       fill(255);
     }
@@ -1180,20 +1175,6 @@ class CurveCat
 }
 
 
-class Element{
-	PVector position;
-	CurveCat curve;
-
-	Element(PVector _position){
-		position = _position;
-	}
-
-	void drag(float dx, float dy)
-	{
-		position.x += dx;
-		position.y += dy;
-	}
-}
 class SceneElement
 {
 	String name;
@@ -1368,7 +1349,7 @@ class Interpolator {
 // multidimensional point
 class Property {
   
-  ArrayList<Float> prop = new ArrayList<Float>();
+  private ArrayList<Float> prop = new ArrayList<Float>();
   
   // An empty property
   Property() {
@@ -1482,6 +1463,18 @@ class Property {
 
   float dist(Property operand){
     return (operand.sub(this)).mag();
+  }
+
+  float getX(){
+    return this.get(0);
+  }
+
+  float getY(){
+    return this.get(1);
+  }
+
+  float getT(){
+    return this.get(2);
   }
 
 
@@ -1616,7 +1609,6 @@ class CircleState extends State {
     public void mousePressed() 
     {
         Circle c = new Circle(20,20);
-        println("Instanciando Circle...");
         console.log("Instanciando Circle...");
         context.addElement(c);  
         context.setSelectedElement(c);
@@ -1656,15 +1648,13 @@ class DrawningState extends State {
 
     DrawningState(Context _context){
       super(_context);
-
-      //context.curve.decimeAll();
-      // Adding a comentary
     }
 
     public void mousePressed() 
     {
       t = 0;
       ms = frameCount;
+
       // Então seleciona o mais próximo
       int selectedSegment = context.curve.findControlPoint(context.mouse);
       // Verifica se o local clicado é proximo do final da curva;
@@ -1672,17 +1662,17 @@ class DrawningState extends State {
       else { canSketch = false; }
         
       if (canSketch){
-        this.context.curve.insertPoint(new Property(this.context.mouse.x, this.context.mouse.y));
+        this.context.curve.insertPoint(new Property(this.context.mouse.x, this.context.mouse.y, 0));
       }
     }
     
     public void mouseReleased(PVector mouse) 
     {
-        super.mouseReleased();
+        // super.mouseReleased();
     	  // Retorna o estado de poder desenhar para FALSE
         //canSketch = false;
 
-        context.refreshInterpolator();
+        // context.refreshInterpolator();
     }
     public void mouseDragged()
     {	
@@ -1694,8 +1684,8 @@ class DrawningState extends State {
       t = t + elapsed;
 
       if (canSketch){
-        context.mouse.add(new PVector(0,0,t));
-  		  context.curve.insertPoint( new Property(context.mouse.x, context.mouse.y, context.mouse.z), context.curve.getNumberControlPoints());
+        Property myPoint = new Property(context.mouse.x, context.mouse.y, t);
+  		  context.curve.insertPoint( myPoint, context.curve.getNumberControlPoints());
       }
     }
 
@@ -1807,7 +1797,6 @@ class EditingState extends State {
         }
 
         context.refreshInterpolator();
-        
     }
 
     public void mouseDragged()
@@ -1825,8 +1814,8 @@ class EditingState extends State {
 
             // Soma aos elementos selecionados
             for (int i = 0; i<context.selectedSegments.length; i++){
-              PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[i]);
-              context.curve.setPoint(new PVector(controlPoint.x + dx, controlPoint.y + dy, controlPoint.z), context.selectedSegments[i]);
+              Property controlPoint = context.curve.getControlPoint(context.selectedSegments[i]);
+              context.curve.setPoint(new Property(controlPoint.getX() + dx, controlPoint.getY() + dy, controlPoint.getT()), context.selectedSegments[i]);
             }
           }else if(context.selectedSegments.length == 1){
 
@@ -1855,8 +1844,8 @@ class EditingState extends State {
                 tdy = dy;
               }
 
-              PVector controlPoint = context.curve.getControlPoint(context.selectedSegments[0] + i);
-              context.curve.setPoint( new PVector(controlPoint.x + tdx, controlPoint.y + tdy, controlPoint.z) , context.selectedSegments[0] + i);
+              Property controlPoint = context.curve.getControlPoint(context.selectedSegments[0] + i);
+              context.curve.setPoint( new Property(controlPoint.getX() + tdx, controlPoint.getY() + tdy, controlPoint.getT()) , context.selectedSegments[0] + i);
             }
 
           }
@@ -1864,13 +1853,13 @@ class EditingState extends State {
     }
 
     public void keyPressed(){
-      if(context.selectedSegments.length != 0){
-        for (int i = context.selectedSegments.length - 1; i>=0; i--){
-          context.curve.removeElement(context.selectedSegments[i]);
-        }
+      // if(context.selectedSegments.length != 0){
+      //   for (int i = context.selectedSegments.length - 1; i>=0; i--){
+      //     context.curve.removeElement(context.selectedSegments[i]);
+      //   }
 
-        context.diselect();  
-      }
+      //   context.diselect();  
+      // }
     }
 
     public void draw()
@@ -2124,12 +2113,13 @@ class State
 	
 class TimeEditingState extends State {
 
-    float timeSpacing = 2;
+    float timeSpacing = 1;
     SceneElement element;
     
     TimeEditingState(Context context){
       super(context);
       element = context.getSelectedElement();
+      context.refreshInterpolator();
     }
 
     public void mousePressed() 
@@ -2155,12 +2145,10 @@ class TimeEditingState extends State {
     {
       for (int i = 0; i < element.lastTime(); ++i) {
         if(i % timeSpacing == 0){
-          println("test");
           PVector pos = element.pos.get(i);
-          println("pos: "+pos);
           fill(mainColor);
           stroke(mainColor);
-          //ellipse(pos.x, pos.y, 10, 10);
+          ellipse(pos.x, pos.y, 10, 10);
         }
       }
     }
