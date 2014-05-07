@@ -7,7 +7,7 @@ class DrawningState extends State {
     DrawningState(Context _context){
       super(_context);
 
-      context.curve.decimeAll();
+      //context.curve.decimeAll();
       // Adding a comentary
     }
 

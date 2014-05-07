@@ -577,12 +577,14 @@ class CurveCat
       controlPoints.remove(index);
   }
 
-  Segment getSegment(ArrayList<PVector> pAux, int i)
+  Segment getSegment(ArrayList<Property> pAux, int i)
   { 
-         PVector a = i >= 1 ? pAux.get(i-1) : pAux.get(0);
-         PVector b = pAux.get(i);
-         PVector c = pAux.get(i+1);
-         PVector d = i+2 < pAux.size() ? pAux.get(i+2) : pAux.get(i+1);
+         //console.log(i);
+         Property a = i >= 1 ? pAux.get(i-1) : pAux.get(0);
+         Property b = pAux.get(i);
+         //console.log(b);
+         Property c = pAux.get(i+1);
+         Property d = i+2 < pAux.size() ? pAux.get(i+2) : pAux.get(i+1);
          return new Segment(a,b,c,d);
   }
 
@@ -591,50 +593,16 @@ class CurveCat
          return getSegment(controlPoints,i);
   }
 
- // Método que retorna os principais controlPoints que são essenciais para a curva
- // Passamos como paramêtros os indices do vetor, e o vetor.
-  ArrayList<int> DouglasPeuckerReducingInt(ArrayList<Property> cpoints,int index, int end, float epsilon){
-    float maxDistance = 0, distance = 0;
-    ArrayList<int> result;
-
-    for (int i = 2; i < end - 1; ++i) {
-      distance = shortestDistanceToSegment(cpoints.get(i), cpoints.get(1), cpoints.get(end - 1));
-      if( distance > maxDistance){
-        maxDistance = distance;
-        index = i;
-      }
-    }
-
-    println("maxDistance: "+maxDistance);
-    println("epsilon: "+epsilon);
-    if(maxDistance > epsilon){
-      ArrayList<int> results1, results2;
-
-      // Subdivide os calculos e passa apenas os indices, poupando trabalho para criar vetor auxiliar.
-      results1 = DouglasPeuckerReducingInt(cpoints,index,end-1, epsilon);
-
-      results2 = DouglasPeuckerReducingInt(cpoints,1,index, epsilon);
-
-      // Concatenando dois arrays, por que tinha que ser tão difícil ? Custava retornar o array novo ?
-      results1.addAll(results2);
-      result = (ArrayList<int>) results1.clone();
-    }
-    else{
-      result = cpoints;
-    }
-
-    return result;
-  }
-
   // Método que retorna os principais controlPoints que são essenciais para a curva
-  ArrayList<Property> DouglasPeuckerReducing(ArrayList<Property> cpoints, float epsilon){
+  ArrayList<Property> DouglasPeuckerReducing(ArrayList<Property> pList, float epsilon){
     float maxDistance = 0, distance = 0;
     int index = 0;
-    int end = cpoints.size();
+    int end = pList.size();
+    console.log(end);
     ArrayList<Property> result;
 
-    for (int i = 2; i < end - 1; ++i) {
-      distance = shortestDistanceToSegment(cpoints.get(i), cpoints.get(0), cpoints.get(end - 1));
+    for (int i = 2; i <= end - 1; ++i) {
+      distance = shortestDistanceToSegment(pList.get(i), pList.get(0), pList.get(end - 1));
       if( distance > maxDistance){
         maxDistance = distance;
         index = i;
@@ -643,18 +611,18 @@ class CurveCat
     if(maxDistance > epsilon){
       ArrayList<Property> results1, results2;
 
-      // Fiz isso aqui porque não posso modificar o cpoints
+      // Fiz isso aqui porque não posso modificar o pList
       ArrayList<Property> tmp = new ArrayList<Property>();
-      for (int i = index; i < end - 1; ++i) {
-          tmp.add(cpoints.get(i));
+      for (int i = 1; i <= index; ++i) {
+          tmp.add(pList.get(i));
       }
       results1 = DouglasPeuckerReducing(tmp, epsilon);
 
-      // Fiz isso aqui porque não posso modificar o cpoints
+      // Fiz isso aqui porque não posso modificar o pList
       tmp = new ArrayList<Property>();
-      console.log(tmp);
-      for (int i = 1; i < index; ++i) {
-          tmp.add(cpoints.get(i));
+      //console.log(tmp);
+      for (int i = index; i <= end; ++i) {
+          tmp.add(pList.get(i));
       }
       results2 = DouglasPeuckerReducing(tmp, epsilon);
 
@@ -662,11 +630,61 @@ class CurveCat
       results1.addAll(results2);
       result = (ArrayList<Property>) results1.clone();
     }else{
-      result = cpoints;
+      //console.log(pList.toArray());
+      result = pList;
     }
 
     return result;
   }
+
+    // Método que retorna os principais controlPoints que são essenciais para a curva
+  ArrayList<Property> DouglasPeuckerReducing(ArrayList<Property> pList, float epsilon){
+    Property firstPoint = pList.get(0);
+    Property lastPoint = pList.get(pList.size()-1);
+    ArrayList<Property> result;
+    
+    if (pList.size() < 3)
+        return pList;
+    
+    int index = -1;
+    float maxDistance = 0, distance = 0;
+    
+    for (int i = 1; i <= pList.size() - 1; ++i) {
+      distance = shortestDistanceToSegment(pList.get(i), firstPoint, lastPoint);
+      if( distance > maxDistance){
+        maxDistance = distance;
+        index = i;
+      }
+    }
+    if(maxDistance > epsilon){
+      ArrayList<Property> results1, results2;
+
+      // Fiz isso aqui porque não posso modificar o pList
+      ArrayList<Property> tmp = new ArrayList<Property>();
+      for (int i = 1; i <= index; ++i) {
+          tmp.add(pList.get(i));
+      }
+      results1 = DouglasPeuckerReducing(tmp, epsilon);
+
+      // Fiz isso aqui porque não posso modificar o pList
+      tmp = new ArrayList<Property>();
+      //console.log(tmp);
+      for (int i = index; i <= end; ++i) {
+          tmp.add(pList.get(i));
+      }
+      results2 = DouglasPeuckerReducing(tmp, epsilon);
+
+      // Concatenando dois arrays, por que tinha que ser tão difícil ? Custava retornar o array novo ?
+      results1.addAll(results2);
+      result = (ArrayList<Property>) results1.clone();
+    }else{
+      //console.log(pList.toArray());
+      result = pList;
+    }
+
+    return result;
+  }
+
 
   // Método para percorrer um segmento de reta que começa em segBegin e terminar em segEnd vendo qual menor distancia para o vetor cpoint
   float shortestDistanceToSegment(Property cpoint, Property segBegin, Property segEnd){
@@ -722,7 +740,7 @@ class CurveCat
       // // Pega a lista de indices essenciais e depois cria um vetor com esse indices.
       // for (int i = 0; i < essentialsIndex.size();i++)
       //   essentials.add(controlPoints.get(essentialsIndex.get(i)));
-      ArrayList<Property> essentials = DouglasPeuckerReducing(controlPoints,100);
+      ArrayList<Property> essentials = DouglasPeuckerReducing(controlPoints,1);
       
       // Pega o tempo final
       int t1Douglas = millis();
@@ -742,21 +760,26 @@ class CurveCat
       
       println("essentials.size(): "+essentials.size());
       // Adiciona os essenciais no final da lista de testáveis em ordem de prioridade do menos importante pro mais importante.
-      for (int i = essentials.size(); i >= 0; --i)
+      /*for (int i = essentials.size(); i >= 0; --i)
       {
         testableControlPoints.add(essentials.get(i));
-      }
+      }*/
 
       // Percorre os testáveis removendo e verificando com a tolerância.
       for(int i = 0; i < testableControlPoints.size() - 1; i++){
 
-         pAux = new ArrayList<PVector>(controlPoints.size());
-         pAux = (ArrayList<PVector>) controlPoints.clone();
+         pAux = new ArrayList<Property>(controlPoints.size());
+
+         pAux = (ArrayList<Property>) controlPoints.clone();
 
          // Pega o vetor e procura qual o indice dele nos controlPoints
          int index = controlPoints.indexOf( testableControlPoints.get(i) );
          pAux.remove(index);
+
+         //console.log(index);
          segAux = getSegment(pAux,index-1);
+         console.log(segAux);
+         console.log(i);
          remove = true;
          
          for (int j=0; j<=numberDivisions; j++) 
@@ -774,7 +797,6 @@ class CurveCat
                 tAux = t*2 - 1;
             }
             
-            println("segAux: "+typeof(segAux));
             float x1 = curvePoint(segAux.a.get(0), segAux.b.get(0), segAux.c.get(0), segAux.d.get(0), t);
             float y1 = curvePoint(segAux.a.get(1), segAux.b.get(1), segAux.c.get(1), segAux.d.get(1), t);
             PVector v1 = new PVector(x1,y1);
@@ -1635,7 +1657,7 @@ class DrawningState extends State {
     DrawningState(Context _context){
       super(_context);
 
-      context.curve.decimeAll();
+      //context.curve.decimeAll();
       // Adding a comentary
     }
 
