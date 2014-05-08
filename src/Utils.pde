@@ -1,4 +1,4 @@
-static class Utils{
+public static class Utils{
   
   static void printArrayPVector(PVector[] p)
   {

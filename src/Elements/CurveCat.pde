@@ -60,7 +60,7 @@ class CurveCat
   }
 
   // Método que retorna os principais controlPoints que são essenciais para a curva
-  ArrayList<Property> DouglasPeuckerReducing(ArrayList<Property> pList, float epsilon){
+  ArrayList<Property> DouglasPeuckerReducingOld(ArrayList<Property> pList, float epsilon){
     float maxDistance = 0, distance = 0;
     int index = 0;
     int end = pList.size();
@@ -108,7 +108,7 @@ class CurveCat
     Property firstPoint = pList.get(0);
     Property lastPoint = pList.get(pList.size()-1);
     ArrayList<Property> result;
-    
+    //console.log("Usando novo DouglasPeuckerReducing");
     if (pList.size() < 3)
         return pList;
     
@@ -116,7 +116,7 @@ class CurveCat
     float maxDistance = 0, distance = 0;
     
     for (int i = 1; i <= pList.size() - 1; ++i) {
-      distance = shortestDistanceToSegment(pList.get(i), firstPoint, lastPoint);
+      distance = findPerpendicularDistance(pList.get(i), firstPoint, lastPoint);
       if( distance > maxDistance){
         maxDistance = distance;
         index = i;
@@ -127,7 +127,7 @@ class CurveCat
 
       // Fiz isso aqui porque não posso modificar o pList
       ArrayList<Property> tmp = new ArrayList<Property>();
-      for (int i = 1; i <= index; ++i) {
+      for (int i = 1; i <= index+1; ++i) {
           tmp.add(pList.get(i));
       }
       results1 = DouglasPeuckerReducing(tmp, epsilon);
@@ -135,7 +135,7 @@ class CurveCat
       // Fiz isso aqui porque não posso modificar o pList
       tmp = new ArrayList<Property>();
       //console.log(tmp);
-      for (int i = index; i <= end; ++i) {
+      for (int i = index; i <= pList.size() -1 ; ++i) {
           tmp.add(pList.get(i));
       }
       results2 = DouglasPeuckerReducing(tmp, epsilon);
@@ -174,6 +174,22 @@ class CurveCat
     return distance;
   }
 
+  float findPerpendicularDistance(p, p1,p2) {
+    // if start and end point are on the same x the distance is the difference in X.
+    float result;
+    float slope;
+    float intercept;
+    if (p1.get(0) == p2.get(0)){
+        result=abs(p.get(0)-p1.get(0));
+    }else{
+        slope = (p2.get(1) - p1.get(1)) / (p2.get(0) - p1.get(0));
+        intercept = p1.get(1) - (slope * p1.get(0));
+        result = abs(slope * p.get(0) - p.get(1) + intercept) / sqrt(pow(slope, 2) + 1);
+    }
+    console.log(result);
+    return result;
+  }
+
 
   // Remove pontos de controle de uma curva criada pela lista p que possuam distancia menor que a tolerancia em relação aos pontos da nova curva.
   void decimeCurve(float tolerance)
@@ -206,8 +222,8 @@ class CurveCat
       // // Pega a lista de indices essenciais e depois cria um vetor com esse indices.
       // for (int i = 0; i < essentialsIndex.size();i++)
       //   essentials.add(controlPoints.get(essentialsIndex.get(i)));
-      ArrayList<Property> essentials = DouglasPeuckerReducing(controlPoints,1);
-      
+      ArrayList<Property> essentials = DouglasPeuckerReducing(controlPoints,5);
+      console.log(essentials.toArray());
       // Pega o tempo final
       int t1Douglas = millis();
 
