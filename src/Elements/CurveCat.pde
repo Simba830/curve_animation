@@ -183,7 +183,6 @@ class CurveCat
         intercept = p1.get(1) - (slope * p1.get(0));
         result = abs(slope * p.get(0) - p.get(1) + intercept) / sqrt(pow(slope, 2) + 1);
     }
-    console.log(result);
     return result;
   }
 
@@ -220,7 +219,6 @@ class CurveCat
       // for (int i = 0; i < essentialsIndex.size();i++)
       //   essentials.add(controlPoints.get(essentialsIndex.get(i)));
       ArrayList<Property> essentials = DouglasPeuckerReducing(controlPoints,5);
-      console.log(essentials.toArray());
       // Pega o tempo final
       int t1Douglas = millis();
 
@@ -468,7 +466,6 @@ class CurveCat
 
   int[] getControlPointsBetween(Property init, Property pFinal){
     Property aux;
-    console.log("getControlPointsBetween()");
     ArrayList<Integer> result = new ArrayList<Integer>();
     for (int i = 0; i<controlPoints.size() ; i++){
       Property controlPoint = controlPoints.get(i);

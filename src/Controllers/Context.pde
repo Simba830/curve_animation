@@ -38,17 +38,6 @@ class Context{
 		this.mouseCount = _mouseCount;
 	}
 
-
-	void print(){
-		console.log("Context[");
-		console.log("this.mouse: "+this.mouse+",");
-		console.log("this.pMouse: "+this.pMouse+",");
-		console.log("this.keyCode: "+this.keyCode+",");
-		console.log("this.key: "+this.key+",");
-		Utils.print_r(selectedSegments);
-		console.log("elements"+sceneElements);
-	}
-
 	void diselect(){
 		this.selectedSegments = new int[0];
 	}
@@ -94,6 +83,7 @@ class Context{
 
 	void stop(){
 		playing = false;
+		t = 0;
 	}
 
 	void addElement(SceneElement e)

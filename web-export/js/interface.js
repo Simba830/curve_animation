@@ -7,6 +7,10 @@ function init(){
 
 	$("#main-interface").css({ left: -$("#main-interface").outerWidth()});
 	$("#element-interface").css({ right: -$("#element-interface").outerWidth()});
+
+	$("#canvas").click(function(){
+
+	});
 }
 
 $(function(){

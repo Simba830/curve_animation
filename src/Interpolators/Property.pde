@@ -130,6 +130,10 @@ class Property {
     return this.get(2);
   }
 
+  void setT(float t){
+    this.set(2, t);
+  }
+
 
 };
 

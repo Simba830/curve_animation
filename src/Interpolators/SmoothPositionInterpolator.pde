@@ -40,6 +40,10 @@ class SmoothPositionInterpolator {
   PVector get (float t) {
     return toPVector (interp.get(t));
   }
+
+  Property getProperty(float t){
+    return interp.get(t);
+  }
   
   // Returns the estimated tangent (a unit vector) at point t
   PVector getTangent (float t) {

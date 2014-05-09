@@ -7,10 +7,9 @@ public class StateContext {
     PVector mouseInit;
     PVector mouseFinal;
 
-
-        /**
-         * Standard constructor
-         */
+    /**
+     * Standard constructor
+     */
     StateContext(Context _context) 
     {
         setState(new SelectState(_context));
@@ -37,6 +36,10 @@ public class StateContext {
                   myState = new DrawningState(this.context);
               break;  
 
+            case 'edit' :
+                  myState = new EditingState(this.context);
+              break; 
+
             case 'time' :
                   myState = new TimeEditingState(this.context);
               break;          
@@ -57,6 +60,10 @@ public class StateContext {
     public void setState(final State NEW_STATE) {
         myState = NEW_STATE;
     }
+
+    public State getState() {
+        return myState;
+    }
  
     /**
      * Mouse Actions Methods
@@ -64,29 +71,9 @@ public class StateContext {
      */
     void mousePressed()
     {
-        // Inicializa os ponteiros para o retangulo de seleção.
+        // // Inicializa os ponteiros para o retangulo de seleção.
         mouseInit.set(mouseX, mouseY);
         mouseFinal.set(mouseX, mouseY);
-        // Seleciona o segmento em questão se for o mouse LEFT
-        PVector closestPoint = new PVector();
-        PVector q = new PVector(context.mouse.x, context.mouse.y);
-        int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
-
-        //int closestControlPointIndex  = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
-        PVector closestControlPoint = context.curve.getControlPoint(selectedSegment);
-
-        float distance = q.dist(closestPoint);
-
-        if(distance < 10 && !(myState instanceof OverSketchState) && !(myState instanceof EditingState)){
-          myState = new EditingState(this.context);
-        }
-        
-        //console.log("Numero de Pontos de Controle:"+context.curve.getNumberControlPoints());
-        //console.log("Pontos Selecionados"+selectedSegment);
-        
-        if(selectedSegment == context.curve.getNumberControlPoints() - 1 && distance < 10){
-            myState = new DrawningState(this.context);
-        }
 
         myState.mousePressed();
     }
@@ -100,13 +87,11 @@ public class StateContext {
     }
     void mouseReleased()
     {
-        
         // Resets dragged rectangle
         mouseInit.set(0,0);
         mouseFinal.set(0,0);
         
         myState.mouseReleased();
-
     }
 
     void keyPressed(){
