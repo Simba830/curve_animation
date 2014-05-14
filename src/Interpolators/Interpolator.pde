@@ -16,6 +16,10 @@ class Interpolator {
     return time.size();
   }
 
+  float lastTime(){
+    return keyTime(nKeys()-1);
+  }
+
   // Return the time for keyframe i
   float keyTime(int i) {
     return time.get(i);

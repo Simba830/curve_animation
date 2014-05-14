@@ -115,7 +115,8 @@ class Property {
   }
 
   float dist(Property operand){
-    return (operand.sub(this)).mag();
+    Property result = operand.sub(this);
+    return result.mag();
   }
 
   float getX(){
@@ -132,6 +133,15 @@ class Property {
 
   void setT(float t){
     this.set(2, t);
+  }
+
+  public String toString(){
+    String s = "Property [";
+    for (int i = 0; i < this.size(); ++i) {
+      s += this.get(i)+", ";
+    }
+
+    return s;
   }
 
 

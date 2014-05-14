@@ -12,6 +12,24 @@ class SelectState extends State
                         return;
     		}
     	}
+
+      // Seleciona o segmento em questão se for o mouse LEFT
+      PVector closestPoint = new PVector();
+      PVector q = new PVector(context.mouse.x, context.mouse.y);
+      int selectedSegment = context.curve.findClosestPoint (context.curve.controlPoints, q, closestPoint);
+
+      //int closestControlPointIndex  = context.curve.findControlPoint(new PVector(context.mouse.x, context.mouse.y));
+      PVector closestControlPoint = context.curve.getControlPoint(selectedSegment);
+
+      float distance = q.dist(closestPoint);
+
+      if(distance < 10 && !(stateContext.getState() instanceof OverSketchState) && !(stateContext.getState() instanceof EditingState)){
+        stateContext.setStateName("edit");
+      }
+      
+      if(selectedSegment == context.curve.getNumberControlPoints() - 1 && distance < 10){
+          stateContext.setStateName("draw");
+      }
     }
     
     public void mouseReleased(PVector mouse) 

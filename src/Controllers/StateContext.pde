@@ -118,7 +118,6 @@ public class StateContext {
         background (255);
         noFill();
         
-        myState.draw();
 
         if(context.isPlayed()){
             context.refreshInterpolator();
@@ -127,7 +126,7 @@ public class StateContext {
             if(lastTime == 0){
                 context.stop();
             }else{
-                float t = frameCount%int(lastTime);
+                float t = (frameCount/3) % int(lastTime);
                 context.draw(t);
             }
 
@@ -135,5 +134,7 @@ public class StateContext {
         }else{
             context.draw(0.0);
         }
+        
+        myState.draw();
     }
 }

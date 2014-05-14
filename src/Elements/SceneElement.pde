@@ -1,9 +1,9 @@
 class SceneElement
 {
-	String name;
-	SmoothPositionInterpolator pos;
-	color c, curveColor;
-	CurveCat curve;
+	private String name;
+	private SmoothPositionInterpolator pos;
+	private color c, curveColor;
+	private CurveCat curve;
 
 	SceneElement(PVector position)
 	{
@@ -36,4 +36,9 @@ class SceneElement
 	boolean isOver(PVector mouse){
 		return true;
 	}
+
+	CurveCat getCurve(){
+		return this.curve;
+	}
+
 }

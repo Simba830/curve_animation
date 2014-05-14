@@ -104,8 +104,9 @@ class Context{
 				o.c = color(0,0,0);
 				o.curveColor = color(200,200,200);
 			}
-			o.drawCurve();
+
 			o.draw(t);
+			o.drawCurve();
 		}
 
 		fill(0);
@@ -164,5 +165,9 @@ class Context{
 	PVector getpMouse()
 	{
 		return this.pMouse;
+	}
+
+	PVector getMouse(){
+		return this.mouse;
 	}
 }

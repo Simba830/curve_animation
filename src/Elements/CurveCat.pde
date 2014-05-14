@@ -20,6 +20,10 @@ class CurveCat
   // Min Ditance wich can be in the curve
   private float minDistance = 5;
   private color strokeColor = color(0);
+  private float controlPointAlpha = 200;
+
+  // Interpolator
+  private SmoothInterpolator interpolator;
 
   CurveCat() 
   {
@@ -28,6 +32,7 @@ class CurveCat
     tolerance = 10;
 
     history = new ArrayList<ArrayList<Property>>();
+    interpolator = new SmoothInterpolator();
   }
 
   void clear()
@@ -361,12 +366,16 @@ class CurveCat
   }
 
   // Retorna as coordenadas (X,Y) para de uma lista de PVectors p dado o index.
-  PVector getControlPoint(int index)
+  Property getControlPoint(int index)
   {
     if (controlPoints.size() > index && index >-1)
       return controlPoints.get(index);
     else
-      return new PVector(0,0);
+      return new Property(0,0);
+  }
+
+  Property getPropertyByLocationAndTime(float x, float y, float t){
+    return getControlPoint(findControlPoint(x,y));
   }
   
   // Retorna o indice do ponto de controle mais próximo de q. Caso
@@ -374,11 +383,12 @@ class CurveCat
   // retorna -1
   int findControlPoint(PVector q)
   {
+    PVector p = new Property(q.x, q.y);
     int op=-1;
     float bestDist = 100000;
     for (int i = 0; i < getNumberControlPoints(); i++) 
     {
-      float d = controlPoints.get(i).dist(q);
+      float d = controlPoints.get(i).dist(p);
       if (d < minDistance && d < bestDist) 
       { 
         bestDist = d;
@@ -612,8 +622,8 @@ class CurveCat
   void drawControlPoints()
   {
     if ( !(getNumberControlPoints()<4) ){
-      fill(secondaryColor);
-      stroke(secondaryColor);
+      fill(secondaryColor, controlPointAlpha);
+      stroke(secondaryColor, controlPointAlpha);
       for (int i = 0; i < getNumberControlPoints(); i++) 
       {
         ellipse (controlPoints.get(i).get(0), controlPoints.get(i).get(1), 7, 7);
@@ -651,5 +661,83 @@ class CurveCat
     curve += "}";
     return curve;
   }
+
+  void refreshInterpolator(){
+      Property p;
+      for (int i = 0; i < controlPoints.size(); ++i) {
+        p = controlPoints.get(i);
+        this.interpolator.set(p.getT(), p);
+      }
+  }
+
+  void reAmostragemPorTempo(float timeSpacing){
+    ArrayList<Property> aux = new ArrayList<Property>();
+    this.refreshInterpolator();
+    for (int i = 0; i < interpolator.lastTime(); ++i) {
+      if(i % timeSpacing == 0){
+        aux.add(interpolator.get(i));
+      }
+    }
+
+    this.controlPoints = aux;
+    saveCurve();
+  }
+
+  Property getPropertyByDif(int index, float dx){
+    if( dx == 0 )
+      throw new Exception("Variantion equals 0");
+
+    float correction = 0;
+    if(dx < 0){
+      Property current = getControlPoint(index - 1);
+      Segment seg = getSegment(index - 1);
+      float curveLength = 0, totalCurveLength = 0;
+      for (int j=0; j<=numberDivisions; j++) 
+      {
+          float t = (float)(j) / (float)(numberDivisions);
+          float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+          float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+          t = (float)(j+1) / (float)(numberDivisions);
+          float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+          float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+          float distance = dist(x, y, x2, y2);
+          totalCurveLength += distance;
+      }
+
+      for (int j=0; j<=numberDivisions; j++) 
+      {
+          float t = (float)(j) / (float)(numberDivisions);
+          float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+          float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+          t = (float)(j+1) / (float)(numberDivisions);
+          float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+          float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+          float distance = dist(x, y, x2, y2);
+          curveLength += distance;
+          if(totalCurveLength - curveLength <= abs(dx)){
+            return new Property(x2, y2, current.getT() + t);
+          }
+      }
+    }else{
+      Property current = getControlPoint(index);
+      Segment seg = getSegment(index);
+      float curveLength = 0;
+      for (int j=0; j<=numberDivisions; j++) 
+        {
+          float t = (float)(j) / (float)(numberDivisions);
+          float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+          float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+          t = (float)(j+1) / (float)(numberDivisions);
+          float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+          float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+          float distance = dist(x, y, x2, y2);
+          curveLength += distance;
+          if(curveLength >= dx){
+            return new Property(x2, y2, current.getT() + t);
+          }
+        }
+    }
+  }
+
 }
 
