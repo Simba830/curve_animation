@@ -98,7 +98,7 @@ class Context{
 
 		for (SceneElement o : sceneElements) {
 			if(o == selectedElement){
-				o.c = color(255,0,0);
+				o.c = #428bca;
 				o.curveColor = color(0,0,0);
 			}else{
 				o.c = color(0,0,0);

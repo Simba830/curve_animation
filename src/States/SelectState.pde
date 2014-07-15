@@ -39,8 +39,17 @@ class SelectState extends State
     
     public void mouseDragged()
     {
-        //stateContext.setState(new DrawningState(context));
-        //stateContext.mouseDragged();
+      // Pega a variação de x e de y
+      float dx = context.mouse.x - context.pMouse.x;
+      float dy = context.mouse.y - context.pMouse.y;
+
+      println("dx: "+dx);
+      println("dy: "+dy);
+
+      SceneElement selected = context.getSelectedElement();
+      PVector ini = selected.getInitialPosition();
+
+      selected.setInitialPosition( new PVector(ini.x + dx, ini.y + dy) );
     }
 
     public void keyPressed(){

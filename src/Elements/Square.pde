@@ -1,12 +1,12 @@
-class Circle extends SceneElement{
+class Square extends SceneElement{
 
 	float width, height;
 	boolean active;
 
-	Circle(float _width, float _height)
+	Square(float _width, float _height)
 	{
 		super(context.mouse);
-		this.name = "Circle";
+		this.name = "Square";
 		this.width = _width;
 		this.height = _height;
 		active = true;
@@ -29,9 +29,14 @@ class Circle extends SceneElement{
 			position = pos.get(t);
 		}
 
+		rectMode(CENTER);
 		fill(c);
 		stroke(0);
-		ellipse(position.x, position.y, this.width, this.height);
+		rect(position.x, position.y, this.width, this.height);
+
+		fill(0);
+		stroke(0);
+		point(position.x, position.y);
 	}
 
 	void setWidth(float x){

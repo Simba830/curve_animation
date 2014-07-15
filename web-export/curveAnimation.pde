@@ -239,7 +239,7 @@ class Context{
 
 		for (SceneElement o : sceneElements) {
 			if(o == selectedElement){
-				o.c = color(255,0,0);
+				o.c = #428bca;
 				o.curveColor = color(0,0,0);
 			}else{
 				o.c = color(0,0,0);
@@ -343,6 +343,10 @@ public class StateContext {
                 myState = new CircleState(this.context);
             break;   
 
+            case 'square' :
+                myState = new SquareState(this.context);
+            break;
+
             case 'select' :
                  myState = new SelectState(this.context);
              break;   
@@ -356,7 +360,7 @@ public class StateContext {
               break; 
 
             case 'time' :
-                  myState = new TimeEditingState(this.context);
+                  myState = new SimpleTimeEditingState(this.context);
               break;          
 
             default :
@@ -432,17 +436,14 @@ public class StateContext {
     {
         background (255);
         noFill();
-        
 
         if(context.isPlayed()){
-            context.refreshInterpolator();
             float lastTime = context.lastTime();
 
             if(lastTime == 0){
                 context.stop();
             }else{
-                float t = (frameCount/3) % int(lastTime);
-                context.draw(t);
+                context.draw((frameCount*0.5) % int(lastTime));
             }
 
 
@@ -453,7 +454,6 @@ public class StateContext {
         myState.draw();
     }
 }
-
 class Circle extends SceneElement{
 
 	float width, height;
@@ -509,7 +509,7 @@ class Circle extends SceneElement{
 	boolean isOver(PVector mouse){
                 PVector position = pos.get(0);
                 float radious = this.width;
-		return (mouse.x - position.x)*(mouse.x - position.x) + (mouse.y - position.y)*(mouse.y - position.y) <= radious;
+		return (mouse.x - position.x)*(mouse.x - position.x) + (mouse.y - position.y)*(mouse.y - position.y) <= radious*radious;
 	}
 }
 
@@ -1012,6 +1012,14 @@ class CurveCat
     return r;
   }
 
+  ArrayList<Property> getControlPointsClone(){
+    return this.controlPoints.clone();
+  }
+
+  ArrayList<Property> getControlPoints(){
+    return this.controlPoints;
+  }
+
   /** FIM DOS MÉTODOS DE EDIÇÃO E CRIAÇÃO **/
 
   /** MÉTODOS PARA PARAMETRIZAÇÃO DE UMA CURVA **/
@@ -1123,13 +1131,6 @@ class CurveCat
         curveVertex(seg.c.get(0), seg.c.get(1));
         curveVertex(seg.d.get(0), seg.d.get(1));
       endShape();
-
-      beginShape();
-        curveVertex(seg.a.get(0), seg.a.get(1));
-        curveVertex(seg.b.get(0), seg.b.get(1));
-        curveVertex(seg.c.get(0), seg.c.get(1));
-        curveVertex(seg.d.get(0), seg.d.get(1));
-      endShape();
     }
   }
 
@@ -1185,7 +1186,7 @@ class CurveCat
       }
   }
 
-  void reAmostragemPorTempo(float timeSpacing){
+  ArrayList<Property> reAmostragemPorTempo(float timeSpacing){
     ArrayList<Property> aux = new ArrayList<Property>();
     this.refreshInterpolator();
     for (int i = 0; i < interpolator.lastTime(); ++i) {
@@ -1194,63 +1195,95 @@ class CurveCat
       }
     }
 
-    this.controlPoints = aux;
-    saveCurve();
+    aux.add(interpolator.get(interpolator.lastTime));
+
+    return aux;
   }
 
   Property getPropertyByDif(int index, float dx){
     if( dx == 0 )
-      throw new Exception("Variantion equals 0");
+      return;
 
     float correction = 0;
+    boolean found = false;
+    int indexDiference = 0;
+
+    // Se é negativa
     if(dx < 0){
-      Property current = getControlPoint(index - 1);
-      Segment seg = getSegment(index - 1);
-      float curveLength = 0, totalCurveLength = 0;
-      for (int j=0; j<=numberDivisions; j++) 
-      {
-          float t = (float)(j) / (float)(numberDivisions);
-          float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-          float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-          t = (float)(j+1) / (float)(numberDivisions);
-          float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-          float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-          float distance = dist(x, y, x2, y2);
-          totalCurveLength += distance;
+      indexDiference = 1; 
+      while(!found){
+
+        if(index - indexDiference <= 0 )
+          return getControlPoint(0);
+
+        Property current = getControlPoint(index - indexDiference);
+        Segment seg = getSegment(index - indexDiference);
+        float curveLength = 0, totalCurveLength = 0;
+
+        // Calcula o curveLength total do segmento
+        for (int j=0; j<=numberDivisions; j++) 
+        {
+            float t = (float)(j) / (float)(numberDivisions);
+            float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+            float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+            t = (float)(j+1) / (float)(numberDivisions);
+            float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+            float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+            float distance = dist(x, y, x2, y2);
+            totalCurveLength += distance;
+        }
+
+        // Calcula o curveLength até que o total menos ele seja igual ao dx
+        for (int j=0; j<=numberDivisions; j++) 
+        {
+            float t = (float)(j) / (float)(numberDivisions);
+            float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+            float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+            t = (float)(j+1) / (float)(numberDivisions);
+            float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+            float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+            float distance = dist(x, y, x2, y2);
+            curveLength += distance;
+            if(!(curveLength >= totalCurveLength)){
+              if(totalCurveLength - curveLength <= abs(dx)){
+                return new Property(x2, y2, current.getT() + t);
+              }
+            }
+        }
+
+        dx += totalCurveLength;
+        console.log(dx);
+        indexDiference++;
       }
 
-      for (int j=0; j<=numberDivisions; j++) 
-      {
-          float t = (float)(j) / (float)(numberDivisions);
-          float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-          float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-          t = (float)(j+1) / (float)(numberDivisions);
-          float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-          float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-          float distance = dist(x, y, x2, y2);
-          curveLength += distance;
-          if(totalCurveLength - curveLength <= abs(dx)){
-            return new Property(x2, y2, current.getT() + t);
-          }
-      }
     }else{
-      Property current = getControlPoint(index);
-      Segment seg = getSegment(index);
-      float curveLength = 0;
-      for (int j=0; j<=numberDivisions; j++) 
-        {
-          float t = (float)(j) / (float)(numberDivisions);
-          float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-          float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-          t = (float)(j+1) / (float)(numberDivisions);
-          float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-          float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-          float distance = dist(x, y, x2, y2);
-          curveLength += distance;
-          if(curveLength >= dx){
-            return new Property(x2, y2, current.getT() + t);
-          }
+      indexDiference = 0;
+      while(!found){
+
+        if(index + indexDiference >= controlPoints.size()){
+          return getControlPoint(controlPoints.size() - 1);
         }
+
+        Property current = getControlPoint(index + indexDiference);
+        Segment seg = getSegment(index + indexDiference);
+        float curveLength = 0;
+        for (int j=0; j<=numberDivisions; j++) 
+          {
+            float t = (float)(j) / (float)(numberDivisions);
+            float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+            float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+            t = (float)(j+1) / (float)(numberDivisions);
+            float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+            float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+            float distance = dist(x, y, x2, y2);
+            curveLength += distance;
+            if(curveLength >= dx){
+              return new Property(x2, y2, current.getT() + t);
+            }
+          }
+        dx -= curveLength;
+        indexDiference++;
+      }
     }
   }
 
@@ -1282,8 +1315,7 @@ class SceneElement
 		noFill();
 		if(curve.getNumberControlPoints() >= 4)
 			this.curve.draw();
-
-
+		
 		stroke(0);
 	}
 	void load(){}
@@ -1300,6 +1332,15 @@ class SceneElement
 		return this.curve;
 	}
 
+	void setInitialPosition(PVector p){
+		pos.set(0, p);
+		this.curve.setPoint(p, 1);
+	}
+
+	PVector getInitialPosition(){
+		return pos.get(0);
+	}
+
 }
 
 class Segment{
@@ -1312,6 +1353,70 @@ class Segment{
       this.d = _d;
    } 
 
+}
+
+class Square extends SceneElement{
+
+	float width, height;
+	boolean active;
+
+	Square(float _width, float _height)
+	{
+		super(context.mouse);
+		this.name = "Square";
+		this.width = _width;
+		this.height = _height;
+		active = true;
+	}
+
+	void draw(float t)
+	{
+		if(pos.nKeys() < 1){
+			return;
+		}
+
+		if(t >= pos.keyTime(pos.nKeys()-1)){
+			t = pos.keyTime(pos.nKeys()-1);
+		}
+
+		PVector position;
+		if(!active){
+			position = pos.get(0);
+		}else{
+			position = pos.get(t);
+		}
+
+		rectMode(CENTER);
+		fill(c);
+		stroke(0);
+		rect(position.x, position.y, this.width, this.height);
+
+		fill(0);
+		stroke(0);
+		point(position.x, position.y);
+	}
+
+	void setWidth(float x){
+		this.width = x;
+	}
+
+	void setHeight(float x){
+		this.height = x;
+	}
+
+	float lastTime()
+	{
+		if(pos.nKeys() < 1)
+			return 0;
+
+		return pos.interp.time.get(pos.nKeys()-1);
+	}
+
+	boolean isOver(PVector mouse){
+                PVector position = pos.get(0);
+                float radious = this.width;
+		return (mouse.x - position.x)*(mouse.x - position.x) + (mouse.y - position.y)*(mouse.y - position.y) <= radious*radious;
+	}
 }
 
 class Text extends Element{
@@ -1440,6 +1545,15 @@ class Interpolator {
 // multidimensional point
 class Property {
   
+  private int X_POS = 0;
+  private int Y_POS = 1;
+  private int TIME = 2;
+  private int WIDTH = 3;
+  private int HEIGHT = 4;
+
+  private float DEFAULT_WIDTH = 15;
+  private float DEFAULT_HEIGHT = 15;
+
   private ArrayList<Float> prop = new ArrayList<Float>();
   
   // An empty property
@@ -1573,6 +1687,22 @@ class Property {
     this.set(2, t);
   }
 
+  float getWidth(){
+    if(this.get(WIDTH) == 0){
+      return DEFAULT_WIDTH;
+    }
+
+    return this.get(WIDTH);
+  }
+
+  float getHeight(){
+    if(this.get(HEIGHT) == 0){
+      return DEFAULT_HEIGHT;
+    }
+
+    return this.get(HEIGHT);
+  }
+
   public String toString(){
     String s = "Property [";
     for (int i = 0; i < this.size(); ++i) {
@@ -1581,8 +1711,6 @@ class Property {
 
     return s;
   }
-
-
 };
 
 
@@ -2055,6 +2183,44 @@ class FontState extends State {
       }
   	}
 }
+class IntroState extends State
+{
+	PImage introImage;
+	float currentAlpha;
+	CurveCat introCurve;
+
+	IntroState(Context _context){
+		context = _context;
+		currentAlpha = 255;
+		// introImage = loadImage("intro.jpg");
+		introCurve = new CurveCat();
+	}
+
+	void mousePressed(){
+	};
+	void mouseDragged(){
+
+	};
+	void mouseReleased(){
+		context.curve.decimeAll();
+	};
+
+	void keyPressed(){
+
+	};
+	void draw(){
+		pushMatrix();
+		fill(0,currentAlpha);
+		translate(width/2, height/2);
+		textSize(50);
+		textAlign(CENTER);
+		text("CURVE ANIMATION", 0, 0);
+		text("LCG - 2014", 0, 50);
+		currentAlpha -= 1;
+		popMatrix();
+	};
+}
+	
 class OverSketchState extends State {
 
     CurveCat aux;
@@ -2213,8 +2379,17 @@ class SelectState extends State
     
     public void mouseDragged()
     {
-        //stateContext.setState(new DrawningState(context));
-        //stateContext.mouseDragged();
+      // Pega a variação de x e de y
+      float dx = context.mouse.x - context.pMouse.x;
+      float dy = context.mouse.y - context.pMouse.y;
+
+      println("dx: "+dx);
+      println("dy: "+dy);
+
+      SceneElement selected = context.getSelectedElement();
+      PVector ini = selected.getInitialPosition();
+
+      selected.setInitialPosition( new PVector(ini.x + dx, ini.y + dy) );
     }
 
     public void keyPressed(){
@@ -2227,6 +2402,123 @@ class SelectState extends State
     }
 }
 
+class SimpleTimeEditingState extends State {
+
+    private SceneElement element;
+    private CurveCat elementCurve;
+
+    private float distanceToSelect = 20;
+    private Property selectedProperty;
+    private int selectedSegment;
+    
+    SimpleTimeEditingState(Context context){
+      super(context);
+      element = context.getSelectedElement();
+      elementCurve = element.getCurve();
+      selectedProperty = null;
+      selectedSegment = null;
+    }
+
+    public void mousePressed() 
+    {
+      // Create a variable for the closestpoint
+      PVector closestPoint = new PVector();
+
+      //Vector that
+      PVector q = new PVector(context.mouse.x, context.mouse.y);
+
+      // Context finde the closest point gives the selectedSegment
+      selectedSegment = context.curve.findClosestPoint(context.curve.controlPoints, q, closestPoint);
+
+      float distance = q.dist(closestPoint);
+      if (distance < distanceToSelect)
+      {
+       selectedProperty = elementCurve.getControlPoint(selectedSegment);
+      }else{
+        selectedProperty = null;
+      }
+    }
+
+    public void mouseReleased() 
+    {
+
+    }
+
+    public void mouseDragged()
+    {
+      if(selectedSegment != null){
+        int dx = context.mouse.x - context.pMouse.x;
+        Property previousProperty = elementCurve.getControlPoint(selectedSegment - 1);
+        Property nextProperty = elementCurve.getControlPoint(selectedSegment + 1);
+        if( previousProperty.getT() < selectedProperty.getT() + dx && nextProperty.getT() > selectedProperty.getT() + dx){ 
+          selectedProperty.setT( selectedProperty.getT() + dx);
+        }
+      }
+    }
+
+    public void keyPressed(){
+
+    }
+
+    public void draw()
+    {
+      for (Property p : elementCurve.getControlPoints() ) {
+        pushMatrix();
+
+        if(selectedProperty == p){
+          fill(0,0,255);
+        }else{
+          fill(0);
+        }
+        translate(p.getX(), p.getY());
+        text(p.getT(), 0 , -10);
+        ellipse(0, 0, p.getWidth(), p.getHeight());
+
+        popMatrix();
+
+      }
+    }
+}
+class SquareState extends State {
+
+    SquareState(Context _context){
+      super(_context);
+    }
+
+    public void mousePressed() 
+    {
+        Square c = new Square(20,20);
+        console.log("Instanciando Square...");
+        context.addElement(c);  
+        context.setSelectedElement(c);
+    }
+
+    public void mouseDragged(){
+        Square c = context.getSelectedElement();
+        PVector pos = c.pos.get(0);
+
+        PVector pMouse = context.getpMouse();
+        float dx = abs(pMouse.x - pos.x);
+        float dy = abs(pMouse.y - pos.y);
+
+        c.setWidth(dx);
+        c.setHeight(dx);
+    }
+    
+    public void mouseReleased() 
+    {
+        stateContext.setStateName("draw");
+    }
+
+    public void keyPressed(){
+      
+    }
+
+    public void draw()
+    {
+
+  	}
+}
 class State
 {
 	Context context;
@@ -2263,38 +2555,37 @@ class State
 	
 class TimeEditingState extends State {
 
-    private float timeSpacing = 2;
+    private float timeSpacing = 1;
     private SceneElement element;
     private Property selectedProperty;
     private int selectedSegment;
     private CurveCat elementCurve;
+    private ArrayList<Property> controlPoints;
+    private CurveCat auxCurve;
+    private float dx;
 
     private float distanceToSelect = 20;
     
     TimeEditingState(Context context){
       super(context);
+      dx = 0;
       selectedProperty = null;
       element = context.getSelectedElement();
       elementCurve = element.getCurve();
-      elementCurve.reAmostragemPorTempo(timeSpacing);
-      context.refreshInterpolator();
+      controlPoints = elementCurve.getControlPointsClone();
     }
 
     public void mousePressed() 
     {
-      PVector closestPoint = new PVector();
-
-      //Vector that
-      PVector q = new PVector(context.mouse.x, context.mouse.y);
-
-      // Context finde the closest point gives the selectedSegment
-      selectedSegment = elementCurve.findClosestPoint(context.curve.controlPoints, q, closestPoint);
-      float distance = q.dist(closestPoint);
-      if (distance < distanceToSelect)
-      {
-        selectedProperty = elementCurve.getControlPoint(selectedSegment);
+      Property p;
+      for (int i = 0; i < controlPoints.size(); i++) {
+        p = controlPoints.get(i);
+        if(dist(p.getX(), p.getY(), context.getMouse().x, context.getMouse().y) < 20){
+          selectedProperty = p;
+          selectedSegment = i;
+          dx = 0;
+        }
       }
-
     }
 
     public void mouseReleased() 
@@ -2305,11 +2596,13 @@ class TimeEditingState extends State {
     public void mouseDragged()
     {
       if(selectedProperty){
-        float t1 = selectedProperty.getT();
-        float dx = context.mouse.x - context.pMouse.x;
-        Property p = elementCurve.getPropertyByDif(selectedSegment, dx);
-        elementCurve.setPoint(p, selectedSegment);
-        selectedProperty = p;
+        dx += context.mouse.x - context.pMouse.x;
+        if(dx != 0){
+          Property p = elementCurve.getPropertyByDif(selectedSegment, dx);
+          p.setT(selectedProperty.getT());
+          controlPoints.set(selectedSegment, p);
+          selectedProperty = p;
+        }
       }
     }
 
@@ -2319,18 +2612,18 @@ class TimeEditingState extends State {
 
     public void draw()
     {
-      if(context.isPlayed()){
-        // return;
-      }
-
       Property p;
-      for (int i = 0; i < elementCurve.getNumberControlPoints() - 1; ++i) {
-          p = elementCurve.getControlPoint(i);
-          fill(mainColor, 200);
-          stroke(mainColor, 200);
+      stroke(mainColor, 200);
+
+      for (int i = 0; i < controlPoints.size() - 1; ++i) {
+          p = controlPoints.get(i);
+
           if(p == selectedProperty){
             fill(secondaryColor, 200);
+          }else{
+            fill(mainColor, 200);
           }
+          
           ellipse(p.getX(), p.getY(), 10, 10);
           text("t: "+ ( (int) p.getT()), p.getX() + 10, p.getY() + 10);
       }

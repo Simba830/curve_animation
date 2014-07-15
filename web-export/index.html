@@ -4,11 +4,6 @@
 
 		<meta charset="UTF-8">
 
-		<!--[if lt IE 9]>
-			<script type="text/javascript">alert("Your browser does not support the canvas tag.");</script>
-		<![endif]-->
-
-		<!-- Latest compiled and minified CSS -->
 		<link rel="stylesheet" href="css/bootstrap.css">
 		<link rel="stylesheet" type="text/css" href="css/main.css">
 	</head>
@@ -17,7 +12,6 @@
 		<div id="content">
 			<canvas id="canvas" data-processing-sources="" >
 				<p>Your browser does not support the canvas tag.</p>
-				<!-- Note: you can put any alternative content here. -->
 			</canvas>
 
 			<noscript>
@@ -44,6 +38,11 @@
 	    		<button type="button" onClick="processing.getStateContext().setStateName('circle')" class="myBtn btn btn-primary">
 	    			<span class="glyphicon glyphicon-unchecked"></span> Circle
 	    		</button>
+
+	    		<button type="button" onClick="processing.getStateContext().setStateName('square')" class="myBtn btn btn-primary">
+	    			<span class="glyphicon glyphicon-unchecked"></span> Square
+	    		</button>
+
 
 	    		<button type="button" onClick="processing.getStateContext().setStateName('circle')" class="myBtn btn btn-primary">
 	    			<span class="glyphicon glyphicon-font"></span> Font

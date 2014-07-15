@@ -497,6 +497,14 @@ class CurveCat
     return r;
   }
 
+  ArrayList<Property> getControlPointsClone(){
+    return this.controlPoints.clone();
+  }
+
+  ArrayList<Property> getControlPoints(){
+    return this.controlPoints;
+  }
+
   /** FIM DOS MÉTODOS DE EDIÇÃO E CRIAÇÃO **/
 
   /** MÉTODOS PARA PARAMETRIZAÇÃO DE UMA CURVA **/
@@ -608,13 +616,6 @@ class CurveCat
         curveVertex(seg.c.get(0), seg.c.get(1));
         curveVertex(seg.d.get(0), seg.d.get(1));
       endShape();
-
-      beginShape();
-        curveVertex(seg.a.get(0), seg.a.get(1));
-        curveVertex(seg.b.get(0), seg.b.get(1));
-        curveVertex(seg.c.get(0), seg.c.get(1));
-        curveVertex(seg.d.get(0), seg.d.get(1));
-      endShape();
     }
   }
 
@@ -670,7 +671,7 @@ class CurveCat
       }
   }
 
-  void reAmostragemPorTempo(float timeSpacing){
+  ArrayList<Property> reAmostragemPorTempo(float timeSpacing){
     ArrayList<Property> aux = new ArrayList<Property>();
     this.refreshInterpolator();
     for (int i = 0; i < interpolator.lastTime(); ++i) {
@@ -679,63 +680,95 @@ class CurveCat
       }
     }
 
-    this.controlPoints = aux;
-    saveCurve();
+    aux.add(interpolator.get(interpolator.lastTime));
+
+    return aux;
   }
 
   Property getPropertyByDif(int index, float dx){
     if( dx == 0 )
-      throw new Exception("Variantion equals 0");
+      return;
 
     float correction = 0;
+    boolean found = false;
+    int indexDiference = 0;
+
+    // Se é negativa
     if(dx < 0){
-      Property current = getControlPoint(index - 1);
-      Segment seg = getSegment(index - 1);
-      float curveLength = 0, totalCurveLength = 0;
-      for (int j=0; j<=numberDivisions; j++) 
-      {
-          float t = (float)(j) / (float)(numberDivisions);
-          float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-          float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-          t = (float)(j+1) / (float)(numberDivisions);
-          float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-          float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-          float distance = dist(x, y, x2, y2);
-          totalCurveLength += distance;
+      indexDiference = 1; 
+      while(!found){
+
+        if(index - indexDiference <= 0 )
+          return getControlPoint(0);
+
+        Property current = getControlPoint(index - indexDiference);
+        Segment seg = getSegment(index - indexDiference);
+        float curveLength = 0, totalCurveLength = 0;
+
+        // Calcula o curveLength total do segmento
+        for (int j=0; j<=numberDivisions; j++) 
+        {
+            float t = (float)(j) / (float)(numberDivisions);
+            float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+            float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+            t = (float)(j+1) / (float)(numberDivisions);
+            float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+            float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+            float distance = dist(x, y, x2, y2);
+            totalCurveLength += distance;
+        }
+
+        // Calcula o curveLength até que o total menos ele seja igual ao dx
+        for (int j=0; j<=numberDivisions; j++) 
+        {
+            float t = (float)(j) / (float)(numberDivisions);
+            float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+            float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+            t = (float)(j+1) / (float)(numberDivisions);
+            float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+            float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+            float distance = dist(x, y, x2, y2);
+            curveLength += distance;
+            if(!(curveLength >= totalCurveLength)){
+              if(totalCurveLength - curveLength <= abs(dx)){
+                return new Property(x2, y2, current.getT() + t);
+              }
+            }
+        }
+
+        dx += totalCurveLength;
+        console.log(dx);
+        indexDiference++;
       }
 
-      for (int j=0; j<=numberDivisions; j++) 
-      {
-          float t = (float)(j) / (float)(numberDivisions);
-          float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-          float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-          t = (float)(j+1) / (float)(numberDivisions);
-          float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-          float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-          float distance = dist(x, y, x2, y2);
-          curveLength += distance;
-          if(totalCurveLength - curveLength <= abs(dx)){
-            return new Property(x2, y2, current.getT() + t);
-          }
-      }
     }else{
-      Property current = getControlPoint(index);
-      Segment seg = getSegment(index);
-      float curveLength = 0;
-      for (int j=0; j<=numberDivisions; j++) 
-        {
-          float t = (float)(j) / (float)(numberDivisions);
-          float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-          float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-          t = (float)(j+1) / (float)(numberDivisions);
-          float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-          float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-          float distance = dist(x, y, x2, y2);
-          curveLength += distance;
-          if(curveLength >= dx){
-            return new Property(x2, y2, current.getT() + t);
-          }
+      indexDiference = 0;
+      while(!found){
+
+        if(index + indexDiference >= controlPoints.size()){
+          return getControlPoint(controlPoints.size() - 1);
         }
+
+        Property current = getControlPoint(index + indexDiference);
+        Segment seg = getSegment(index + indexDiference);
+        float curveLength = 0;
+        for (int j=0; j<=numberDivisions; j++) 
+          {
+            float t = (float)(j) / (float)(numberDivisions);
+            float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+            float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+            t = (float)(j+1) / (float)(numberDivisions);
+            float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+            float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+            float distance = dist(x, y, x2, y2);
+            curveLength += distance;
+            if(curveLength >= dx){
+              return new Property(x2, y2, current.getT() + t);
+            }
+          }
+        dx -= curveLength;
+        indexDiference++;
+      }
     }
   }
 

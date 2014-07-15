@@ -28,6 +28,10 @@ public class StateContext {
                 myState = new CircleState(this.context);
             break;   
 
+            case 'square' :
+                myState = new SquareState(this.context);
+            break;
+
             case 'select' :
                  myState = new SelectState(this.context);
              break;   
@@ -41,7 +45,7 @@ public class StateContext {
               break; 
 
             case 'time' :
-                  myState = new TimeEditingState(this.context);
+                  myState = new SimpleTimeEditingState(this.context);
               break;          
 
             default :
@@ -117,17 +121,14 @@ public class StateContext {
     {
         background (255);
         noFill();
-        
 
         if(context.isPlayed()){
-            context.refreshInterpolator();
             float lastTime = context.lastTime();
 
             if(lastTime == 0){
                 context.stop();
             }else{
-                float t = (frameCount/3) % int(lastTime);
-                context.draw(t);
+                context.draw((frameCount*0.5) % int(lastTime));
             }
 
 

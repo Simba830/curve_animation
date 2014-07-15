@@ -23,8 +23,7 @@ class SceneElement
 		noFill();
 		if(curve.getNumberControlPoints() >= 4)
 			this.curve.draw();
-
-
+		
 		stroke(0);
 	}
 	void load(){}
@@ -39,6 +38,15 @@ class SceneElement
 
 	CurveCat getCurve(){
 		return this.curve;
+	}
+
+	void setInitialPosition(PVector p){
+		pos.set(0, p);
+		this.curve.setPoint(p, 1);
+	}
+
+	PVector getInitialPosition(){
+		return pos.get(0);
 	}
 
 }

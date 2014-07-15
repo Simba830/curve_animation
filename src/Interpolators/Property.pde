@@ -2,6 +2,15 @@
 // multidimensional point
 class Property {
   
+  private int X_POS = 0;
+  private int Y_POS = 1;
+  private int TIME = 2;
+  private int WIDTH = 3;
+  private int HEIGHT = 4;
+
+  private float DEFAULT_WIDTH = 15;
+  private float DEFAULT_HEIGHT = 15;
+
   private ArrayList<Float> prop = new ArrayList<Float>();
   
   // An empty property
@@ -135,6 +144,22 @@ class Property {
     this.set(2, t);
   }
 
+  float getWidth(){
+    if(this.get(WIDTH) == 0){
+      return DEFAULT_WIDTH;
+    }
+
+    return this.get(WIDTH);
+  }
+
+  float getHeight(){
+    if(this.get(HEIGHT) == 0){
+      return DEFAULT_HEIGHT;
+    }
+
+    return this.get(HEIGHT);
+  }
+
   public String toString(){
     String s = "Property [";
     for (int i = 0; i < this.size(); ++i) {
@@ -143,7 +168,5 @@ class Property {
 
     return s;
   }
-
-
 };
 
