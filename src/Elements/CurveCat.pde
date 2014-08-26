@@ -361,7 +361,7 @@ class CurveCat
       controlPoints.set(index,q); 
     } catch (Exception e) {
         console.log("e.toString(): "+e.toString());
-        print("Erro ao setar ponto de controle");
+        console.log("Erro ao setar ponto de controle");
     }
   }
 
@@ -604,18 +604,20 @@ class CurveCat
   // Desenha uma curva de acordo com a lista p de pontos de controle.
   void draw()
   { 
-    stroke(this.strokeColor);
-    strokeWeight(1.5);
-    strokeCap(ROUND);
-    for (int i = 0; i < getNumberControlPoints() - 1; i++) {
-      Segment seg = getSegment(i);
+    if(this.getNumberControlPoints() >= 4){
+      stroke(this.strokeColor);
+      strokeWeight(1.5);
+      strokeCap(ROUND);
+      for (int i = 0; i < getNumberControlPoints() - 1; i++) {
+        Segment seg = getSegment(i);
 
-      beginShape();
-        curveVertex(seg.a.get(0), seg.a.get(1));
-        curveVertex(seg.b.get(0), seg.b.get(1));
-        curveVertex(seg.c.get(0), seg.c.get(1));
-        curveVertex(seg.d.get(0), seg.d.get(1));
-      endShape();
+        beginShape();
+          curveVertex(seg.a.get(0), seg.a.get(1));
+          curveVertex(seg.b.get(0), seg.b.get(1));
+          curveVertex(seg.c.get(0), seg.c.get(1));
+          curveVertex(seg.d.get(0), seg.d.get(1));
+        endShape();
+      }
     }
   }
 

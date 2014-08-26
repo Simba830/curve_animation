@@ -22,7 +22,7 @@ module.exports = function(grunt) {
 	            ],   
 	          tasks: ['concat'],     //tasks to run
 	          options: {
-	            livereload: true                        //reloads the browser
+	            livereload: false                        //reloads the browser
 	          }
 	        }
 		}

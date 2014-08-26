@@ -13,6 +13,7 @@
 #main-interface{
 	position: absolute;
 	top: 0;
+	margin: 0 auto;
 }
 
 #element-interface{

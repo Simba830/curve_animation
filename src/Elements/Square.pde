@@ -10,6 +10,7 @@ class Square extends SceneElement{
 		this.width = _width;
 		this.height = _height;
 		active = true;
+
 	}
 
 	void draw(float t)

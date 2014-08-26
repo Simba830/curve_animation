@@ -94,8 +94,7 @@ void draw()
     update();
     stateContext.draw();
   } catch (Exception e) {
-    println("Falha no Draw \ne.toString(): "+e.toString());
-    e.printStackTrace();
+    console.log("Falha no Draw \ne.toString(): "+e.toString());
   }
 }
 

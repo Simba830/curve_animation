@@ -123,8 +123,7 @@ void draw()
     update();
     stateContext.draw();
   } catch (Exception e) {
-    println("Falha no Draw \ne.toString(): "+e.toString());
-    e.printStackTrace();
+    console.log("Falha no Draw \ne.toString(): "+e.toString());
   }
 }
 
@@ -876,7 +875,7 @@ class CurveCat
       controlPoints.set(index,q); 
     } catch (Exception e) {
         console.log("e.toString(): "+e.toString());
-        print("Erro ao setar ponto de controle");
+        console.log("Erro ao setar ponto de controle");
     }
   }
 
@@ -1119,18 +1118,20 @@ class CurveCat
   // Desenha uma curva de acordo com a lista p de pontos de controle.
   void draw()
   { 
-    stroke(this.strokeColor);
-    strokeWeight(1.5);
-    strokeCap(ROUND);
-    for (int i = 0; i < getNumberControlPoints() - 1; i++) {
-      Segment seg = getSegment(i);
+    if(this.getNumberControlPoints() >= 4){
+      stroke(this.strokeColor);
+      strokeWeight(1.5);
+      strokeCap(ROUND);
+      for (int i = 0; i < getNumberControlPoints() - 1; i++) {
+        Segment seg = getSegment(i);
 
-      beginShape();
-        curveVertex(seg.a.get(0), seg.a.get(1));
-        curveVertex(seg.b.get(0), seg.b.get(1));
-        curveVertex(seg.c.get(0), seg.c.get(1));
-        curveVertex(seg.d.get(0), seg.d.get(1));
-      endShape();
+        beginShape();
+          curveVertex(seg.a.get(0), seg.a.get(1));
+          curveVertex(seg.b.get(0), seg.b.get(1));
+          curveVertex(seg.c.get(0), seg.c.get(1));
+          curveVertex(seg.d.get(0), seg.d.get(1));
+        endShape();
+      }
     }
   }
 
@@ -1292,34 +1293,60 @@ class CurveCat
 
 class SceneElement
 {
+	/** 
+
+	Propriedades Posicionais possíveis do objeto:
+		- Nome;
+		- Posição;
+		- Rotação;
+		- Curva de Trajetória Associada;
+	
+	Propriedades Não-posicionais do Objeto:
+		- Cor;
+		- Transparência;
+		- Escala;
+		
+
+	**/
 	private String name;
 	private SmoothPositionInterpolator pos;
-	private color c, curveColor;
-	private CurveCat curve;
+	private float rotation; 
+	private CurveCat curve; 
+	private float scale; 
+	private color c, curveColor; 
+	private float transparency;
+
 
 	SceneElement(PVector position)
 	{
-		c = color(0,0,0);
-		curveColor = color(100,100,100);
-		name = "Element";
-		pos = new SmoothPositionInterpolator(new SmoothInterpolator());
-		pos.set(0,position);
-
+		this.name = "Element";
+		this.scale = 1.0;
+		this.c = color(0,0,0);
+		this.pos = new SmoothPositionInterpolator(new SmoothInterpolator());
+		this.pos.set(0,position);
+		this.rotation = 0.6;
+		this.curveColor = color(100,100,100);
+		this.transparency = 0;
 		this.curve = new CurveCat();
 		this.curve.setTolerance(15);
+
 	}
 
-	void draw(float t){}
+	void draw(float t){
+
+	}
 	void drawCurve(){
 		curve.strokeColor = curveColor;
 		noFill();
-		if(curve.getNumberControlPoints() >= 4)
-			this.curve.draw();
-		
+		this.curve.draw();
 		stroke(0);
 	}
-	void load(){}
-	void update(){}
+	void load(){
+
+	}
+	void update(){
+
+	}
 	float lastTime(){
 		return pos.keyTime(pos.nKeys()-1);
 	}
@@ -1339,6 +1366,25 @@ class SceneElement
 
 	PVector getInitialPosition(){
 		return pos.get(0);
+	}
+
+	// Get e Set das Escalas
+	void setScale(float _scale)
+	{
+		this.scale = _scale;
+	}
+	float getScale()
+	{
+		return this.scale;
+	}
+	// Get e Set da Rotação
+	void setRotation(float _rotation)
+	{
+		this.rotation = _rotation;
+	}
+	float getRotation()
+	{
+		return this.rotation;
 	}
 
 }
@@ -1367,6 +1413,7 @@ class Square extends SceneElement{
 		this.width = _width;
 		this.height = _height;
 		active = true;
+
 	}
 
 	void draw(float t)
