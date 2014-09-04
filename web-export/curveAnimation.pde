@@ -534,6 +534,7 @@ class CurveCat
   // Min Ditance wich can be in the curve
   private float minDistance = 5;
   private color strokeColor = color(0);
+  private int curveWeight = 3;
   private float controlPointAlpha = 200;
 
   // Interpolator
@@ -1050,6 +1051,7 @@ class CurveCat
     return (float)curveLength;
   }
 
+
   void reAmostragem()
   {
     CurveCat aux = new CurveCat();
@@ -1121,30 +1123,38 @@ class CurveCat
     color from = color(#FF0000);
     color to = color(#00FF00);
     if(this.getNumberControlPoints() >= 4){
-      beginShape(TRIANGLE_STRIP);
+      beginShape(QUAD_STRIP);
       for (int i = 0; i < getNumberControlPoints() - 1; i++) {
         Segment seg = getSegment(i);
 
-        for (int j=0; j<=numberDivisions; j++) 
+        float segmentlength = seg.b.dist(seg.c)/2; 
+        //console.log(segmentlength);
+
+        for (int j=0; j<=segmentlength; j++) 
         {
 
-          float t = (float)(j) / (float)(100);
+          float t = (float)(j) / (float)(segmentlength);
           float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
           float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
 
-          t = (float)(j+1) / (float)(100);
+          t = (float)(j+1) / (float)(segmentlength);
           float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
           float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
 
-          PVector ortogonal1 = new PVector(y, -x);
-          PVector ortogonal2 = new PVector(y2, -x2);
+          PVector ortogonal1 = new PVector(-y, x);
+          PVector ortogonal2 = new PVector(-y2, x2);
+
           ortogonal1.normalize();
           ortogonal2.normalize();
 
-          ortogonal1.mult(10);
-          ortogonal2.mult(10);
+          ortogonal1.mult(curveWeight);
+          ortogonal2.mult(curveWeight);
 
-          stroke(lerpColor(from, to, t));
+
+          noStroke();
+          fill(lerpColor(from, to, (float)j/segmentlength));
+          
+          //  strokeWeight()
 
           vertex(x + ortogonal1.x, y + ortogonal1.y);
           vertex(x - ortogonal1.x, y - ortogonal1.y);
