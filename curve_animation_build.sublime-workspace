@@ -1,0 +1,408 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"le",
+				"lerpcolor	lerpColor"
+			],
+			[
+				"i",
+				"i"
+			],
+			[
+				"orgo",
+				"ortogonal2"
+			],
+			[
+				"sca",
+				"scale	scale"
+			],
+			[
+				"orgon",
+				"ortogonal2"
+			],
+			[
+				"org",
+				"ortogonal1"
+			],
+			[
+				"verte",
+				"vertex	vertex"
+			],
+			[
+				"explo",
+				"exploded"
+			],
+			[
+				"indi",
+				"indice_delimitadores"
+			],
+			[
+				"delimi",
+				"delimitadores"
+			],
+			[
+				"gera",
+				"gera_tokens"
+			],
+			[
+				"tex",
+				"text_entrada"
+			],
+			[
+				"TK_",
+				"TK_NUM"
+			],
+			[
+				"TK",
+				"TK_ID"
+			],
+			[
+				"max-",
+				"max-width"
+			],
+			[
+				"mysql",
+				"MySQL"
+			],
+			[
+				"font",
+				"font-weight"
+			],
+			[
+				"te",
+				"text-decoration"
+			],
+			[
+				"fot",
+				"font-size"
+			],
+			[
+				"text",
+				"text-align"
+			],
+			[
+				"paddi",
+				"padding-right"
+			],
+			[
+				"padd",
+				"padding-left"
+			],
+			[
+				"back",
+				"background-color"
+			],
+			[
+				"controller",
+				"controller"
+			],
+			[
+				"message",
+				"assert.throws(block, /*optional*/error, /*optional*/message);"
+			],
+			[
+				"read",
+				"fs.readFileSync(path, encoding);"
+			],
+			[
+				"readF",
+				"fs.readFile(path, encoding_);"
+			],
+			[
+				"for",
+				"form	Tag"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"proce",
+				"Set Syntax: Processing"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"C",
+				"Set Syntax: C++"
+			],
+			[
+				"c++",
+				"Set Syntax: C++"
+			],
+			[
+				"bat",
+				"Set Syntax: Batch File"
+			],
+			[
+				"mark",
+				"Set Syntax: Markdown"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"java",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"jade",
+				"Set Syntax: Jade"
+			],
+			[
+				"js",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"jav",
+				"Set Syntax: JavaScript"
+			],
+			[
+				"jad",
+				"Set Syntax: Jade"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 400.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/C/Users/JoãoVitor/Documents/lógica04-09.tst",
+		"/C/Users/JoãoVitor/Desktop/compiladores03-09.cpp",
+		"/C/Users/JoãoVitor/Desktop/compiladores03-09",
+		"/C/Users/JoãoVitor/Documents/appMarcos/controllers/ClientController.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/models/Client.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/router.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/server.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/views/client/index.jade",
+		"/C/Users/JoãoVitor/Documents/appMarcos/js/linkConfig.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/css/main.css",
+		"/C/Users/JoãoVitor/Documents/appMarcos/paths.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/views/client/insert.jade",
+		"/C/Users/JoãoVitor/Documents/appMarcos/js/formUtils.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/package.json",
+		"/C/Users/JoãoVitor/Documents/appMarcos/js/animations.js",
+		"/C/Users/JoãoVitor/Downloads/Adobe Photoshop CC 2014 (64 bit) (Crack) [ChingLiu]/ChingLiu.Install.Notes.nfo",
+		"/C/Users/JoãoVitor/AppData/Roaming/Sublime Text 3/Packages/User/linha.sublime-snippet",
+		"/C/Users/JoãoVitor/Documents/appMarcos/seeders/ClientSeeder.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/clearDB.bat",
+		"/C/Users/JoãoVitor/Documents/lógica02-09.txt",
+		"/C/Users/JoãoVitor/Documents/lógica02-09",
+		"/C/Users/JoãoVitor/Documents/appMarcos/loadDB.bat",
+		"/C/Users/JoãoVitor/Documents/appMarcos/views/product/insert.jade",
+		"/C/Users/JoãoVitor/Documents/appMarcos/views/product/index.jade",
+		"/C/Users/JoãoVitor/Documents/appMarcos/controllers/ProductController.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/installDB.bat",
+		"/C/Users/JoãoVitor/Documents/appMarcos/js/confirmExcluir.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/post.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/database.js",
+		"/C/Users/JoãoVitor/Desktop/compiladores01-09",
+		"/C/Users/JoãoVitor/Documents/appMarcos/views/menu.jade",
+		"/C/Users/JoãoVitor/Documents/appMarcos/controllers/HomeController.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/models/Product.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/models/index.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/locales/pt-BR.pak",
+		"/C/Users/JoãoVitor/Documents/appMarcos/js/libs/inputConfig.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/index.html",
+		"/C/Users/JoãoVitor/AppData/Roaming/Sublime Text 3/Packages/User/NodeWebkit.sublime-build",
+		"/C/Users/JoãoVitor/Documents/appMarcos/views/index.jade",
+		"/C/Users/JoãoVitor/Documents/appMarcos/seeders/index.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/controllers/UserController.js",
+		"/C/Users/JoãoVitor/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/Users/JoãoVitor/Documents/appMarcos/views/main.jade",
+		"/C/Users/JoãoVitor/Documents/appMarcos/locales/ja.pak",
+		"/C/Users/JoãoVitor/Documents/appMarcos/css/bootstrap.css",
+		"/C/Users/JoãoVitor/Documents/appMarcos/npm-debug.log",
+		"/C/Users/JoãoVitor/Documents/appMarcos/debug.log",
+		"/C/Users/JoãoVitor/Documents/appMarcos/views/head.jade",
+		"/C/Users/JoãoVitor/Documents/appMarcos/views/Client/insert.js",
+		"/C/Users/JoãoVitor/Documents/appMarco_backupwithnodeserver/index.html",
+		"/C/Users/JoãoVitor/Documents/appMarco_backupwithnodeserver/server.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/node_modules/sqlite3/binding.gyp",
+		"/C/Users/JoãoVitor/Documents/appMarcos/models/User.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/storage/database.sqlite",
+		"/C/Users/JoãoVitor/Documents/appMarcos/routes.json",
+		"/C/Users/JoãoVitor/Documents/appMarcos/node_modules/jade/node_modules/constantinople/node_modules/uglify-js/node_modules/source-map/build/mini-require.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/node_modules/express/lib/request.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/node_modules/express/Readme.md",
+		"/C/Users/JoãoVitor/Documents/appMarcos/credits.html",
+		"/C/Users/JoãoVitor/Documents/appMarcos/index.js",
+		"/C/Users/JoãoVitor/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/C/Users/JoãoVitor/Documents/appMarcos/js/controllers/UserController.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/cadastro.html",
+		"/C/Users/JoãoVitor/Documents/appMarcos/formUtils.js",
+		"/C/Users/JoãoVitor/Documents/node-webkit-v0.10.2-win-ia32/package.json",
+		"/C/Users/JoãoVitor/Documents/node-webkit-v0.10.2-win-ia32/index.html"
+	],
+	"find":
+	{
+		"height": 23.0
+	},
+	"find_in_files":
+	{
+		"height": 90.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"cout",
+			"router",
+			"Programa",
+			"Clientes",
+			"client",
+			".form",
+			"error",
+			"max",
+			"require",
+			"'",
+			"\"",
+			"tabs",
+			"tab"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"Produtos",
+			"product",
+			"min",
+			"\"",
+			"'"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"project": "curve_animation_build.sublime-project",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 236.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

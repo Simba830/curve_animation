@@ -26,9 +26,19 @@ class CurveCat
   // Interpolator
   private SmoothInterpolator interpolator;
 
+  // Relative to the new draw
+  private ArrayList<PVector> vertexs;
+  private boolean wasEdited;
+  private ArrayList<float> speeds;
+  private float minSpeed;
+  private float maxSpeed;
+
   CurveCat() 
   {
+    wasEdited = false;
     controlPoints = new ArrayList<Property>();
+    vertexs = new ArrayList<PVector>();
+    speeds = new ArrayList<float>();
     decimable = true;
     tolerance = 10;
 
@@ -38,9 +48,10 @@ class CurveCat
 
   void clear()
   {
-    saveCurve();
     decimable = true;
     controlPoints = new ArrayList<Property>();
+    vertexs = new ArrayList<PVector>(); 
+    saveCurve();
   }
 
   void removeElement(int index){
@@ -577,6 +588,8 @@ class CurveCat
     ArrayList<Property> branch = (ArrayList<Property>) controlPoints.clone();
     history.add(branch);
     historyIndex++;
+
+    calculateVertexs();
   }
 
   void undo(){
@@ -600,21 +613,16 @@ class CurveCat
     }
   }
 
-  /**
-   MÉTODOS DE DESENHAR
-   **/
-  // Desenha uma curva de acordo com a lista p de pontos de controle.
-  void draw()
-  { 
-    color from = color(#FF0000);
-    color to = color(#00FF00);
-    if(this.getNumberControlPoints() >= 4){
-      beginShape(QUAD_STRIP);
+  void calculateVertexs(){
+    maxSpeed = 0;
+    minSpeed = 9999;
+
+    vertexs.clear();
+    speeds.clear();
       for (int i = 0; i < getNumberControlPoints() - 1; i++) {
         Segment seg = getSegment(i);
 
         float segmentlength = seg.b.dist(seg.c)/2; 
-        //console.log(segmentlength);
 
         for (int j=0; j<=segmentlength; j++) 
         {
@@ -622,10 +630,25 @@ class CurveCat
           float t = (float)(j) / (float)(segmentlength);
           float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
           float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+          float t = curvePoint(seg.a.get(2), seg.b.get(2), seg.c.get(2), seg.d.get(2), t);
 
           t = (float)(j+1) / (float)(segmentlength);
           float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
           float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+          float t2 = curvePoint(seg.a.get(2), seg.b.get(2), seg.c.get(2), seg.d.get(2), t);
+
+          float speed = PVector.dist(new PVector(x,y), new PVector(x2,y2))/(t2 - t);
+
+          if(speed > maxSpeed){
+            maxSpeed = speed;
+          }
+
+          if(speed < minSpeed){
+            minSpeed = speed;
+          }
+
+          speeds.add(speed);
+          console.error(speed);
 
           PVector ortogonal1 = new PVector(-y, x);
           PVector ortogonal2 = new PVector(-y2, x2);
@@ -635,21 +658,44 @@ class CurveCat
 
           ortogonal1.mult(curveWeight);
           ortogonal2.mult(curveWeight);
-
-
-          noStroke();
-          fill(lerpColor(from, to, (float)j/segmentlength));
           
           //  strokeWeight()
-
-          vertex(x + ortogonal1.x, y + ortogonal1.y);
-          vertex(x - ortogonal1.x, y - ortogonal1.y);
-          vertex(x2 + ortogonal2.x, y2 + ortogonal2.y);
-          vertex(x2 - ortogonal2.x, y2 - ortogonal2.y);
-
+          vertexs.add(new PVector(x + ortogonal1.x, y + ortogonal1.y));
+          vertexs.add(new PVector(x - ortogonal1.x, y - ortogonal1.y));
+          vertexs.add(new PVector(x2 + ortogonal2.x, y2 + ortogonal2.y));
+          vertexs.add(new PVector(x2 - ortogonal2.x, y2 - ortogonal2.y));
         }
         
       }
+
+      console.log(maxSpeed);
+      console.log(minSpeed);
+  }
+
+  /**
+   MÉTODOS DE DESENHAR
+   **/
+  void draw()
+  { 
+    color from = color(#FF0000);
+    color to = color(#00FF00);
+
+    if(vertexs.size() >= 4){
+      beginShape(QUAD_STRIP);
+      noStroke();
+
+      for (int i = 0; i < vertexs.size() - 1; i++) {
+        if(i % 4 == 0){
+          float p = norm( speeds.get( (int) (i / 4) ) , minSpeed, maxSpeed);
+          p = abs(p);
+          fill(lerpColor(from, to, p));
+        }
+
+        PVector vi = vertexs.get(i);
+
+        vertex(vi.x, vi.y);
+      }
+      
       endShape();
     }
   }

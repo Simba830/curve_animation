@@ -128,7 +128,7 @@ public class StateContext {
             if(lastTime == 0){
                 context.stop();
             }else{
-                context.draw((frameCount*0.5) % int(lastTime));
+                context.draw((frameCount) % int(lastTime));
             }
 
 

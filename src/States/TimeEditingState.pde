@@ -18,6 +18,24 @@ class TimeEditingState extends State {
       element = context.getSelectedElement();
       elementCurve = element.getCurve();
       controlPoints = elementCurve.getControlPointsClone();
+      elementCurve.draw = function(){
+        color from = color(#FF0000);
+        color to = color(#00FF00);
+
+        if(vertexs.size() >= 4){
+          beginShape(QUAD_STRIP);
+          for (int i = 0; i < vertexs.size() - 1; i++) {
+            PVector vi = vertexs.get(i);
+            noStroke();
+            fill(0,0,0);
+            fill(lerpColor(from, to, (float)j/segmentlength));
+
+            vertex(vi.x, vi.y);
+          }
+          
+          endShape();
+        }
+      }
     }
 
     public void mousePressed() 
