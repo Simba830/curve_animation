@@ -605,19 +605,40 @@ class CurveCat
   void draw()
   { 
     if(this.getNumberControlPoints() >= 4){
-      stroke(this.strokeColor);
-      strokeWeight(1.5);
-      strokeCap(ROUND);
+      beginShape(QUAD_STRIP);
       for (int i = 0; i < getNumberControlPoints() - 1; i++) {
         Segment seg = getSegment(i);
 
-        beginShape();
-          curveVertex(seg.a.get(0), seg.a.get(1));
-          curveVertex(seg.b.get(0), seg.b.get(1));
-          curveVertex(seg.c.get(0), seg.c.get(1));
-          curveVertex(seg.d.get(0), seg.d.get(1));
-        endShape();
+        for (int j=0; j<=numberDivisions; j++) 
+        {
+
+          float t = (float)(j) / (float)(100);
+          float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+          float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+
+          t = (float)(j+1) / (float)(100);
+          float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+          float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+
+          PVector ortogonal1 = new PVector(y, -x);
+          PVector ortogonal2 = new PVector(y2, -x2);
+          ortogonal1.normalize();
+          ortogonal2.normalize();
+
+          ortogonal1.mult(i % 255);
+          ortogonal2.mult(i % 255);
+
+          stroke(j % 255, j % 255, j % 255);
+
+          vertex(x + ortogonal1.x, y + ortogonal1.y);
+          vertex(x - ortogonal1.x, y - ortogonal1.y);
+          vertex(x2 + ortogonal2.x, y2 + ortogonal2.y);
+          vertex(x2 - ortogonal2.x, y2 - ortogonal2.y);
+
+        }
+        
       }
+      endShape();
     }
   }
 
