@@ -604,8 +604,10 @@ class CurveCat
   // Desenha uma curva de acordo com a lista p de pontos de controle.
   void draw()
   { 
+    color from = color(#FF0000);
+    color to = color(#00FF00);
     if(this.getNumberControlPoints() >= 4){
-      beginShape(QUAD_STRIP);
+      beginShape(TRIANGLE_STRIP);
       for (int i = 0; i < getNumberControlPoints() - 1; i++) {
         Segment seg = getSegment(i);
 
@@ -625,10 +627,10 @@ class CurveCat
           ortogonal1.normalize();
           ortogonal2.normalize();
 
-          ortogonal1.mult(i % 255);
-          ortogonal2.mult(i % 255);
+          ortogonal1.mult(10);
+          ortogonal2.mult(10);
 
-          stroke(j % 255, j % 255, j % 255);
+          stroke(lerpColor(from, to, t));
 
           vertex(x + ortogonal1.x, y + ortogonal1.y);
           vertex(x - ortogonal1.x, y - ortogonal1.y);
