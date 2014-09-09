@@ -21,17 +21,15 @@ int width,height;
 public void setup() 
 {
   try {
-    
-  width = 800;
-  height = 600;
-  size(width, height);
 
-  smooth();
+    size(screen.width*0.865, screen.height*0.85);
 
-  context = new Context();
-  update();
-  stateContext = new StateContext(context);
-  stateContext.setContext(context);
+    smooth();
+
+    context = new Context();
+    update();
+    stateContext = new StateContext(context);
+    stateContext.setContext(context);
   } catch (Exception e) {
     console.log(e);  
   }
@@ -65,7 +63,7 @@ void mousePressed()
     console.log(e);  
   }
 }
-    
+
 void mouseReleased()
 {
   try {

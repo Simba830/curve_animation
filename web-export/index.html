@@ -1,94 +1,94 @@
 <!DOCTYPE html>
-	<head>
-		<title>CurveAnimation</title>
+<head>
+	<title>CurveAnimation</title>
 
-		<meta charset="UTF-8">
+	<meta charset="UTF-8">
 
-		<link rel="stylesheet" href="css/bootstrap.css">
-		<link rel="stylesheet" type="text/css" href="css/main.css">
-	</head>
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
 
-	<body>
-		<div id="content">
-			<canvas id="canvas" data-processing-sources="" >
-				<p>Your browser does not support the canvas tag.</p>
-			</canvas>
+<body>
+	<div id="content">
+		<canvas id="canvas" data-processing-sources="" >
+			<p>Your browser does not support the canvas tag.</p>
+		</canvas>
 
-			<noscript>
-				<p>JavaScript is required to view the contents of this page.</p>
-			</noscript>
+		<noscript>
+			<p>JavaScript is required to view the contents of this page.</p>
+		</noscript>
 
-	    	<div id='main-interface'>
-	    		<button type="button" onClick="" class="menu-control btn btn-default">
-	    			Create
-	    		</button>
+		<div id='create-component'>
+			<button type="button" onClick="" class="menu-control btn btn-default">
+				Create
+			</button>
 
-	    		<button type="button" onClick="processing.getStateContext().setStateName('circle')" class="myBtn btn btn-primary">
-	    			<span class="glyphicon glyphicon-unchecked"></span> Circle
-	    		</button>
-	    		<button type="button" onClick="processing.getStateContext().setStateName('square')" class="myBtn btn btn-primary">
-	    			<span class="glyphicon glyphicon-unchecked"></span> Square
-	    		</button>
-	    		<button type="button" onClick="processing.getStateContext().setStateName('square')" class="myBtn btn btn-primary">
-	    			<span class="glyphicon glyphicon-unchecked"></span> Picture
-	    		</button>
-	    		<button type="button" onClick="processing.getStateContext().setStateName('circle')" class="myBtn btn btn-primary">
-	    			<span class="glyphicon glyphicon-font"></span> Font
-	    		</button>
-
-
-	    		<button type="button" onClick="processing.getContext().togglePlay()" class="myBtn btn btn-primary">
-	    			<span class="glyphicon glyphicon-play"></span> Play
-	    		</button>
-
-	    		<button type="button" onClick="processing.getStateContext().setStateName('time')" class="myBtn btn btn-primary">
-	    			<span class="glyphicon glyphicon-play"></span> Time
-	    		</button>
-
-	    		<button type="button" onClick="processing.getStateContext().setStateName('select')" class="myBtn btn btn-primary">
-	    			<span class="glyphicon glyphicon-share-alt"></span> Select
-	    		</button>
+			<button type="button" onClick="processing.getStateContext().setStateName('circle')" class="myBtn btn btn-primary">
+				<span class="glyphicon glyphicon-unchecked"></span> Circle
+			</button>
+			<button type="button" onClick="processing.getStateContext().setStateName('square')" class="myBtn btn btn-primary">
+				<span class="glyphicon glyphicon-unchecked"></span> Square
+			</button>
+			<button type="button" onClick="processing.getStateContext().setStateName('square')" class="myBtn btn btn-primary">
+				<span class="glyphicon glyphicon-unchecked"></span> Picture
+			</button>
+			<button type="button" onClick="processing.getStateContext().setStateName('circle')" class="myBtn btn btn-primary">
+				<span class="glyphicon glyphicon-font"></span> Font
+			</button>
 
 
-	    	</div>
+			<button type="button" onClick="processing.getContext().togglePlay()" class="myBtn btn btn-primary">
+				<span class="glyphicon glyphicon-play"></span> Play
+			</button>
 
-	    	<div id='element-interface'>
-	    		<button type="button" onClick="" class="menu-control btn btn-default">
-	    			Inspector
-	    		</button>
+			<button type="button" onClick="processing.getStateContext().setStateName('time')" class="myBtn btn btn-primary">
+				<span class="glyphicon glyphicon-play"></span> Time
+			</button>
 
-	    		<button type="button" onClick="processing.getContext().curve.clear()" class="myBtn btn btn-primary">
-	    			<span class="glyphicon glyphicon-remove"></span> Clear Curve
-	    		</button>
+			<button type="button" onClick="processing.getStateContext().setStateName('select')" class="myBtn btn btn-primary">
+				<span class="glyphicon glyphicon-share-alt"></span> Select
+			</button>
 
-	    		<button type="button" onClick="processing.getStateContext().setStateName('draw')" class="myBtn btn btn-primary">
-	    			<span class="glyphicon glyphicon-record"></span> Record
-	    		</button>
 
-	    		<button type="button" onClick="processing.getContext().deleteSelectedElement()" class="myBtn btn btn-primary">
-	    			<span class="glyphicon glyphicon-remove"></span> Delete Element
-	    		</button>
-	    	</div>
-	    	 
 		</div>
 
-		<!-- Scripts -->
-		<script src="processing.js" type="text/javascript"></script>
+		<div id='inspector-component'>
+			<button type="button" onClick="" class="menu-control btn btn-default">
+				Inspector
+			</button>
 
-		<script type="text/javascript">
+			<button type="button" onClick="processing.getContext().curve.clear()" class="myBtn btn btn-primary">
+				<span class="glyphicon glyphicon-remove"></span> Clear Curve
+			</button>
+
+			<button type="button" onClick="processing.getStateContext().setStateName('draw')" class="myBtn btn btn-primary">
+				<span class="glyphicon glyphicon-record"></span> Record
+			</button>
+
+			<button type="button" onClick="processing.getContext().deleteSelectedElement()" class="myBtn btn btn-primary">
+				<span class="glyphicon glyphicon-remove"></span> Delete Element
+			</button>
+		</div>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="processing.js" type="text/javascript"></script>
+
+	<script type="text/javascript">
 			// convenience function to get the id attribute of generated sketch html element
 			function getProcessingSketchId () { return 'curveAnimation'; }
-		</script>
+			</script>
 
 
-		<!-- JQuery -->
-		<script src='js/jquery-1.11.0.js'></script>
-		
-		<!-- Latest compiled and minified JavaScript -->
-		<script src="js/bootstrap.min.js"></script>
+			<!-- JQuery -->
+			<script src='js/jquery-1.11.0.js'></script>
 
-		<!-- Latest compiled and minified JavaScript -->
-		<script src="js/interface.js"></script>
+			<!-- Latest compiled and minified JavaScript -->
+			<script src="js/bootstrap.min.js"></script>
 
-	</body>
-</html>
+			<!-- Latest compiled and minified JavaScript -->
+			<script src="js/interface.js"></script>
+
+		</body>
+		</html>
