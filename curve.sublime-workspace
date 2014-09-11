@@ -4,60 +4,8 @@
 		"selected_items":
 		[
 			[
-				"le",
-				"lerpcolor	lerpColor"
-			],
-			[
-				"i",
-				"i"
-			],
-			[
-				"orgo",
-				"ortogonal2"
-			],
-			[
-				"sca",
-				"scale	scale"
-			],
-			[
-				"orgon",
-				"ortogonal2"
-			],
-			[
-				"org",
-				"ortogonal1"
-			],
-			[
-				"verte",
-				"vertex	vertex"
-			],
-			[
-				"explo",
-				"exploded"
-			],
-			[
-				"indi",
-				"indice_delimitadores"
-			],
-			[
-				"delimi",
-				"delimitadores"
-			],
-			[
-				"gera",
-				"gera_tokens"
-			],
-			[
-				"tex",
-				"text_entrada"
-			],
-			[
-				"TK_",
-				"TK_NUM"
-			],
-			[
-				"TK",
-				"TK_ID"
+				"nome",
+				"nome"
 			],
 			[
 				"max-",
@@ -81,6 +29,10 @@
 			],
 			[
 				"text",
+				"text-align"
+			],
+			[
+				"tex",
 				"text-align"
 			],
 			[
@@ -119,20 +71,48 @@
 	},
 	"buffers":
 	[
+		{
+			"file": "src/States/EditingState.pde",
+			"settings":
+			{
+				"buffer_size": 6236,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/Elements/CurveCat.pde",
+			"settings":
+			{
+				"buffer_size": 26031,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/Controllers/Context.pde",
+			"settings":
+			{
+				"buffer_size": 3075,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/Controllers/StateContext.pde",
+			"settings":
+			{
+				"buffer_size": 3304,
+				"line_ending": "Windows"
+			}
+		}
 	],
-	"build_system": "",
+	"build_system": "Packages/User/NodeWebkit.sublime-build",
 	"command_palette":
 	{
-		"height": 392.0,
+		"height": 311.0,
 		"selected_items":
 		[
 			[
-				"proce",
-				"Set Syntax: Processing"
-			],
-			[
-				"instal",
-				"Package Control: Install Package"
+				"js",
+				"Set Syntax: JavaScript"
 			],
 			[
 				"C",
@@ -167,10 +147,6 @@
 				"Set Syntax: Jade"
 			],
 			[
-				"js",
-				"Set Syntax: JavaScript"
-			],
-			[
 				"jav",
 				"Set Syntax: JavaScript"
 			],
@@ -179,11 +155,15 @@
 				"Set Syntax: Jade"
 			],
 			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
 				"install",
 				"Package Control: Install Package"
 			]
 		],
-		"width": 400.0
+		"width": 416.0
 	},
 	"console":
 	{
@@ -204,24 +184,34 @@
 	},
 	"file_history":
 	[
-		"/C/Users/JoãoVitor/Documents/lógica04-09.tst",
-		"/C/Users/JoãoVitor/Desktop/compiladores03-09.cpp",
-		"/C/Users/JoãoVitor/Desktop/compiladores03-09",
+		"/C/Users/JoãoVitor/Documents/appMarcos/models/relations.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/models/Purchase.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/seeders/ProductSeeder.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/seeders/index.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/seeders/ClientSeeder.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/database.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/views/menu.jade",
+		"/C/Users/JoãoVitor/Documents/appMarcos/controllers/HomeController.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/views/purchase/insert.jade",
+		"/C/Users/JoãoVitor/Documents/appMarcos/views/purchase/index.jade",
+		"/C/Users/JoãoVitor/Documents/appMarcos/removeTable.bat",
+		"/C/Users/JoãoVitor/Documents/appMarcos/views/client/insert.jade",
+		"/C/Users/JoãoVitor/Documents/appMarcos/views/client/index.jade",
 		"/C/Users/JoãoVitor/Documents/appMarcos/controllers/ClientController.js",
 		"/C/Users/JoãoVitor/Documents/appMarcos/models/Client.js",
+		"/C/Users/JoãoVitor/Documents/appMarcos/models/index.js",
+		"/C/Users/JoãoVitor/Desktop/compiladores03-09.cpp",
+		"/C/Users/JoãoVitor/Desktop/compiladores03-09",
 		"/C/Users/JoãoVitor/Documents/appMarcos/router.js",
 		"/C/Users/JoãoVitor/Documents/appMarcos/server.js",
-		"/C/Users/JoãoVitor/Documents/appMarcos/views/client/index.jade",
 		"/C/Users/JoãoVitor/Documents/appMarcos/js/linkConfig.js",
 		"/C/Users/JoãoVitor/Documents/appMarcos/css/main.css",
 		"/C/Users/JoãoVitor/Documents/appMarcos/paths.js",
-		"/C/Users/JoãoVitor/Documents/appMarcos/views/client/insert.jade",
 		"/C/Users/JoãoVitor/Documents/appMarcos/js/formUtils.js",
 		"/C/Users/JoãoVitor/Documents/appMarcos/package.json",
 		"/C/Users/JoãoVitor/Documents/appMarcos/js/animations.js",
 		"/C/Users/JoãoVitor/Downloads/Adobe Photoshop CC 2014 (64 bit) (Crack) [ChingLiu]/ChingLiu.Install.Notes.nfo",
 		"/C/Users/JoãoVitor/AppData/Roaming/Sublime Text 3/Packages/User/linha.sublime-snippet",
-		"/C/Users/JoãoVitor/Documents/appMarcos/seeders/ClientSeeder.js",
 		"/C/Users/JoãoVitor/Documents/appMarcos/clearDB.bat",
 		"/C/Users/JoãoVitor/Documents/lógica02-09.txt",
 		"/C/Users/JoãoVitor/Documents/lógica02-09",
@@ -232,18 +222,13 @@
 		"/C/Users/JoãoVitor/Documents/appMarcos/installDB.bat",
 		"/C/Users/JoãoVitor/Documents/appMarcos/js/confirmExcluir.js",
 		"/C/Users/JoãoVitor/Documents/appMarcos/post.js",
-		"/C/Users/JoãoVitor/Documents/appMarcos/database.js",
 		"/C/Users/JoãoVitor/Desktop/compiladores01-09",
-		"/C/Users/JoãoVitor/Documents/appMarcos/views/menu.jade",
-		"/C/Users/JoãoVitor/Documents/appMarcos/controllers/HomeController.js",
 		"/C/Users/JoãoVitor/Documents/appMarcos/models/Product.js",
-		"/C/Users/JoãoVitor/Documents/appMarcos/models/index.js",
 		"/C/Users/JoãoVitor/Documents/appMarcos/locales/pt-BR.pak",
 		"/C/Users/JoãoVitor/Documents/appMarcos/js/libs/inputConfig.js",
 		"/C/Users/JoãoVitor/Documents/appMarcos/index.html",
 		"/C/Users/JoãoVitor/AppData/Roaming/Sublime Text 3/Packages/User/NodeWebkit.sublime-build",
 		"/C/Users/JoãoVitor/Documents/appMarcos/views/index.jade",
-		"/C/Users/JoãoVitor/Documents/appMarcos/seeders/index.js",
 		"/C/Users/JoãoVitor/Documents/appMarcos/controllers/UserController.js",
 		"/C/Users/JoãoVitor/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
 		"/C/Users/JoãoVitor/Documents/appMarcos/views/main.jade",
@@ -273,7 +258,7 @@
 	],
 	"find":
 	{
-		"height": 23.0
+		"height": 34.0
 	},
 	"find_in_files":
 	{
@@ -288,7 +273,11 @@
 		"case_sensitive": true,
 		"find_history":
 		[
-			"cout",
+			"calculate",
+			"render",
+			"vendedor",
+			"tipo",
+			"      Client.findAll({where: {tipo: \"corretor\"}}).success(function(result_corretores){\n        render(\"purchase/insert\", {corretores: result_corretores});\n      });",
 			"router",
 			"Programa",
 			"Clientes",
@@ -308,6 +297,9 @@
 		"regex": false,
 		"replace_history":
 		[
+			"entregador",
+			"vendedor",
+			"corretor",
 			"Produtos",
 			"product",
 			"min",
@@ -323,8 +315,128 @@
 	"groups":
 	[
 		{
+			"selected": 2,
 			"sheets":
 			[
+				{
+					"buffer": 0,
+					"file": "src/States/EditingState.pde",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6236,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5414,
+								5414
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Processing/Syntax/Processing.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1935.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/Elements/CurveCat.pde",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 26031,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								642,
+								642
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Processing/Syntax/Processing.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 45.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/Controllers/Context.pde",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 3075,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1220,
+								1220
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Processing/Syntax/Processing.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 720.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/Controllers/StateContext.pde",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3304,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								158,
+								158
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Processing/Syntax/Processing.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				}
 			]
 		}
 	],
@@ -367,10 +479,10 @@
 	{
 		"height": 0.0
 	},
-	"project": "curve_animation_build.sublime-project",
+	"project": "curve.sublime-project",
 	"replace":
 	{
-		"height": 42.0
+		"height": 62.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -408,7 +520,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 236.0,
+	"side_bar_width": 306.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

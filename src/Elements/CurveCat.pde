@@ -344,7 +344,6 @@ class CurveCat
     this.tolerance = t;
   }
   
-
   boolean canBeDecimed(){
     return this.decimable;
   }
@@ -650,8 +649,9 @@ class CurveCat
           speeds.add(speed);
           console.error(speed);
 
-          PVector ortogonal1 = new PVector(-y, x);
-          PVector ortogonal2 = new PVector(-y2, x2);
+          PVector bP = PVector.sub(new PVector(x2,y2), new PVector(x,y));
+          PVector ortogonal1 = new PVector(-bP.y, bP.x);
+          PVector ortogonal2 = new PVector(-bP.y, bP.x);
 
           ortogonal1.normalize();
           ortogonal2.normalize();
