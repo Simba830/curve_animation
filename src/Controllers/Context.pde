@@ -123,7 +123,7 @@ class Context{
 				lastTime = lastTimeElement;
 			}
 		}
-
+		
 		return lastTime;
 	}
 

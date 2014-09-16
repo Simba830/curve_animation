@@ -7,7 +7,6 @@ class CircleState extends State {
     public void mousePressed() 
     {
         Circle c = new Circle(20,20);
-        console.log("Instanciando Circle...");
         context.addElement(c);  
         context.setSelectedElement(c);
     }

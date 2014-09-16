@@ -22,7 +22,7 @@ public void setup()
 {
   try {
 
-    size(screen.width*0.865, screen.height*0.85);
+    size(screen.width*0.8, screen.height*0.7);
 
     smooth();
 
@@ -92,7 +92,7 @@ void draw()
     update();
     stateContext.draw();
   } catch (Exception e) {
-    console.log("Falha no Draw \ne.toString(): "+e.toString());
+    // console.log("Falha no Draw \ne.toString(): "+e.toString());
   }
 }
 

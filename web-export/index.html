@@ -1,15 +1,23 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
+<html>
 <head>
-	<title>CurveAnimation</title>
+	<meta charset="utf-8" />
 
-	<meta charset="UTF-8">
+	<link href='css/mb.containerPlus.css' rel='stylesheet' type='text/css'>
+	<link href='css/style.css' rel='stylesheet' type='text/css'>
 
-	<link rel="stylesheet" href="css/bootstrap.css">
-	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<title>Perfomance Animation App</title>
+
+	<script type="text/javascript" src="js/jquery-1.11.0.js"></script>
+	<script type="text/javascript" src="jquery-ui.js"></script>
+	<script type="text/javascript" src="inc/jquery.mb.containerPlus.js"></script>
+	<script type="text/javascript" src="inc/mb.containerPlus.plugins.js"></script>
+
 </head>
-
 <body>
-	<div id="content">
+
+	<div id="wrapper">
+
 		<canvas id="canvas" data-processing-sources="" >
 			<p>Your browser does not support the canvas tag.</p>
 		</canvas>
@@ -18,77 +26,81 @@
 			<p>JavaScript is required to view the contents of this page.</p>
 		</noscript>
 
-		<div id='create-component'>
-			<button type="button" onClick="" class="menu-control btn btn-default">
-				Create
-			</button>
 
-			<button type="button" onClick="processing.getStateContext().setStateName('circle')" class="myBtn btn btn-primary">
-				<span class="glyphicon glyphicon-unchecked"></span> Circle
+		<div id="cont" class="container" style=" top:4%; left: 1px; height: 400px" data-autoresize="true" data-skin="black" data-drag=true data-resize=true data-dock="dock" data-collapsable=true data-containment="document"  data-buttons="dock,close">
+			<h2>Create</h2>
+
+			<button type="button" onClick="processing.getStateContext().setStateName('circle')">
+				Circle
 			</button>
 			<button type="button" onClick="processing.getStateContext().setStateName('square')" class="myBtn btn btn-primary">
-				<span class="glyphicon glyphicon-unchecked"></span> Square
+				Square
 			</button>
 			<button type="button" onClick="processing.getStateContext().setStateName('square')" class="myBtn btn btn-primary">
-				<span class="glyphicon glyphicon-unchecked"></span> Picture
+				Picture
 			</button>
 			<button type="button" onClick="processing.getStateContext().setStateName('circle')" class="myBtn btn btn-primary">
-				<span class="glyphicon glyphicon-font"></span> Font
-			</button>
-
-
-			<button type="button" onClick="processing.getContext().togglePlay()" class="myBtn btn btn-primary">
-				<span class="glyphicon glyphicon-play"></span> Play
-			</button>
-
-			<button type="button" onClick="processing.getStateContext().setStateName('time')" class="myBtn btn btn-primary">
-				<span class="glyphicon glyphicon-play"></span> Time
+				Font <br>
 			</button>
 
 			<button type="button" onClick="processing.getStateContext().setStateName('select')" class="myBtn btn btn-primary">
-				<span class="glyphicon glyphicon-share-alt"></span> Select
+				Select
 			</button>
-
+			<br>
 
 		</div>
 
-		<div id='inspector-component'>
-			<button type="button" onClick="" class="menu-control btn btn-default">
-				Inspector
+		<div id="cont_inspector" class="container" style=" top:4%; right: 1px; height: 400px;" data-autoresize="true" data-skin="black" data-drag=true data-resize=true data-dock="dock" data-collapsable=true data-containment="document"  data-buttons="dock,close">
+			<h2>Inspector</h2>
+
+			<button type="button" onClick="processing.getContext().togglePlay()" class="myBtn btn btn-primary">
+				Play
+			</button>
+
+			<button type="button" onClick="processing.getStateContext().setStateName('time')" class="myBtn btn btn-primary">
+				Time
 			</button>
 
 			<button type="button" onClick="processing.getContext().curve.clear()" class="myBtn btn btn-primary">
-				<span class="glyphicon glyphicon-remove"></span> Clear Curve
+				Clear Curve
 			</button>
 
 			<button type="button" onClick="processing.getStateContext().setStateName('draw')" class="myBtn btn btn-primary">
-				<span class="glyphicon glyphicon-record"></span> Record
+				Record
 			</button>
 
 			<button type="button" onClick="processing.getContext().deleteSelectedElement()" class="myBtn btn btn-primary">
-				<span class="glyphicon glyphicon-remove"></span> Delete Element
+				Delete Element
 			</button>
+
+			<br>
+
 		</div>
+
+		<div id="dock"></div>
 
 	</div>
 
-	<!-- Scripts -->
+	<script>
+	$(function(){
+
+		$(".container").containerize({
+			onLoad: function(){
+			}
+		});
+		/***********************************************/
+
+	})
+
+	</script>
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="js/interface.js"></script>
 	<script src="processing.js" type="text/javascript"></script>
 
 	<script type="text/javascript">
-			// convenience function to get the id attribute of generated sketch html element
-			function getProcessingSketchId () { return 'curveAnimation'; }
-			</script>
-
-
-			<!-- JQuery -->
-			<script src='js/jquery-1.11.0.js'></script>
-
-			<!-- Latest compiled and minified JavaScript -->
-			<script src="js/bootstrap.min.js"></script>
-
-			<!-- Latest compiled and minified JavaScript -->
-			<script src="js/interface.js"></script>
-
-		</body>
-		</html>
+    // convenience function to get the id attribute of generated sketch html element
+    function getProcessingSketchId () { return 'curveAnimation'; }
+    </script>
+</body>
+</html>

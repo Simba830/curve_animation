@@ -96,7 +96,7 @@ class EditingState extends State {
         }
 
         context.refreshInterpolator();
-        context.curve.calculateVertexs();
+        // context.curve.calculateVertexs();
     }
 
     public void mouseDragged()
@@ -149,7 +149,7 @@ class EditingState extends State {
             }
 
           }
-          context.curve.calculateVertexs();
+          // context.curve.calculateVertexs();
         }
     }
 
@@ -178,6 +178,5 @@ class EditingState extends State {
 
         // Draw control points if have a curve;
         context.curve.drawControlPoints();
-        
     }
 }

@@ -25,8 +25,6 @@ class DrawningState extends State {
         stateContext.setStateName("edit");
       }
       
-      //console.log("Numero de Pontos de Controle:"+context.curve.getNumberControlPoints());
-      //console.log("Pontos Selecionados"+selectedSegment);
       
       if(selectedSegment == context.curve.getNumberControlPoints() - 1 && distance < 10){
           stateContext.setStateName("draw");

@@ -4,38 +4,19 @@ body{
 
 }
 #content{
-	/* Set rules to fill background */
-	min-height: 100%;
-	min-width: 1024px;
-	
-	/* Set up proportionate scaling */
 	width: 100%;
-	height: auto;
-	
-	/* Set up positioning */
-	position: fixed;
-	top: 0;
-	left: 0;
+	height: 100%;
 }
 
+#create-component { width: 170px; height: 100%; padding: 0.5em; background: grey; }
+#inspector-component { width: 170px; height: 100%; padding: 0.5em; background: grey; }
+
 #canvas{
-	margin: 0 10% 0 10%;
+	margin: 0 auto;
+	position: relative;
 	border-style: solid;
 	border-width: 1px;
 	border-color: #eeeeee;
-	position: absolute;
-}
-
-#create-component{
-	position: fixed;
-	
-	margin: 0 0 0 90%;
-}
-
-#inspector-component{
-	position: relative;
-	margin-left: 300%;
-
 }
 
 .myBtn{
@@ -53,8 +34,4 @@ body{
 	border-radius: 0px 0px;
 	display: block;
 	width: 150px;
-}
-footer
-{
-	clear:both;
 }

@@ -7,7 +7,6 @@ class SquareState extends State {
     public void mousePressed() 
     {
         Square c = new Square(20,20);
-        console.log("Instanciando Square...");
         context.addElement(c);  
         context.setSelectedElement(c);
     }

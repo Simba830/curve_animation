@@ -138,4 +138,8 @@ public class StateContext {
         
         myState.draw();
     }
+
+    void is(State testState){
+        return typeof(testState) == typeof(myState);
+    }
 }

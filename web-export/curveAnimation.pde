@@ -51,7 +51,7 @@ public void setup()
 {
   try {
 
-    size(screen.width*0.865, screen.height*0.85);
+    size(screen.width*0.8, screen.height*0.7);
 
     smooth();
 
@@ -121,7 +121,7 @@ void draw()
     update();
     stateContext.draw();
   } catch (Exception e) {
-    console.log("Falha no Draw \ne.toString(): "+e.toString());
+    // console.log("Falha no Draw \ne.toString(): "+e.toString());
   }
 }
 
@@ -261,7 +261,7 @@ class Context{
 				lastTime = lastTimeElement;
 			}
 		}
-
+		
 		return lastTime;
 	}
 
@@ -450,6 +450,10 @@ public class StateContext {
         
         myState.draw();
     }
+
+    void is(State testState){
+        return typeof(testState) == typeof(myState);
+    }
 }
 class Circle extends SceneElement{
 
@@ -538,18 +542,13 @@ class CurveCat
   // Interpolator
   private SmoothInterpolator interpolator;
 
-  // Relative to the new draw
-  private ArrayList<PVector> vertexs;
-  private boolean wasEdited;
-  private ArrayList<float> speeds;
-  private float minSpeed;
-  private float maxSpeed;
+  private Renderer renderer;
 
   CurveCat() 
   {
+    renderer = new TimeRenderer();
     wasEdited = false;
     controlPoints = new ArrayList<Property>();
-    vertexs = new ArrayList<PVector>();
     speeds = new ArrayList<float>();
     decimable = true;
     tolerance = 10;
@@ -562,7 +561,6 @@ class CurveCat
   {
     decimable = true;
     controlPoints = new ArrayList<Property>();
-    vertexs = new ArrayList<PVector>(); 
     saveCurve();
   }
 
@@ -612,7 +610,6 @@ class CurveCat
 
       // Fiz isso aqui porque não posso modificar o pList
       tmp = new ArrayList<Property>();
-      //console.log(tmp);
       for (int i = index; i <= end; ++i) {
           tmp.add(pList.get(i));
       }
@@ -622,7 +619,6 @@ class CurveCat
       results1.addAll(results2);
       result = (ArrayList<Property>) results1.clone();
     }else{
-      //console.log(pList.toArray());
       result = pList;
     }
 
@@ -634,7 +630,6 @@ class CurveCat
     Property firstPoint = pList.get(0);
     Property lastPoint = pList.get(pList.size()-1);
     ArrayList<Property> result;
-    //console.log("Usando novo DouglasPeuckerReducing");
     if (pList.size() < 3)
         return pList;
     
@@ -660,7 +655,6 @@ class CurveCat
 
       // Fiz isso aqui porque não posso modificar o pList
       tmp = new ArrayList<Property>();
-      //console.log(tmp);
       for (int i = index; i <= pList.size() -1 ; ++i) {
           tmp.add(pList.get(i));
       }
@@ -670,7 +664,6 @@ class CurveCat
       results1.addAll(results2);
       result = (ArrayList<Property>) results1.clone();
     }else{
-      //console.log(pList.toArray());
       result = pList;
     }
 
@@ -753,7 +746,6 @@ class CurveCat
 
       int totalTimeDouglas = t1Douglas - t0;
       // Exibe o tempo total gasto em Douglas Peucker
-      // console.log("Tempo de processamento Douglas Peucker: "+totalTimeDouglas+" ms");
 
       // Array que vai conter os vetores a serem testados
       ArrayList<Property> testableControlPoints = (ArrayList<Property>) controlPoints.clone();
@@ -764,7 +756,6 @@ class CurveCat
       //   testableControlPoints.remove(essentials.get(i));
       // }
       
-      // console.log("essentials.size(): "+essentials.size());
       // Adiciona os essenciais no final da lista de testáveis em ordem de prioridade do menos importante pro mais importante.
       /*for (int i = essentials.size(); i >= 0; --i)
       {
@@ -782,7 +773,6 @@ class CurveCat
          int index = controlPoints.indexOf( testableControlPoints.get(i) );
          pAux.remove(index);
 
-         //console.log(index);
          segAux = getSegment(pAux,index-1);
          remove = true;
          
@@ -816,7 +806,7 @@ class CurveCat
          }
          
          if(remove){
-           this.controlPoints.remove(index);
+           controlPoints.remove(index);
            wasDecimed = true;
          }
          
@@ -824,7 +814,6 @@ class CurveCat
 
       // Calculating the time of processing of the decime
       int totalTimeDecime = millis() - t0;
-      console.log("Tempo de processamento do decimeCurve: "+totalTimeDecime+" ms");
       this.decimable = wasDecimed;
   }
 
@@ -883,9 +872,10 @@ class CurveCat
     try {
       controlPoints.set(index,q); 
     } catch (Exception e) {
-        console.log("e.toString(): "+e.toString());
-        console.log("Erro ao setar ponto de controle");
+        console.error("e.toString(): "+e.toString());
+        console.error("Erro ao setar ponto de controle");
     }
+    saveCurve();
   }
 
   // Retorna as coordenadas (X,Y) para de uma lista de PVectors p dado o index.
@@ -1021,11 +1011,11 @@ class CurveCat
   }
 
   ArrayList<Property> getControlPointsClone(){
-    return this.controlPoints.clone();
+    return controlPoints.clone();
   }
 
   ArrayList<Property> getControlPoints(){
-    return this.controlPoints;
+    return controlPoints;
   }
 
   /** FIM DOS MÉTODOS DE EDIÇÃO E CRIAÇÃO **/
@@ -1100,7 +1090,7 @@ class CurveCat
     history.add(branch);
     historyIndex++;
 
-    calculateVertexs();
+    renderer.update(controlPoints);
   }
 
   void undo(){
@@ -1124,92 +1114,12 @@ class CurveCat
     }
   }
 
-  void calculateVertexs(){
-    maxSpeed = 0;
-    minSpeed = 9999;
-
-    vertexs.clear();
-    speeds.clear();
-      for (int i = 0; i < getNumberControlPoints() - 1; i++) {
-        Segment seg = getSegment(i);
-
-        float segmentlength = seg.b.dist(seg.c)/2; 
-
-        for (int j=0; j<=segmentlength; j++) 
-        {
-
-          float t = (float)(j) / (float)(segmentlength);
-          float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-          float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-          float t = curvePoint(seg.a.get(2), seg.b.get(2), seg.c.get(2), seg.d.get(2), t);
-
-          t = (float)(j+1) / (float)(segmentlength);
-          float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-          float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-          float t2 = curvePoint(seg.a.get(2), seg.b.get(2), seg.c.get(2), seg.d.get(2), t);
-
-          float speed = PVector.dist(new PVector(x,y), new PVector(x2,y2))/(t2 - t);
-
-          if(speed > maxSpeed){
-            maxSpeed = speed;
-          }
-
-          if(speed < minSpeed){
-            minSpeed = speed;
-          }
-
-          speeds.add(speed);
-          console.error(speed);
-
-          PVector bP = PVector.sub(new PVector(x2,y2), new PVector(x,y));
-          PVector ortogonal1 = new PVector(-bP.y, bP.x);
-          PVector ortogonal2 = new PVector(-bP.y, bP.x);
-
-          ortogonal1.normalize();
-          ortogonal2.normalize();
-
-          ortogonal1.mult(curveWeight);
-          ortogonal2.mult(curveWeight);
-          
-          //  strokeWeight()
-          vertexs.add(new PVector(x + ortogonal1.x, y + ortogonal1.y));
-          vertexs.add(new PVector(x - ortogonal1.x, y - ortogonal1.y));
-          vertexs.add(new PVector(x2 + ortogonal2.x, y2 + ortogonal2.y));
-          vertexs.add(new PVector(x2 - ortogonal2.x, y2 - ortogonal2.y));
-        }
-        
-      }
-
-      console.log(maxSpeed);
-      console.log(minSpeed);
-  }
-
   /**
    MÉTODOS DE DESENHAR
    **/
   void draw()
   { 
-    color from = color(#FF0000);
-    color to = color(#00FF00);
-
-    if(vertexs.size() >= 4){
-      beginShape(QUAD_STRIP);
-      noStroke();
-
-      for (int i = 0; i < vertexs.size() - 1; i++) {
-        if(i % 4 == 0){
-          float p = norm( speeds.get( (int) (i / 4) ) , minSpeed, maxSpeed);
-          p = abs(p);
-          fill(lerpColor(from, to, p));
-        }
-
-        PVector vi = vertexs.get(i);
-
-        vertex(vi.x, vi.y);
-      }
-      
-      endShape();
-    }
+    renderer.render();
   }
 
   // Desenha elipses de acordo com os elementos do tipo PVector da lista p
@@ -1330,7 +1240,6 @@ class CurveCat
         }
 
         dx += totalCurveLength;
-        console.log(dx);
         indexDiference++;
       }
 
@@ -1579,6 +1488,133 @@ class Text extends Element{
 	{
 		return this.text;
 	}
+}
+class Renderer{
+  ArrayList<PVector> vertexs;
+
+  void calculateVertexs(){};
+  void render(){};
+
+  Segment getSegment(ArrayList<Property> pAux, int i)
+  { 
+         Property a = i >= 1 ? pAux.get(i-1) : pAux.get(0);
+         Property b = pAux.get(i);
+         Property c = pAux.get(i+1);
+         Property d = i+2 < pAux.size() ? pAux.get(i+2) : pAux.get(i+1);
+         return new Segment(a,b,c,d);
+  }
+
+  Segment getSegment(int i)
+  { 
+         return getSegment(controlPoints,i);
+  }
+}
+class TimeRenderer extends Renderer{
+  private boolean wasEdited;
+  private ArrayList<float> speeds;
+  private ArrayList<float> speeds;
+  private float minSpeed;
+  private float maxSpeed;
+
+  private float minDistance = 5;
+  private color strokeColor = color(0);
+  private float controlPointAlpha = 200;
+  private float curveWeight = 5;
+
+  private SmoothPositionInterpolator interpolator;
+
+  private ArrayList<PVector> vertexs;
+
+  TimeRenderer(){
+    vertexs = new ArrayList<PVector>();
+    speeds = new ArrayList<Float>();
+    interpolator = new SmoothPositionInterpolator(new SmoothInterpolator());
+  }
+
+  void render(){
+    color from = color(#07123A);
+    color to = color(#7A86AD);
+
+    if(vertexs.size() >= 4){
+      beginShape(QUAD_STRIP);
+      strokeCap(ROUND);
+      strokeJoin(ROUND);
+
+      for (int i = 0; i < vertexs.size() - 1; i++) {
+        if(i % 4 == 0){
+          float p = norm( speeds.get( (int) (i / 4) ) , minSpeed, maxSpeed);
+          p = abs(p);
+          fill(lerpColor(from, to, p));
+          stroke(lerpColor(from, to, p));
+        }
+
+        PVector vi = vertexs.get(i);
+
+        vertex(vi.x, vi.y);
+      }
+      
+      endShape();
+    }
+  }
+
+  void update(ArrayList<Property> properties){
+    maxSpeed = 0;
+    minSpeed = 9999;
+
+    // Updating the inpolator
+    for (int i = 0; i< properties.size(); i++){
+      p = properties.get(i);
+
+      interpolator.set(p.getT(), new PVector(p.getX(), p.getY()));
+    }
+
+    vertexs = new ArrayList<PVector>();
+    speeds = new ArrayList<PVector>();
+
+    for (int i = 0; i < properties.size() - 1; i++) {
+      Property p = properties.get(i);
+      Segment seg = getSegment(properties,i);
+
+      float segmentlength = seg.b.dist(seg.c)/2; 
+
+      for (int j=0; j<=segmentlength; j++) 
+      {
+        float t = (float)(j) / (float)(segmentlength);
+        float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+        float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+        float t1 = p.getT() + t;
+
+        t = (float)(j+1) / (float)(segmentlength);
+        float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+        float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+        float t2 = p.getT() + t;
+
+        PVector bP = PVector.sub(new PVector(x2,y2), new PVector(x,y));
+        PVector ortogonal1 = new PVector(-bP.y, bP.x);
+        float speed = (bP.mag())/(t2 - t1);
+        speeds.add(speed);
+
+        if(speed > maxSpeed){
+          maxSpeed = speed;
+        }
+
+        if(speed < minSpeed){
+          minSpeed = speed;
+        }
+
+        ortogonal1.normalize();
+
+        ortogonal1.mult(curveWeight);
+        
+        //  strokeWeight()
+        vertexs.add(new PVector(x + ortogonal1.x, y + ortogonal1.y));
+        vertexs.add(new PVector(x - ortogonal1.x, y - ortogonal1.y));
+        vertexs.add(new PVector(x2 + ortogonal1.x, y2 + ortogonal1.y));
+        vertexs.add(new PVector(x2 - ortogonal1.x, y2 - ortogonal1.y));
+      }
+      
+    }
+  }
 }
 // Linearly interpolates properties for a specific
 // time, given values of these properties at 
@@ -1970,7 +2006,6 @@ class CircleState extends State {
     public void mousePressed() 
     {
         Circle c = new Circle(20,20);
-        console.log("Instanciando Circle...");
         context.addElement(c);  
         context.setSelectedElement(c);
     }
@@ -2028,8 +2063,6 @@ class DrawningState extends State {
         stateContext.setStateName("edit");
       }
       
-      //console.log("Numero de Pontos de Controle:"+context.curve.getNumberControlPoints());
-      //console.log("Pontos Selecionados"+selectedSegment);
       
       if(selectedSegment == context.curve.getNumberControlPoints() - 1 && distance < 10){
           stateContext.setStateName("draw");
@@ -2181,7 +2214,7 @@ class EditingState extends State {
         }
 
         context.refreshInterpolator();
-        context.curve.calculateVertexs();
+        // context.curve.calculateVertexs();
     }
 
     public void mouseDragged()
@@ -2234,7 +2267,7 @@ class EditingState extends State {
             }
 
           }
-          context.curve.calculateVertexs();
+          // context.curve.calculateVertexs();
         }
     }
 
@@ -2263,7 +2296,6 @@ class EditingState extends State {
 
         // Draw control points if have a curve;
         context.curve.drawControlPoints();
-        
     }
 }
 class FontState extends State {
@@ -2614,7 +2646,6 @@ class SquareState extends State {
     public void mousePressed() 
     {
         Square c = new Square(20,20);
-        console.log("Instanciando Square...");
         context.addElement(c);  
         context.setSelectedElement(c);
     }
