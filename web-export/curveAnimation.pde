@@ -50,11 +50,13 @@ int width,height;
 public void setup() 
 {
   try {
-
-    size(screen.width*0.8, screen.height*0.7);
+    size(screen.width*0.8, screen.height*0.7, P3D);
+    width = screen.width*0.8;
+    height = screen.height*0.7;
 
     smooth();
 
+    frameRate(1000);
     context = new Context();
     update();
     stateContext = new StateContext(context);
@@ -123,6 +125,9 @@ void draw()
   } catch (Exception e) {
     // console.log("Falha no Draw \ne.toString(): "+e.toString());
   }
+  
+  fill(255,0,0);
+  text('FPS: '+frameRate, 20, 20);
 }
 
 void update(){
@@ -224,11 +229,13 @@ class Context{
 		t = 0;
 	}
 
+	// Adiciona um elemento a lista de elementos
 	void addElement(SceneElement e)
 	{
 		sceneElements.add(e);
 	}
 
+	// Desenha todos os elementos na tela
 	void draw(float t){
 		if(t == 0){
 			t = this.time;
@@ -487,8 +494,11 @@ class Circle extends SceneElement{
 		}
 
 		fill(c);
-		stroke(0);
+		noStroke();
 		ellipse(position.x, position.y, this.width, this.height);
+
+		fill(0);
+		ellipse(position.x, position.y, 5, 5);
 	}
 
 	void setWidth(float x){
@@ -536,7 +546,6 @@ class CurveCat
   // Min Ditance wich can be in the curve
   private float minDistance = 5;
   private color strokeColor = color(0);
-  private int curveWeight = 3;
   private float controlPointAlpha = 200;
 
   // Interpolator
@@ -839,6 +848,8 @@ class CurveCat
     while(this.canBeDecimed()){
       this.decimeCurve(this.tolerance);
     }  
+
+    renderer.update(this.controlPoints);
   }
 
   void setTolerance(float t){
@@ -861,9 +872,11 @@ class CurveCat
   }
 
   void insertPoint(Property q){
-    saveCurve();
     controlPoints.add(q);
     this.decimable = true;
+    this.decimeAll();
+    // renderer.addPoint(controlPoints);
+    saveCurve();
   }
 
   // Altera o valor do elemento index da lista p para q
@@ -1090,7 +1103,8 @@ class CurveCat
     history.add(branch);
     historyIndex++;
 
-    renderer.update(controlPoints);
+    // this.decimeAll();
+    renderer.update(this.controlPoints);
   }
 
   void undo(){
@@ -1130,10 +1144,13 @@ class CurveCat
       stroke(secondaryColor, controlPointAlpha);
       for (int i = 0; i < getNumberControlPoints(); i++) 
       {
-        ellipse (controlPoints.get(i).get(0), controlPoints.get(i).get(1), 7, 7);
-        text("t: "+controlPoints.get(i).get(2), controlPoints.get(i).get(0) + 10, controlPoints.get(i).get(1) - 10);
+        pushMatrix();
+        translate(controlPoints.get(i).get(0), controlPoints.get(i).get(1), 10);
+        
+        sphere(5);
+        text("t: "+controlPoints.get(i).get(2), 10, -10, 0);
+        popMatrix();
       } 
-      fill(255);
     }
   }
 
@@ -1415,18 +1432,25 @@ class Square extends SceneElement{
 		PVector position;
 		if(!active){
 			position = pos.get(0);
+			PVector tangent = pos.getTangent(0);
 		}else{
 			position = pos.get(t);
+			PVector tangent = pos.getTangent(t);
 		}
 
-		rectMode(CENTER);
-		fill(c);
-		stroke(0);
-		rect(position.x, position.y, this.width, this.height);
 
-		fill(0);
-		stroke(0);
-		point(position.x, position.y);
+		pushMatrix();
+
+		rectMode(CENTER);
+
+		fill(c);
+		noStroke();
+		smooth(8);
+		translate(position.x, position.y, 0);
+		rotate(-atan2(tangent.x, tangent.y));
+		rect(0, 0, this.width, this.height);
+		
+		popMatrix();
 	}
 
 	void setWidth(float x){
@@ -1521,55 +1545,49 @@ class TimeRenderer extends Renderer{
   private float controlPointAlpha = 200;
   private float curveWeight = 5;
 
-  private SmoothPositionInterpolator interpolator;
-
   private ArrayList<PVector> vertexs;
+  private ArrayList<PVector> points;
+  private color from = color(#07123A);
+  private color to = color(#7A86AD);
 
   TimeRenderer(){
     vertexs = new ArrayList<PVector>();
     speeds = new ArrayList<Float>();
-    interpolator = new SmoothPositionInterpolator(new SmoothInterpolator());
+    maxSpeed = sqrt( (width*width) + (height*height) )/2;
+    minSpeed = 0;
   }
 
+  // Desenha a curva
   void render(){
-    color from = color(#07123A);
-    color to = color(#7A86AD);
+    fill(0);
+    noStroke();
 
     if(vertexs.size() >= 4){
       beginShape(QUAD_STRIP);
-      strokeCap(ROUND);
-      strokeJoin(ROUND);
+      smooth();
+      // strokeCap(ROUND);
+      // strokeJoin(ROUND);
 
       for (int i = 0; i < vertexs.size() - 1; i++) {
-        if(i % 4 == 0){
-          float p = norm( speeds.get( (int) (i / 4) ) , minSpeed, maxSpeed);
-          p = abs(p);
-          fill(lerpColor(from, to, p));
-          stroke(lerpColor(from, to, p));
+        if(i % 2 == 0){
+          fill(vertexs.get(i).z);
         }
 
-        PVector vi = vertexs.get(i);
-
-        vertex(vi.x, vi.y);
+        vertex(vertexs.get(i).x, vertexs.get(i).y, 1);
       }
       
       endShape();
     }
   }
 
+  // Calcula os vertexs com base nos pontos de controle da curva guardados em properties
+  // Preenche o array vertexs da classe TimeRenderer
   void update(ArrayList<Property> properties){
-    maxSpeed = 0;
-    minSpeed = 9999;
-
-    // Updating the inpolator
-    for (int i = 0; i< properties.size(); i++){
-      p = properties.get(i);
-
-      interpolator.set(p.getT(), new PVector(p.getX(), p.getY()));
-    }
-
     vertexs = new ArrayList<PVector>();
-    speeds = new ArrayList<PVector>();
+    speeds = new ArrayList<Float>();
+    points = new ArrayList<PVector>();
+
+    boolean first = true;
 
     for (int i = 0; i < properties.size() - 1; i++) {
       Property p = properties.get(i);
@@ -1579,40 +1597,51 @@ class TimeRenderer extends Renderer{
 
       for (int j=0; j<=segmentlength; j++) 
       {
-        float t = (float)(j) / (float)(segmentlength);
-        float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
-        float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
-        float t1 = p.getT() + t;
+        if(first){
 
+          float t = 0;
+          float t = (float)(j) / (float)(segmentlength);
+          float x = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+          float y = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+          float t1 = p.getT() + t;
+          PVector p1 = new PVector(x,y,t1);
+
+          points.add(p1);
+
+          t = (float)(j+1) / (float)(segmentlength);
+          float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
+          float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
+          float t2 = p.getT() + t;
+          PVector p2 = new PVector(x2,y2,t2);
+
+          points.add(p2);
+
+      }else{
         t = (float)(j+1) / (float)(segmentlength);
         float x2 = curvePoint(seg.a.get(0), seg.b.get(0), seg.c.get(0), seg.d.get(0), t);
         float y2 = curvePoint(seg.a.get(1), seg.b.get(1), seg.c.get(1), seg.d.get(1), t);
         float t2 = p.getT() + t;
+        PVector p2 = new PVector(x2,y2,t2);
 
-        PVector bP = PVector.sub(new PVector(x2,y2), new PVector(x,y));
-        PVector ortogonal1 = new PVector(-bP.y, bP.x);
-        float speed = (bP.mag())/(t2 - t1);
-        speeds.add(speed);
-
-        if(speed > maxSpeed){
-          maxSpeed = speed;
-        }
-
-        if(speed < minSpeed){
-          minSpeed = speed;
-        }
-
-        ortogonal1.normalize();
-
-        ortogonal1.mult(curveWeight);
-        
-        //  strokeWeight()
-        vertexs.add(new PVector(x + ortogonal1.x, y + ortogonal1.y));
-        vertexs.add(new PVector(x - ortogonal1.x, y - ortogonal1.y));
-        vertexs.add(new PVector(x2 + ortogonal1.x, y2 + ortogonal1.y));
-        vertexs.add(new PVector(x2 - ortogonal1.x, y2 - ortogonal1.y));
+        points.add(p2);
       }
+
+      PVector bP = PVector.sub( points.get(points.size() - 1), points.get(points.size() - 2));
+      PVector ortogonal1 = new PVector(-bP.y, bP.x);
+      float speed = ( bP.mag() )/(t2 - t1);
+      speeds.add(speed);
+
+      ortogonal1.normalize();
+
+      ortogonal1.mult(5);
       
+      float parameter = norm( speed , minSpeed, maxSpeed);
+      parameter = abs(parameter);
+      color c = lerpColor(from, to, parameter)
+
+      vertexs.add(new PVector(x + ortogonal1.x, y + ortogonal1.y, c));
+      vertexs.add(new PVector(x - ortogonal1.x, y - ortogonal1.y, c));
+      }
     }
   }
 }
@@ -2127,7 +2156,6 @@ class EditingState extends State {
 
     public void mousePressed() 
     {
-
         if(context.mouseButton == RIGHT){
 
             // Verfica se tem nenhum element selecionado
@@ -2212,9 +2240,6 @@ class EditingState extends State {
         {
             context.selectedSegments = context.curve.getControlPointsBetween(context.mouseInit, context.mouseFinal);
         }
-
-        context.refreshInterpolator();
-        // context.curve.calculateVertexs();
     }
 
     public void mouseDragged()
@@ -2267,7 +2292,6 @@ class EditingState extends State {
             }
 
           }
-          // context.curve.calculateVertexs();
         }
     }
 

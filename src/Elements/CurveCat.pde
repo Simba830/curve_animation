@@ -20,7 +20,6 @@ class CurveCat
   // Min Ditance wich can be in the curve
   private float minDistance = 5;
   private color strokeColor = color(0);
-  private int curveWeight = 3;
   private float controlPointAlpha = 200;
 
   // Interpolator
@@ -323,6 +322,8 @@ class CurveCat
     while(this.canBeDecimed()){
       this.decimeCurve(this.tolerance);
     }  
+
+    renderer.update(this.controlPoints);
   }
 
   void setTolerance(float t){
@@ -345,9 +346,11 @@ class CurveCat
   }
 
   void insertPoint(Property q){
-    saveCurve();
     controlPoints.add(q);
     this.decimable = true;
+    this.decimeAll();
+    // renderer.addPoint(controlPoints);
+    saveCurve();
   }
 
   // Altera o valor do elemento index da lista p para q
@@ -574,7 +577,8 @@ class CurveCat
     history.add(branch);
     historyIndex++;
 
-    renderer.update(controlPoints);
+    // this.decimeAll();
+    renderer.update(this.controlPoints);
   }
 
   void undo(){
@@ -614,10 +618,13 @@ class CurveCat
       stroke(secondaryColor, controlPointAlpha);
       for (int i = 0; i < getNumberControlPoints(); i++) 
       {
-        ellipse (controlPoints.get(i).get(0), controlPoints.get(i).get(1), 7, 7);
-        text("t: "+controlPoints.get(i).get(2), controlPoints.get(i).get(0) + 10, controlPoints.get(i).get(1) - 10);
+        pushMatrix();
+        translate(controlPoints.get(i).get(0), controlPoints.get(i).get(1), 10);
+        
+        sphere(5);
+        text("t: "+controlPoints.get(i).get(2), 10, -10, 0);
+        popMatrix();
       } 
-      fill(255);
     }
   }
 

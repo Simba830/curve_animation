@@ -26,18 +26,25 @@ class Square extends SceneElement{
 		PVector position;
 		if(!active){
 			position = pos.get(0);
+			PVector tangent = pos.getTangent(0);
 		}else{
 			position = pos.get(t);
+			PVector tangent = pos.getTangent(t);
 		}
 
-		rectMode(CENTER);
-		fill(c);
-		stroke(0);
-		rect(position.x, position.y, this.width, this.height);
 
-		fill(0);
-		stroke(0);
-		point(position.x, position.y);
+		pushMatrix();
+
+		rectMode(CENTER);
+
+		fill(c);
+		noStroke();
+		smooth(8);
+		translate(position.x, position.y, 0);
+		rotate(-atan2(tangent.x, tangent.y));
+		rect(0, 0, this.width, this.height);
+		
+		popMatrix();
 	}
 
 	void setWidth(float x){

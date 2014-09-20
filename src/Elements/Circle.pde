@@ -30,8 +30,11 @@ class Circle extends SceneElement{
 		}
 
 		fill(c);
-		stroke(0);
+		noStroke();
 		ellipse(position.x, position.y, this.width, this.height);
+
+		fill(0);
+		ellipse(position.x, position.y, 5, 5);
 	}
 
 	void setWidth(float x){

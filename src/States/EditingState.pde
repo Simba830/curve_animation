@@ -9,7 +9,6 @@ class EditingState extends State {
 
     public void mousePressed() 
     {
-
         if(context.mouseButton == RIGHT){
 
             // Verfica se tem nenhum element selecionado
@@ -94,9 +93,6 @@ class EditingState extends State {
         {
             context.selectedSegments = context.curve.getControlPointsBetween(context.mouseInit, context.mouseFinal);
         }
-
-        context.refreshInterpolator();
-        // context.curve.calculateVertexs();
     }
 
     public void mouseDragged()
@@ -149,7 +145,6 @@ class EditingState extends State {
             }
 
           }
-          // context.curve.calculateVertexs();
         }
     }
 

@@ -86,11 +86,13 @@ class Context{
 		t = 0;
 	}
 
+	// Adiciona um elemento a lista de elementos
 	void addElement(SceneElement e)
 	{
 		sceneElements.add(e);
 	}
 
+	// Desenha todos os elementos na tela
 	void draw(float t){
 		if(t == 0){
 			t = this.time;

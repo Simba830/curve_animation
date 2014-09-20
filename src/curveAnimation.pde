@@ -21,11 +21,13 @@ int width,height;
 public void setup() 
 {
   try {
-
-    size(screen.width*0.8, screen.height*0.7);
+    size(screen.width*0.8, screen.height*0.7, P3D);
+    width = screen.width*0.8;
+    height = screen.height*0.7;
 
     smooth();
 
+    frameRate(1000);
     context = new Context();
     update();
     stateContext = new StateContext(context);
@@ -94,6 +96,9 @@ void draw()
   } catch (Exception e) {
     // console.log("Falha no Draw \ne.toString(): "+e.toString());
   }
+  
+  fill(255,0,0);
+  text('FPS: '+frameRate, 20, 20);
 }
 
 void update(){
