@@ -144,6 +144,14 @@ class Property {
     this.set(2, t);
   }
 
+  float getSize(){
+    return this.get(3);
+  }
+
+  void setSize(float t){
+    this.set(3, t);
+  }
+
   float getWidth(){
     if(this.get(WIDTH) == 0){
       return DEFAULT_WIDTH;

@@ -56,7 +56,7 @@ public void setup()
 
     smooth();
 
-    frameRate(1000);
+    frameRate(60);
     context = new Context();
     update();
     stateContext = new StateContext(context);
@@ -123,7 +123,7 @@ void draw()
     update();
     stateContext.draw();
   } catch (Exception e) {
-    // console.log("Falha no Draw \ne.toString(): "+e.toString());
+    console.log("Falha no Draw \ne.toString(): "+e.toString());
   }
   
   fill(255,0,0);
@@ -213,10 +213,12 @@ class Context{
 
 		for (SceneElement o : sceneElements) {
 			o.pos.clear();
+			o.sizeInterpolator.clear();
 
 			for (int i = 0; i< o.curve.getNumberControlPoints(); i++){
 				p = o.curve.getControlPoint(i);
 
+				o.sizeInterpolator.set(p.getT(), p);
 				o.pos.set(p.getT(), new PVector(p.getX(), p.getY()));
 			}
 		}
@@ -251,6 +253,11 @@ class Context{
 			}
 
 			o.draw(t);
+
+			if(this.isPlayed()){
+				o.getCurve().getRenderer().setAlpha(30);
+			}	
+
 			o.drawCurve();
 		}
 
@@ -288,6 +295,7 @@ class Context{
 		for (int i = 0; i < sceneElements.size(); ++i) {
 			SceneElement o = sceneElements.get(i);
 			if(o == selectedElement){
+				o.setCurve(new CurveCat());
 				sceneElements.remove(i);
 				this.curve = new CurveCat();
 				return;
@@ -361,6 +369,10 @@ public class StateContext {
 
             case 'edit' :
                   myState = new EditingState(this.context);
+              break; 
+
+            case 'size' :
+                  myState = new SizeEditingState(this.context);
               break; 
 
             case 'time' :
@@ -447,7 +459,7 @@ public class StateContext {
             if(lastTime == 0){
                 context.stop();
             }else{
-                context.draw((frameCount) % int(lastTime));
+                context.draw( (frameCount/5) % int(lastTime));
             }
 
 
@@ -551,6 +563,7 @@ class CurveCat
   // Interpolator
   private SmoothInterpolator interpolator;
 
+  // Render
   private Renderer renderer;
 
   CurveCat() 
@@ -702,6 +715,10 @@ class CurveCat
     return distance;
   }
 
+  void updateRender(){
+    this.renderer.update(this.controlPoints);
+  }
+
   float findPerpendicularDistance(p, p1,p2) {
     // if start and end point are on the same x the distance is the difference in X.
     float result;
@@ -849,6 +866,8 @@ class CurveCat
       this.decimeCurve(this.tolerance);
     }  
 
+    console.log("Was decimed");
+
     renderer.update(this.controlPoints);
   }
 
@@ -869,12 +888,15 @@ class CurveCat
     saveCurve();
     controlPoints.add(index,q);
     this.decimable = true;
+    this.decimeAll();
+    console.log("Inserting point");
   }
 
   void insertPoint(Property q){
     controlPoints.add(q);
     this.decimable = true;
     this.decimeAll();
+    console.log("Inserting point");
     // renderer.addPoint(controlPoints);
     saveCurve();
   }
@@ -1136,6 +1158,10 @@ class CurveCat
     renderer.render();
   }
 
+  Renderer getRenderer(){
+    return this.renderer;
+  }
+
   // Desenha elipses de acordo com os elementos do tipo PVector da lista p
   void drawControlPoints()
   {
@@ -1318,6 +1344,7 @@ class SceneElement
 	private float scale; 
 	private color c, curveColor; 
 	private float transparency;
+	private SmoothInterpolator sizeInterpolator;
 
 
 	SceneElement(PVector position)
@@ -1325,6 +1352,12 @@ class SceneElement
 		this.name = "Element";
 		this.scale = 1.0;
 		this.c = color(0,0,0);
+		this.sizeInterpolator = new SmoothInterpolator();
+		Property p = new Property(0,0,0);
+		p.setT(0);
+		p.setSize(1);
+		this.sizeInterpolator.set(p.getT(), p);
+		console.log('this.sizeInterpolator.get(0):'+this.sizeInterpolator.get(0).getSize());
 		this.pos = new SmoothPositionInterpolator(new SmoothInterpolator());
 		this.pos.set(0,position);
 		this.rotation = 0.6;
@@ -1332,12 +1365,12 @@ class SceneElement
 		this.transparency = 0;
 		this.curve = new CurveCat();
 		this.curve.setTolerance(15);
-
 	}
 
 	void draw(float t){
 
 	}
+	
 	void drawCurve(){
 		curve.strokeColor = curveColor;
 		noFill();
@@ -1360,6 +1393,10 @@ class SceneElement
 
 	CurveCat getCurve(){
 		return this.curve;
+	}
+
+	void setCurve(CurveCat newCurve){
+		this.curve = newCurve;
 	}
 
 	void setInitialPosition(PVector p){
@@ -1389,7 +1426,6 @@ class SceneElement
 	{
 		return this.rotation;
 	}
-
 }
 
 class Segment{
@@ -1416,7 +1452,6 @@ class Square extends SceneElement{
 		this.width = _width;
 		this.height = _height;
 		active = true;
-
 	}
 
 	void draw(float t)
@@ -1429,15 +1464,17 @@ class Square extends SceneElement{
 			t = pos.keyTime(pos.nKeys()-1);
 		}
 
+		console.log('t:'+t);
 		PVector position;
 		if(!active){
 			position = pos.get(0);
 			PVector tangent = pos.getTangent(0);
+			float myScale = this.sizeInterpolator.get(0).getSize();
 		}else{
 			position = pos.get(t);
 			PVector tangent = pos.getTangent(t);
+			float myScale = this.sizeInterpolator.get(t).getSize();
 		}
-
 
 		pushMatrix();
 
@@ -1448,7 +1485,8 @@ class Square extends SceneElement{
 		smooth(8);
 		translate(position.x, position.y, 0);
 		rotate(-atan2(tangent.x, tangent.y));
-		rect(0, 0, this.width, this.height);
+
+		rect(0, 0, this.width * myScale, this.height * myScale);
 		
 		popMatrix();
 	}
@@ -1515,6 +1553,7 @@ class Text extends Element{
 }
 class Renderer{
   ArrayList<PVector> vertexs;
+  float alphaValue = 100;
 
   void calculateVertexs(){};
   void render(){};
@@ -1532,11 +1571,15 @@ class Renderer{
   { 
          return getSegment(controlPoints,i);
   }
+
+  void setAlpha(float t){
+    this.alphaValue = t;
+  }
 }
 class TimeRenderer extends Renderer{
   private boolean wasEdited;
   private ArrayList<float> speeds;
-  private ArrayList<float> speeds;
+  private ArrayList<float> widths;
   private float minSpeed;
   private float maxSpeed;
 
@@ -1548,11 +1591,12 @@ class TimeRenderer extends Renderer{
   private ArrayList<PVector> vertexs;
   private ArrayList<PVector> points;
   private color from = color(#07123A);
-  private color to = color(#7A86AD);
+  private color to = color(#9BCBEE);
 
   TimeRenderer(){
     vertexs = new ArrayList<PVector>();
     speeds = new ArrayList<Float>();
+    widths = new ArrayList<Float>();
     maxSpeed = sqrt( (width*width) + (height*height) )/2;
     minSpeed = 0;
   }
@@ -1570,7 +1614,7 @@ class TimeRenderer extends Renderer{
 
       for (int i = 0; i < vertexs.size() - 1; i++) {
         if(i % 2 == 0){
-          fill(vertexs.get(i).z);
+          fill(vertexs.get(i).z, this.alphaValue);
         }
 
         vertex(vertexs.get(i).x, vertexs.get(i).y, 1);
@@ -1585,12 +1629,14 @@ class TimeRenderer extends Renderer{
   void update(ArrayList<Property> properties){
     vertexs = new ArrayList<PVector>();
     speeds = new ArrayList<Float>();
+    widths = new ArrayList<Float>();
     points = new ArrayList<PVector>();
 
     boolean first = true;
 
     for (int i = 0; i < properties.size() - 1; i++) {
       Property p = properties.get(i);
+      Property pNext = properties.get(i + 1);
       Segment seg = getSegment(properties,i);
 
       float segmentlength = seg.b.dist(seg.c)/2; 
@@ -1633,7 +1679,8 @@ class TimeRenderer extends Renderer{
 
       ortogonal1.normalize();
 
-      ortogonal1.mult(5);
+      float mySize = curvePoint(p.getSize(), p.getSize(), pNext.getSize(), pNext.getSize(), t);
+      ortogonal1.mult(5 + 10*(mySize - 1));
       
       float parameter = norm( speed , minSpeed, maxSpeed);
       parameter = abs(parameter);
@@ -1876,6 +1923,14 @@ class Property {
     this.set(2, t);
   }
 
+  float getSize(){
+    return this.get(3);
+  }
+
+  void setSize(float t){
+    this.set(3, t);
+  }
+
   float getWidth(){
     if(this.get(WIDTH) == 0){
       return DEFAULT_WIDTH;
@@ -2108,7 +2163,9 @@ class DrawningState extends State {
       else { canSketch = false; }
         
       if (canSketch){
-        this.context.curve.insertPoint(new Property(this.context.mouse.x, this.context.mouse.y, 0));
+        Property myPoint = new Property(this.context.mouse.x, this.context.mouse.y, 0);
+        myPoint.setSize(1);
+        this.context.curve.insertPoint(myPoint);
       }
     }
     
@@ -2131,6 +2188,7 @@ class DrawningState extends State {
 
       if (canSketch){
         Property myPoint = new Property(context.mouse.x, context.mouse.y, t);
+        myPoint.setSize(1);
   		  context.curve.insertPoint( myPoint, context.curve.getNumberControlPoints());
       }
     }
@@ -2309,13 +2367,16 @@ class EditingState extends State {
     {
         if(context.selectedSegments.length == 0)
         {
+            pushMatrix();
             // Desenha caixa de seleção com Alpha 50
-            fill(mainColor, 50);
-            stroke(mainColor, 50);
+            fill(mainColor, 30);
+            stroke(mainColor, 30);
+            rectMode(CORNER);
             rect(context.mouseInit.x, 
             context.mouseInit.y, 
             context.mouseFinal.x - context.mouseInit.x, 
             context.mouseFinal.y - context.mouseInit.y);
+            popMatrix();
         }
 
         // Draw control points if have a curve;
@@ -2565,9 +2626,6 @@ class SelectState extends State
       float dx = context.mouse.x - context.pMouse.x;
       float dy = context.mouse.y - context.pMouse.y;
 
-      println("dx: "+dx);
-      println("dy: "+dy);
-
       SceneElement selected = context.getSelectedElement();
       PVector ini = selected.getInitialPosition();
 
@@ -2661,6 +2719,87 @@ class SimpleTimeEditingState extends State {
       }
     }
 }
+class SizeEditingState extends State {
+
+    private float timeSpacing = 1;
+    private SceneElement element;
+    private Property selectedProperty;
+    private int selectedSegment;
+    private CurveCat elementCurve;
+    private ArrayList<Property> controlPoints;
+    private CurveCat auxCurve;
+    private float dx;
+
+    private float distanceToSelect = 20;
+    
+    SizeEditingState(Context context){
+      super(context);
+      dx = 0;
+      selectedProperty = null;
+      element = context.getSelectedElement();
+      elementCurve = element.getCurve();
+      controlPoints = elementCurve.getControlPoints();
+    }
+
+    public void mousePressed() 
+    {
+      Property p;
+      for (int i = 0; i < controlPoints.size(); i++) {
+        p = controlPoints.get(i);
+        if(dist(p.getX(), p.getY(), context.getMouse().x, context.getMouse().y) < 20){
+          selectedProperty = p;
+          selectedSegment = i;
+          dx = 0;
+        }
+      }
+    }
+
+    public void mouseReleased() 
+    {
+
+    }
+
+    public void mouseDragged()
+    {
+      if(selectedProperty != null){
+        int dx = context.mouse.x - context.pMouse.x;
+        selectedProperty.setSize( selectedProperty.getSize() + (dx/100));
+        elementCurve.updateRender();
+      }
+    }
+
+    public void keyPressed(){
+
+    }
+
+    public void draw()
+    {
+      controlPoints = elementCurve.getControlPoints();
+      Property p;
+
+      if(context.isPlayed())
+        return;
+
+      for (int i = 0; i < controlPoints.size() - 1; ++i) {
+          p = controlPoints.get(i);
+          pushMatrix();
+
+          if(p == selectedProperty){
+            fill(secondaryColor, 200);
+            stroke(secondaryColor, 200);
+          }else{
+            fill(mainColor, 200);
+            stroke(mainColor, 200);
+          }
+          
+
+          translate(p.getX(), p.getY(), 10);
+          sphere(10);
+          text("t: "+ ( (int) p.getT()), 10, 10);
+          popMatrix();
+      }
+    }
+}
 class SquareState extends State {
 
     SquareState(Context _context){
@@ -2670,6 +2809,7 @@ class SquareState extends State {
     public void mousePressed() 
     {
         Square c = new Square(20,20);
+        c.sizeInterpolator.set(0, new Property());
         context.addElement(c);  
         context.setSelectedElement(c);
     }

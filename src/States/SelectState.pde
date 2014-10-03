@@ -43,9 +43,6 @@ class SelectState extends State
       float dx = context.mouse.x - context.pMouse.x;
       float dy = context.mouse.y - context.pMouse.y;
 
-      println("dx: "+dx);
-      println("dy: "+dy);
-
       SceneElement selected = context.getSelectedElement();
       PVector ini = selected.getInitialPosition();
 

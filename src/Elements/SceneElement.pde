@@ -22,6 +22,7 @@ class SceneElement
 	private float scale; 
 	private color c, curveColor; 
 	private float transparency;
+	private SmoothInterpolator sizeInterpolator;
 
 
 	SceneElement(PVector position)
@@ -29,6 +30,12 @@ class SceneElement
 		this.name = "Element";
 		this.scale = 1.0;
 		this.c = color(0,0,0);
+		this.sizeInterpolator = new SmoothInterpolator();
+		Property p = new Property(0,0,0);
+		p.setT(0);
+		p.setSize(1);
+		this.sizeInterpolator.set(p.getT(), p);
+		console.log('this.sizeInterpolator.get(0):'+this.sizeInterpolator.get(0).getSize());
 		this.pos = new SmoothPositionInterpolator(new SmoothInterpolator());
 		this.pos.set(0,position);
 		this.rotation = 0.6;
@@ -36,12 +43,12 @@ class SceneElement
 		this.transparency = 0;
 		this.curve = new CurveCat();
 		this.curve.setTolerance(15);
-
 	}
 
 	void draw(float t){
 
 	}
+	
 	void drawCurve(){
 		curve.strokeColor = curveColor;
 		noFill();
@@ -64,6 +71,10 @@ class SceneElement
 
 	CurveCat getCurve(){
 		return this.curve;
+	}
+
+	void setCurve(CurveCat newCurve){
+		this.curve = newCurve;
 	}
 
 	void setInitialPosition(PVector p){
@@ -93,5 +104,4 @@ class SceneElement
 	{
 		return this.rotation;
 	}
-
 }

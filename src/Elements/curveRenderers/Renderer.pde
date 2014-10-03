@@ -1,5 +1,6 @@
 class Renderer{
   ArrayList<PVector> vertexs;
+  float alphaValue = 100;
 
   void calculateVertexs(){};
   void render(){};
@@ -16,5 +17,9 @@ class Renderer{
   Segment getSegment(int i)
   { 
          return getSegment(controlPoints,i);
+  }
+
+  void setAlpha(float t){
+    this.alphaValue = t;
   }
 }

@@ -162,13 +162,16 @@ class EditingState extends State {
     {
         if(context.selectedSegments.length == 0)
         {
+            pushMatrix();
             // Desenha caixa de seleção com Alpha 50
-            fill(mainColor, 50);
-            stroke(mainColor, 50);
+            fill(mainColor, 30);
+            stroke(mainColor, 30);
+            rectMode(CORNER);
             rect(context.mouseInit.x, 
             context.mouseInit.y, 
             context.mouseFinal.x - context.mouseInit.x, 
             context.mouseFinal.y - context.mouseInit.y);
+            popMatrix();
         }
 
         // Draw control points if have a curve;

@@ -10,7 +10,6 @@ class Square extends SceneElement{
 		this.width = _width;
 		this.height = _height;
 		active = true;
-
 	}
 
 	void draw(float t)
@@ -23,15 +22,17 @@ class Square extends SceneElement{
 			t = pos.keyTime(pos.nKeys()-1);
 		}
 
+		console.log('t:'+t);
 		PVector position;
 		if(!active){
 			position = pos.get(0);
 			PVector tangent = pos.getTangent(0);
+			float myScale = this.sizeInterpolator.get(0).getSize();
 		}else{
 			position = pos.get(t);
 			PVector tangent = pos.getTangent(t);
+			float myScale = this.sizeInterpolator.get(t).getSize();
 		}
-
 
 		pushMatrix();
 
@@ -42,7 +43,8 @@ class Square extends SceneElement{
 		smooth(8);
 		translate(position.x, position.y, 0);
 		rotate(-atan2(tangent.x, tangent.y));
-		rect(0, 0, this.width, this.height);
+
+		rect(0, 0, this.width * myScale, this.height * myScale);
 		
 		popMatrix();
 	}

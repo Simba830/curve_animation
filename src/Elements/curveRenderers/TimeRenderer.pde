@@ -1,7 +1,7 @@
 class TimeRenderer extends Renderer{
   private boolean wasEdited;
   private ArrayList<float> speeds;
-  private ArrayList<float> speeds;
+  private ArrayList<float> widths;
   private float minSpeed;
   private float maxSpeed;
 
@@ -13,11 +13,12 @@ class TimeRenderer extends Renderer{
   private ArrayList<PVector> vertexs;
   private ArrayList<PVector> points;
   private color from = color(#07123A);
-  private color to = color(#7A86AD);
+  private color to = color(#9BCBEE);
 
   TimeRenderer(){
     vertexs = new ArrayList<PVector>();
     speeds = new ArrayList<Float>();
+    widths = new ArrayList<Float>();
     maxSpeed = sqrt( (width*width) + (height*height) )/2;
     minSpeed = 0;
   }
@@ -35,7 +36,7 @@ class TimeRenderer extends Renderer{
 
       for (int i = 0; i < vertexs.size() - 1; i++) {
         if(i % 2 == 0){
-          fill(vertexs.get(i).z);
+          fill(vertexs.get(i).z, this.alphaValue);
         }
 
         vertex(vertexs.get(i).x, vertexs.get(i).y, 1);
@@ -50,12 +51,14 @@ class TimeRenderer extends Renderer{
   void update(ArrayList<Property> properties){
     vertexs = new ArrayList<PVector>();
     speeds = new ArrayList<Float>();
+    widths = new ArrayList<Float>();
     points = new ArrayList<PVector>();
 
     boolean first = true;
 
     for (int i = 0; i < properties.size() - 1; i++) {
       Property p = properties.get(i);
+      Property pNext = properties.get(i + 1);
       Segment seg = getSegment(properties,i);
 
       float segmentlength = seg.b.dist(seg.c)/2; 
@@ -98,7 +101,8 @@ class TimeRenderer extends Renderer{
 
       ortogonal1.normalize();
 
-      ortogonal1.mult(5);
+      float mySize = curvePoint(p.getSize(), p.getSize(), pNext.getSize(), pNext.getSize(), t);
+      ortogonal1.mult(5 + 10*(mySize - 1));
       
       float parameter = norm( speed , minSpeed, maxSpeed);
       parameter = abs(parameter);

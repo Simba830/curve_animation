@@ -27,7 +27,7 @@ public void setup()
 
     smooth();
 
-    frameRate(1000);
+    frameRate(60);
     context = new Context();
     update();
     stateContext = new StateContext(context);
@@ -94,7 +94,7 @@ void draw()
     update();
     stateContext.draw();
   } catch (Exception e) {
-    // console.log("Falha no Draw \ne.toString(): "+e.toString());
+    console.log("Falha no Draw \ne.toString(): "+e.toString());
   }
   
   fill(255,0,0);

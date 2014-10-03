@@ -25,6 +25,7 @@ class CurveCat
   // Interpolator
   private SmoothInterpolator interpolator;
 
+  // Render
   private Renderer renderer;
 
   CurveCat() 
@@ -176,6 +177,10 @@ class CurveCat
     return distance;
   }
 
+  void updateRender(){
+    this.renderer.update(this.controlPoints);
+  }
+
   float findPerpendicularDistance(p, p1,p2) {
     // if start and end point are on the same x the distance is the difference in X.
     float result;
@@ -323,6 +328,8 @@ class CurveCat
       this.decimeCurve(this.tolerance);
     }  
 
+    console.log("Was decimed");
+
     renderer.update(this.controlPoints);
   }
 
@@ -343,12 +350,15 @@ class CurveCat
     saveCurve();
     controlPoints.add(index,q);
     this.decimable = true;
+    this.decimeAll();
+    console.log("Inserting point");
   }
 
   void insertPoint(Property q){
     controlPoints.add(q);
     this.decimable = true;
     this.decimeAll();
+    console.log("Inserting point");
     // renderer.addPoint(controlPoints);
     saveCurve();
   }
@@ -608,6 +618,10 @@ class CurveCat
   void draw()
   { 
     renderer.render();
+  }
+
+  Renderer getRenderer(){
+    return this.renderer;
   }
 
   // Desenha elipses de acordo com os elementos do tipo PVector da lista p

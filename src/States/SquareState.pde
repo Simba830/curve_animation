@@ -7,6 +7,7 @@ class SquareState extends State {
     public void mousePressed() 
     {
         Square c = new Square(20,20);
+        c.sizeInterpolator.set(0, new Property());
         context.addElement(c);  
         context.setSelectedElement(c);
     }

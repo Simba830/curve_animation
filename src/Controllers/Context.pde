@@ -70,10 +70,12 @@ class Context{
 
 		for (SceneElement o : sceneElements) {
 			o.pos.clear();
+			o.sizeInterpolator.clear();
 
 			for (int i = 0; i< o.curve.getNumberControlPoints(); i++){
 				p = o.curve.getControlPoint(i);
 
+				o.sizeInterpolator.set(p.getT(), p);
 				o.pos.set(p.getT(), new PVector(p.getX(), p.getY()));
 			}
 		}
@@ -108,6 +110,11 @@ class Context{
 			}
 
 			o.draw(t);
+
+			if(this.isPlayed()){
+				o.getCurve().getRenderer().setAlpha(30);
+			}	
+
 			o.drawCurve();
 		}
 
@@ -145,6 +152,7 @@ class Context{
 		for (int i = 0; i < sceneElements.size(); ++i) {
 			SceneElement o = sceneElements.get(i);
 			if(o == selectedElement){
+				o.setCurve(new CurveCat());
 				sceneElements.remove(i);
 				this.curve = new CurveCat();
 				return;

@@ -44,6 +44,10 @@ public class StateContext {
                   myState = new EditingState(this.context);
               break; 
 
+            case 'size' :
+                  myState = new SizeEditingState(this.context);
+              break; 
+
             case 'time' :
                   myState = new SimpleTimeEditingState(this.context);
               break;          
@@ -128,7 +132,7 @@ public class StateContext {
             if(lastTime == 0){
                 context.stop();
             }else{
-                context.draw((frameCount) % int(lastTime));
+                context.draw( (frameCount/5) % int(lastTime));
             }
 
 
