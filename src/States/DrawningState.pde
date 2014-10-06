@@ -26,9 +26,9 @@ class DrawningState extends State {
       }
       
       
-      if(selectedSegment == context.curve.getNumberControlPoints() - 1 && distance < 10){
-          stateContext.setStateName("draw");
-      }
+      // if(selectedSegment == context.curve.getNumberControlPoints() - 1 && distance < 10){
+      //     stateContext.setStateName("draw");
+      // }
 
       // Lógica específica do Drawning
       t = 0;

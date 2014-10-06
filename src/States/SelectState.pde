@@ -9,7 +9,7 @@ class SelectState extends State
     	for (SceneElement o : context.sceneElements) {
     		if(o.isOver(context.mouse)){
     			context.setSelectedElement(o);
-                        return;
+          return;
     		}
     	}
 

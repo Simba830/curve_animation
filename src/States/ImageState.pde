@@ -2,8 +2,6 @@ class ImageState extends State {
 
     ImageState(Context _context){
       super(_context);
-      console.log('Image State');
-      console.log('context.path_image:'+context.path_image);  
     }
 
     public void mousePressed() 

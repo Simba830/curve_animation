@@ -37,6 +37,10 @@ class Image extends SceneElement{
       myScale = 1;
     }
 
+    float oldImageWidth = myImage.width;
+    float oldImageHeight = myImage.height;
+    myImage.resize(myImage.width*myScale, myImage.height*myScale);
+
     pushMatrix();
 
     // noFill();
@@ -45,14 +49,17 @@ class Image extends SceneElement{
     smooth(8);
     imageMode(CENTER);
 
+    stroke(c);
     translate(position.x, position.y, 0);
     rotate(atan2(tangent.y, tangent.x));
     translate(-myImage.width/2, -myImage.height/2,0);
 
     // rect(20,20,0,0);
-    image(myImage,0 ,0 );
-    
+    image(myImage, 0 ,0 );
+
     popMatrix();
+
+    myImage.resize(oldImageWidth, oldImageHeight);
   }
 
   void setWidth(float x){
@@ -73,7 +80,8 @@ class Image extends SceneElement{
 
   boolean isOver(PVector mouse){
                 PVector position = pos.get(0);
-                float radious = this.width;
-    return (mouse.x - position.x)*(mouse.x - position.x) + (mouse.y - position.y)*(mouse.y - position.y) <= radious*radious;
+                float my_width = myImage.width;
+                float my_height = myImage.height;
+    return mouse.x < position.x + my_height/2 && mouse.x > position.x - my_height/2 && mouse.y < position.y + my_width/2 && mouse.y > position.y - my_width/2;
   }
 }
