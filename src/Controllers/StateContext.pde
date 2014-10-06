@@ -50,7 +50,11 @@ public class StateContext {
 
             case 'time' :
                   myState = new SimpleTimeEditingState(this.context);
-              break;          
+              break;       
+
+            case 'image' :
+                  myState = new ImageState(this.context);
+              break;     
 
             default :
                 myState = new DrawningState(this.context);

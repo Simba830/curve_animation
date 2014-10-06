@@ -24,5 +24,5 @@ public static class Utils{
 }
 
 void my_assert (boolean p) {
-  if (!p) println ("my_assertion failed");
+  if (!p) console.log ("my_assertion failed");
 }

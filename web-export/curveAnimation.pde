@@ -24,7 +24,7 @@ public static class Utils{
 }
 
 void my_assert (boolean p) {
-  if (!p) println ("my_assertion failed");
+  if (!p) console.log ("my_assertion failed");
 }
 
 /**
@@ -157,7 +157,10 @@ class Context{
 	private SceneElement selectedElement;
 	private float time;
 
+	private string path_image;
+
 	Context(){
+		path_image = "";
 		selectedSegments = new int[0];
 		this.curve = new CurveCat();
 		this.curve.setTolerance(7);
@@ -377,7 +380,11 @@ public class StateContext {
 
             case 'time' :
                   myState = new SimpleTimeEditingState(this.context);
-              break;          
+              break;       
+
+            case 'image' :
+                  myState = new ImageState(this.context);
+              break;     
 
             default :
                 myState = new DrawningState(this.context);
@@ -504,13 +511,22 @@ class Circle extends SceneElement{
 		}else{
 			position = pos.get(t);
 		}
+		
+		float myScale = this.sizeInterpolator.get(t).getSize();
 
+		if(t == 0){
+			myScale = 1;
+		}
+
+		pushMatrix();
 		fill(c);
 		noStroke();
-		ellipse(position.x, position.y, this.width, this.height);
-
+		translate(position.x, position.y, 0);
+		sphere(this.width * myScale);
+		
 		fill(0);
-		ellipse(position.x, position.y, 5, 5);
+		sphere(5);
+		popMatrix();
 	}
 
 	void setWidth(float x){
@@ -1320,6 +1336,83 @@ class CurveCat
 }
 
 
+class Image extends SceneElement{
+
+  float width, height;
+  PImage myImage;
+  boolean active;
+
+  Image(string path)
+  {
+    super(context.mouse);
+    this.name = "Image";
+    active = true;
+    myImage = loadImage(path);
+  }
+
+  void draw(float t)
+  {
+    if(pos.nKeys() < 1){
+      return;
+    }
+
+    if(t >= pos.keyTime(pos.nKeys()-1)){
+      t = pos.keyTime(pos.nKeys()-1);
+    }
+
+    PVector position;
+    if(!active){
+      position = pos.get(0);
+      PVector tangent = pos.getTangent(0);
+      float myScale = this.sizeInterpolator.get(0).getSize();
+    }else{
+      position = pos.get(t);
+      PVector tangent = pos.getTangent(t);
+      float myScale = this.sizeInterpolator.get(t).getSize();
+    }
+
+    if(t == 0){
+      myScale = 1;
+    }
+
+    pushMatrix();
+
+    rectMode(CENTER);
+
+    // noFill();
+    fill(255);
+    // noStroke();
+    smooth(8);
+    translate(position.x, position.y, 0);
+    rotate(-atan2(tangent.x, tangent.y));
+
+    image(myImage,0 ,0 );
+    popMatrix();
+  }
+
+  void setWidth(float x){
+    this.width = x;
+  }
+
+  void setHeight(float x){
+    this.height = x;
+  }
+
+  float lastTime()
+  {
+    if(pos.nKeys() < 1)
+      return 0;
+
+    return pos.interp.time.get(pos.nKeys()-1);
+  }
+
+  boolean isOver(PVector mouse){
+                PVector position = pos.get(0);
+                float radious = this.width;
+    return (mouse.x - position.x)*(mouse.x - position.x) + (mouse.y - position.y)*(mouse.y - position.y) <= radious*radious;
+  }
+}
+
 class SceneElement
 {
 	/** 
@@ -1464,7 +1557,6 @@ class Square extends SceneElement{
 			t = pos.keyTime(pos.nKeys()-1);
 		}
 
-		console.log('t:'+t);
 		PVector position;
 		if(!active){
 			position = pos.get(0);
@@ -1474,6 +1566,10 @@ class Square extends SceneElement{
 			position = pos.get(t);
 			PVector tangent = pos.getTangent(t);
 			float myScale = this.sizeInterpolator.get(t).getSize();
+		}
+
+		if(t == 0){
+			myScale = 1;
 		}
 
 		pushMatrix();
@@ -1680,7 +1776,11 @@ class TimeRenderer extends Renderer{
       ortogonal1.normalize();
 
       float mySize = curvePoint(p.getSize(), p.getSize(), pNext.getSize(), pNext.getSize(), t);
-      ortogonal1.mult(5 + 10*(mySize - 1));
+      if(mySize > 0){
+        ortogonal1.mult(5*(mySize));
+      }else{
+        ortogonal1.mult(0);
+      }
       
       float parameter = norm( speed , minSpeed, maxSpeed);
       parameter = abs(parameter);
@@ -1911,8 +2011,16 @@ class Property {
     return this.get(0);
   }
 
+  void setX(float t){
+    this.set(0, t);
+  }
+
   float getY(){
     return this.get(1);
+  }
+
+  void setY(float t){
+    this.set(1, t);
   }
 
   float getT(){
@@ -1928,6 +2036,10 @@ class Property {
   }
 
   void setSize(float t){
+    if(t < 0){
+      t = 0;
+    }
+
     this.set(3, t);
   }
 
@@ -2103,12 +2215,12 @@ class CircleState extends State {
         float dy = abs(pMouse.y - pos.y);
 
         c.setWidth(dx);
-        c.setHeight(dx);
+        c.setHeight(dy);
     }
     
     public void mouseReleased() 
     {
-        stateContext.setStateName("draw");
+        stateContext.setStateName("select");
     }
 
     public void keyPressed(){
@@ -2316,7 +2428,9 @@ class EditingState extends State {
             // Soma aos elementos selecionados
             for (int i = 0; i<context.selectedSegments.length; i++){
               Property controlPoint = context.curve.getControlPoint(context.selectedSegments[i]);
-              context.curve.setPoint(new Property(controlPoint.getX() + dx, controlPoint.getY() + dy, controlPoint.getT()), context.selectedSegments[i]);
+              controlPoint.setX(controlPoint.getX() + dx);
+              controlPoint.setY(controlPoint.getY() + dy);
+              context.curve.setPoint(controlPoint, context.selectedSegments[i]);
             }
           }else if(context.selectedSegments.length == 1){
 
@@ -2346,7 +2460,9 @@ class EditingState extends State {
               }
 
               Property controlPoint = context.curve.getControlPoint(context.selectedSegments[0] + i);
-              context.curve.setPoint( new Property(controlPoint.getX() + tdx, controlPoint.getY() + tdy, controlPoint.getT()) , context.selectedSegments[0] + i);
+              controlPoint.setX(controlPoint.getX() + tdx);
+              controlPoint.setY(controlPoint.getY() + tdy);
+              context.curve.setPoint( controlPoint , context.selectedSegments[0] + i);
             }
 
           }
@@ -2425,6 +2541,40 @@ class FontState extends State {
         this.text.draw();
       }
   	}
+}
+class ImageState extends State {
+
+    ImageState(Context _context){
+      super(_context);
+      console.log('Image State');
+      console.log('context.path_image:'+context.path_image);  
+    }
+
+    public void mousePressed() 
+    {
+        Image m = new Image(context.path_image);
+        m.sizeInterpolator.set(0, new Property());
+        context.addElement(m);  
+        context.setSelectedElement(m);
+    }
+
+    public void mouseDragged(){
+
+    }
+    
+    public void mouseReleased() 
+    {
+        stateContext.setStateName("select");
+    }
+
+    public void keyPressed(){
+      
+    }
+
+    public void draw()
+    {
+
+    }
 }
 class IntroState extends State
 {
@@ -2823,12 +2973,12 @@ class SquareState extends State {
         float dy = abs(pMouse.y - pos.y);
 
         c.setWidth(dx);
-        c.setHeight(dx);
+        c.setHeight(dy);
     }
     
     public void mouseReleased() 
     {
-        stateContext.setStateName("draw");
+        stateContext.setStateName("select");
     }
 
     public void keyPressed(){

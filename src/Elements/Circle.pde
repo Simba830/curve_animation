@@ -28,13 +28,22 @@ class Circle extends SceneElement{
 		}else{
 			position = pos.get(t);
 		}
+		
+		float myScale = this.sizeInterpolator.get(t).getSize();
 
+		if(t == 0){
+			myScale = 1;
+		}
+
+		pushMatrix();
 		fill(c);
 		noStroke();
-		ellipse(position.x, position.y, this.width, this.height);
-
+		translate(position.x, position.y, 0);
+		sphere(this.width * myScale);
+		
 		fill(0);
-		ellipse(position.x, position.y, 5, 5);
+		sphere(5);
+		popMatrix();
 	}
 
 	void setWidth(float x){

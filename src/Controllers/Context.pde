@@ -14,7 +14,10 @@ class Context{
 	private SceneElement selectedElement;
 	private float time;
 
+	private string path_image;
+
 	Context(){
+		path_image = "";
 		selectedSegments = new int[0];
 		this.curve = new CurveCat();
 		this.curve.setTolerance(7);

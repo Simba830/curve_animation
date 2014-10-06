@@ -27,7 +27,7 @@
 		</noscript>
 
 
-		<div id="cont" class="container" style=" top:4%; left: 1px; height: 400px" data-autoresize="true" data-skin="black" data-drag=true data-resize=true data-dock="dock" data-collapsable=true data-containment="document"  data-buttons="dock,close">
+		<div id="cont" class="container" style=" top:5%; left: 5px; height: 400px" data-autoresize="true" data-skin="black" data-drag=true data-resize=true data-dock="dock" data-collapsable=true data-containment="document"  data-buttons="dock,close">
 			<h2>Create</h2>
 
 			<button type="button" onClick="processing.getStateContext().setStateName('circle')">
@@ -36,12 +36,28 @@
 			<button type="button" onClick="processing.getStateContext().setStateName('square')" class="myBtn btn btn-primary">
 				Square
 			</button>
-			<button type="button" onClick="processing.getStateContext().setStateName('square')" class="myBtn btn btn-primary">
-				Picture
+
+			<button type="button" onClick="
+			processing.getContext().path_image = 'barco.png';
+			processing.getStateContext().setStateName('image')" class="myBtn btn btn-primary">
+				Boat
 			</button>
-			<button type="button" onClick="processing.getStateContext().setStateName('circle')" class="myBtn btn btn-primary">
+
+			<button type="button" onClick="
+			processing.getContext().path_image = 'ondas.png';
+			processing.getStateContext().setStateName('image')" class="myBtn btn btn-primary">
+				Waves
+			</button>
+
+			<button type="button" onClick="
+			processing.getContext().path_image = 'nuvem.jpg';
+			processing.getStateContext().setStateName('image')" class="myBtn btn btn-primary">
+				Cloud
+			</button>
+
+<!-- 			<button type="button" onClick="processing.getStateContext().setStateName('circle')" class="myBtn btn btn-primary">
 				Font <br>
-			</button>
+			</button> -->
 
 			<button type="button" onClick="processing.getStateContext().setStateName('select')" class="myBtn btn btn-primary">
 				Select
@@ -50,7 +66,7 @@
 
 		</div>
 
-		<div id="cont_inspector" class="container" style=" top:4%; right: 1px; height: 400px;" data-autoresize="true" data-skin="black" data-drag=true data-resize=true data-dock="dock" data-collapsable=true data-containment="document"  data-buttons="dock,close">
+		<div id="cont_inspector" class="container" style=" top:5%; right: 10px; height: 600px;" data-autoresize="true" data-skin="black" data-drag=true data-resize=true data-dock="dock" data-collapsable=true data-containment="document"  data-buttons="dock,close">
 			<h2>Inspector</h2>
 
 			<button type="button" onClick="processing.getContext().togglePlay()" class="myBtn btn btn-primary">
@@ -65,12 +81,16 @@
 				Size
 			</button>
 
-			<button type="button" onClick="processing.getContext().curve.clear()" class="myBtn btn btn-primary">
-				Clear Curve
+			<button type="button" onClick="processing.getStateContext().setStateName('edit')" class="myBtn btn btn-primary">
+				Edit Curve
 			</button>
 
 			<button type="button" onClick="processing.getStateContext().setStateName('draw')" class="myBtn btn btn-primary">
 				Record
+			</button>
+
+			<button type="button" onClick="processing.getContext().curve.clear()" class="myBtn btn btn-primary">
+				Clear Curve
 			</button>
 
 			<button type="button" onClick="processing.getContext().deleteSelectedElement()" class="myBtn btn btn-primary">

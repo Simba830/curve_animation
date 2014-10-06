@@ -21,12 +21,12 @@ class SquareState extends State {
         float dy = abs(pMouse.y - pos.y);
 
         c.setWidth(dx);
-        c.setHeight(dx);
+        c.setHeight(dy);
     }
     
     public void mouseReleased() 
     {
-        stateContext.setStateName("draw");
+        stateContext.setStateName("select");
     }
 
     public void keyPressed(){

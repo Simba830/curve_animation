@@ -132,8 +132,16 @@ class Property {
     return this.get(0);
   }
 
+  void setX(float t){
+    this.set(0, t);
+  }
+
   float getY(){
     return this.get(1);
+  }
+
+  void setY(float t){
+    this.set(1, t);
   }
 
   float getT(){
@@ -149,6 +157,10 @@ class Property {
   }
 
   void setSize(float t){
+    if(t < 0){
+      t = 0;
+    }
+
     this.set(3, t);
   }
 

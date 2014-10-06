@@ -22,7 +22,6 @@ class Square extends SceneElement{
 			t = pos.keyTime(pos.nKeys()-1);
 		}
 
-		console.log('t:'+t);
 		PVector position;
 		if(!active){
 			position = pos.get(0);
@@ -32,6 +31,10 @@ class Square extends SceneElement{
 			position = pos.get(t);
 			PVector tangent = pos.getTangent(t);
 			float myScale = this.sizeInterpolator.get(t).getSize();
+		}
+
+		if(t == 0){
+			myScale = 1;
 		}
 
 		pushMatrix();

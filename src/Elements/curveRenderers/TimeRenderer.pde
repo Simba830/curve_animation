@@ -102,7 +102,11 @@ class TimeRenderer extends Renderer{
       ortogonal1.normalize();
 
       float mySize = curvePoint(p.getSize(), p.getSize(), pNext.getSize(), pNext.getSize(), t);
-      ortogonal1.mult(5 + 10*(mySize - 1));
+      if(mySize > 0){
+        ortogonal1.mult(5*(mySize));
+      }else{
+        ortogonal1.mult(0);
+      }
       
       float parameter = norm( speed , minSpeed, maxSpeed);
       parameter = abs(parameter);

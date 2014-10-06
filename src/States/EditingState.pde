@@ -111,7 +111,9 @@ class EditingState extends State {
             // Soma aos elementos selecionados
             for (int i = 0; i<context.selectedSegments.length; i++){
               Property controlPoint = context.curve.getControlPoint(context.selectedSegments[i]);
-              context.curve.setPoint(new Property(controlPoint.getX() + dx, controlPoint.getY() + dy, controlPoint.getT()), context.selectedSegments[i]);
+              controlPoint.setX(controlPoint.getX() + dx);
+              controlPoint.setY(controlPoint.getY() + dy);
+              context.curve.setPoint(controlPoint, context.selectedSegments[i]);
             }
           }else if(context.selectedSegments.length == 1){
 
@@ -141,7 +143,9 @@ class EditingState extends State {
               }
 
               Property controlPoint = context.curve.getControlPoint(context.selectedSegments[0] + i);
-              context.curve.setPoint( new Property(controlPoint.getX() + tdx, controlPoint.getY() + tdy, controlPoint.getT()) , context.selectedSegments[0] + i);
+              controlPoint.setX(controlPoint.getX() + tdx);
+              controlPoint.setY(controlPoint.getY() + tdy);
+              context.curve.setPoint( controlPoint , context.selectedSegments[0] + i);
             }
 
           }
