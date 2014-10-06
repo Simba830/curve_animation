@@ -23,10 +23,12 @@ class SceneElement
 	private color c, curveColor; 
 	private float transparency;
 	private SmoothInterpolator sizeInterpolator;
+	private boolean isStatic;
 
 
 	SceneElement(PVector position)
 	{
+		this.isStatic = true;
 		this.name = "Element";
 		this.scale = 1.0;
 		this.c = color(0,0,0);

@@ -60,6 +60,8 @@ public void setup()
     context = new Context();
     update();
     stateContext = new StateContext(context);
+    hint(ENABLE_DEPTH_SORT);
+    hint(DISABLE_DEPTH_TEST)
     stateContext.setContext(context);
   } catch (Exception e) {
     console.log(e);  
@@ -215,8 +217,8 @@ class Context{
 		Property p;
 
 		for (SceneElement o : sceneElements) {
-			o.pos.clear();
-			o.sizeInterpolator.clear();
+			// o.pos.clear();
+			// o.sizeInterpolator.clear();
 
 			for (int i = 0; i< o.curve.getNumberControlPoints(); i++){
 				p = o.curve.getControlPoint(i);
@@ -325,6 +327,13 @@ class Context{
 
 	PVector getMouse(){
 		return this.mouse;
+	}
+
+	void curveClear(){
+		this.curve.clear();
+		PVector initialPosition = this.selectedElement.pos.get(0);
+		this.selectedElement.pos.clear();
+		this.selectedElement.pos.set(0, initialPosition);
 	}
 }
 
@@ -1340,14 +1349,16 @@ class Image extends SceneElement{
 
   float width, height;
   PImage myImage;
+  string myPath;
   boolean active;
 
   Image(string path)
   {
     super(context.mouse);
     this.name = "Image";
+    myPath = path;
     active = true;
-    myImage = loadImage(path);
+    myImage = loadImage(myPath);
   }
 
   void draw(float t)
@@ -1371,14 +1382,13 @@ class Image extends SceneElement{
       float myScale = this.sizeInterpolator.get(t).getSize();
     }
 
-    if(t == 0){
+    if(t == 0 || isStatic){
       myScale = 1;
+      position = getInitialPosition();
+      tangent = new PVector(0,0);
     }
 
-    float oldImageWidth = myImage.width;
-    float oldImageHeight = myImage.height;
-    myImage.resize(myImage.width*myScale, myImage.height*myScale);
-
+    // myImage = loadImage(myPath);
     pushMatrix();
 
     // noFill();
@@ -1393,11 +1403,9 @@ class Image extends SceneElement{
     translate(-myImage.width/2, -myImage.height/2,0);
 
     // rect(20,20,0,0);
-    image(myImage, 0 ,0 );
+    image(myImage, 0 ,0, myImage.width * myScale, myImage.height * myScale );
 
     popMatrix();
-
-    myImage.resize(oldImageWidth, oldImageHeight);
   }
 
   void setWidth(float x){
@@ -1410,10 +1418,19 @@ class Image extends SceneElement{
 
   float lastTime()
   {
-    if(pos.nKeys() < 1)
-      return 0;
-
-    return pos.interp.time.get(pos.nKeys()-1);
+    float lastTime = 0;
+    if(pos.nKeys() < 1){
+      lastTime = 0;
+      isStatic = true;
+    }else{
+      lastTime = pos.interp.time.get(pos.nKeys()-1);
+      if(lastTime <= 0 )
+        isStatic = true;
+      else
+        isStatic = false;
+    }
+    
+    return lastTime;
   }
 
   boolean isOver(PVector mouse){
@@ -1449,10 +1466,12 @@ class SceneElement
 	private color c, curveColor; 
 	private float transparency;
 	private SmoothInterpolator sizeInterpolator;
+	private boolean isStatic;
 
 
 	SceneElement(PVector position)
 	{
+		this.isStatic = true;
 		this.name = "Element";
 		this.scale = 1.0;
 		this.c = color(0,0,0);

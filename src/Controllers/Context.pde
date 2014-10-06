@@ -72,8 +72,8 @@ class Context{
 		Property p;
 
 		for (SceneElement o : sceneElements) {
-			o.pos.clear();
-			o.sizeInterpolator.clear();
+			// o.pos.clear();
+			// o.sizeInterpolator.clear();
 
 			for (int i = 0; i< o.curve.getNumberControlPoints(); i++){
 				p = o.curve.getControlPoint(i);
@@ -182,5 +182,12 @@ class Context{
 
 	PVector getMouse(){
 		return this.mouse;
+	}
+
+	void curveClear(){
+		this.curve.clear();
+		PVector initialPosition = this.selectedElement.pos.get(0);
+		this.selectedElement.pos.clear();
+		this.selectedElement.pos.set(0, initialPosition);
 	}
 }

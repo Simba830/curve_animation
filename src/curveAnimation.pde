@@ -31,6 +31,8 @@ public void setup()
     context = new Context();
     update();
     stateContext = new StateContext(context);
+    hint(ENABLE_DEPTH_SORT);
+    hint(DISABLE_DEPTH_TEST)
     stateContext.setContext(context);
   } catch (Exception e) {
     console.log(e);  

@@ -2,14 +2,16 @@ class Image extends SceneElement{
 
   float width, height;
   PImage myImage;
+  string myPath;
   boolean active;
 
   Image(string path)
   {
     super(context.mouse);
     this.name = "Image";
+    myPath = path;
     active = true;
-    myImage = loadImage(path);
+    myImage = loadImage(myPath);
   }
 
   void draw(float t)
@@ -33,14 +35,13 @@ class Image extends SceneElement{
       float myScale = this.sizeInterpolator.get(t).getSize();
     }
 
-    if(t == 0){
+    if(t == 0 || isStatic){
       myScale = 1;
+      position = getInitialPosition();
+      tangent = new PVector(0,0);
     }
 
-    float oldImageWidth = myImage.width;
-    float oldImageHeight = myImage.height;
-    myImage.resize(myImage.width*myScale, myImage.height*myScale);
-
+    // myImage = loadImage(myPath);
     pushMatrix();
 
     // noFill();
@@ -55,11 +56,9 @@ class Image extends SceneElement{
     translate(-myImage.width/2, -myImage.height/2,0);
 
     // rect(20,20,0,0);
-    image(myImage, 0 ,0 );
+    image(myImage, 0 ,0, myImage.width * myScale, myImage.height * myScale );
 
     popMatrix();
-
-    myImage.resize(oldImageWidth, oldImageHeight);
   }
 
   void setWidth(float x){
@@ -72,10 +71,19 @@ class Image extends SceneElement{
 
   float lastTime()
   {
-    if(pos.nKeys() < 1)
-      return 0;
-
-    return pos.interp.time.get(pos.nKeys()-1);
+    float lastTime = 0;
+    if(pos.nKeys() < 1){
+      lastTime = 0;
+      isStatic = true;
+    }else{
+      lastTime = pos.interp.time.get(pos.nKeys()-1);
+      if(lastTime <= 0 )
+        isStatic = true;
+      else
+        isStatic = false;
+    }
+    
+    return lastTime;
   }
 
   boolean isOver(PVector mouse){
