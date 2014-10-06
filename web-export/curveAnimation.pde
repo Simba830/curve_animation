@@ -1384,7 +1384,7 @@ class Image extends SceneElement{
     imageMode(CENTER);
 
     translate(position.x, position.y, 0);
-    rotate(-atan2(tangent.x, tangent.y) + Math.PI/2);
+    rotate(atan2(tangent.y, tangent.x));
     translate(-myImage.width/2, -myImage.height/2,0);
 
     // rect(20,20,0,0);
