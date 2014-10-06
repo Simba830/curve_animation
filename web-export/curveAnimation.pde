@@ -1377,16 +1377,19 @@ class Image extends SceneElement{
 
     pushMatrix();
 
-    rectMode(CENTER);
-
     // noFill();
     fill(255);
     // noStroke();
     smooth(8);
-    translate(position.x, position.y, 0);
-    rotate(-atan2(tangent.x, tangent.y));
+    imageMode(CENTER);
 
+    translate(position.x, position.y, 0);
+    rotate(-atan2(tangent.x, tangent.y) + Math.PI/2);
+    translate(-myImage.width/2, -myImage.height/2,0);
+
+    // rect(20,20,0,0);
     image(myImage,0 ,0 );
+    
     popMatrix();
   }
 
