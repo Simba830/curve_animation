@@ -35,11 +35,10 @@ class SceneElement
 		this.scale = 1.0;
 		this.c = color(0,0,0);
 		this.sizeInterpolator = new SmoothInterpolator();
-		Property p = new Property(0,0,0);
+		Property p = new Property(position.x,position.y,0);
 		p.setT(0);
 		p.setSize(1);
 		this.sizeInterpolator.set(p.getT(), p);
-		console.log('this.sizeInterpolator.get(0):'+this.sizeInterpolator.get(0).getSize());
 		this.pos = new SmoothPositionInterpolator(new SmoothInterpolator());
 		this.pos.set(0,position);
 		this.rotation = 0.6;

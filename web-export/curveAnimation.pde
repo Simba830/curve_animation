@@ -216,8 +216,17 @@ class Context{
 		Property p;
 
 		for (SceneElement o : sceneElements) {
-			// o.pos.clear();
-			// o.sizeInterpolator.clear();
+			PVector initialPosition = o.pos.get(0);
+			o.pos.clear();
+			o.sizeInterpolator.clear();
+
+			if(o.curve.getNumberControlPoints() <= 0){
+				o.pos.set(0, initialPosition);
+				Property p = new Property(0,0,0);
+				p.setT(0);
+				p.setSize(1);
+				o.sizeInterpolator.set(p.getT(), p);
+			}
 
 			for (int i = 0; i< o.curve.getNumberControlPoints(); i++){
 				p = o.curve.getControlPoint(i);
@@ -256,7 +265,7 @@ class Context{
 				o.c = color(0,0,0);
 				o.curveColor = color(200,200,200);
 			}
-			
+
 			o.draw(t);
 
 			if(this.isPlayed()){
@@ -335,10 +344,10 @@ class Context{
 	}
 
 	void curveClear(){
-		this.curve.clear();
 		PVector initialPosition = this.selectedElement.pos.get(0);
 		this.selectedElement.pos.clear();
 		this.selectedElement.pos.set(0, initialPosition);
+		this.curve.clear();
 	}
 }
 
@@ -1487,11 +1496,10 @@ class SceneElement
 		this.scale = 1.0;
 		this.c = color(0,0,0);
 		this.sizeInterpolator = new SmoothInterpolator();
-		Property p = new Property(0,0,0);
+		Property p = new Property(position.x,position.y,0);
 		p.setT(0);
 		p.setSize(1);
 		this.sizeInterpolator.set(p.getT(), p);
-		console.log('this.sizeInterpolator.get(0):'+this.sizeInterpolator.get(0).getSize());
 		this.pos = new SmoothPositionInterpolator(new SmoothInterpolator());
 		this.pos.set(0,position);
 		this.rotation = 0.6;
