@@ -123,7 +123,6 @@ class Context{
 			o.draw(t);
 
 			if(this.isPlayed()){
-				// o.getCurve().getRenderer().setAlpha(30);
 				o.noStroke();
 			}else{
 				o.setStroke();
