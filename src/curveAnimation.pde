@@ -21,7 +21,7 @@ int width,height;
 public void setup() 
 {
   try {
-    size(screen.width*0.8, screen.height*0.7, P3D);
+    size(screen.width*0.8, screen.height*0.7, P2D);
     width = screen.width*0.8;
     height = screen.height*0.7;
 

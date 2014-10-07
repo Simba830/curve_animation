@@ -7,7 +7,6 @@ class TimeRenderer extends Renderer{
 
   private float minDistance = 5;
   private color strokeColor = color(0);
-  private float controlPointAlpha = 200;
   private float curveWeight = 5;
 
   private ArrayList<PVector> vertexs;

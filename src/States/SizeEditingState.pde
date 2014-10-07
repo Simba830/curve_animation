@@ -74,7 +74,10 @@ class SizeEditingState extends State {
 
           translate(p.getX(), p.getY(), 10);
           sphere(10);
+          ellipse(0, 0, 10, 10);
           text("t: "+ ( (int) p.getT()), 10, 10);
+
+          text('Size: '+ (p.getSize()) , 10, 20);
           popMatrix();
       }
     }

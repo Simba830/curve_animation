@@ -112,16 +112,16 @@ class Context{
 				o.c = color(0,0,0);
 				o.curveColor = color(200,200,200);
 			}
+			
+			o.draw(t);
 
 			if(this.isPlayed()){
-				o.getCurve().getRenderer().setAlpha(30);
+				// o.getCurve().getRenderer().setAlpha(30);
 				o.noStroke();
 			}else{
 				o.setStroke();
 				o.drawCurve();
 			}
-
-			o.draw(t);
 
 		}
 

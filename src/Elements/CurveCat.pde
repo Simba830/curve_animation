@@ -636,6 +636,7 @@ class CurveCat
         translate(controlPoints.get(i).get(0), controlPoints.get(i).get(1), 10);
         
         sphere(5);
+        ellipse(0, 0, 5, 5);
         text("t: "+controlPoints.get(i).get(2), 10, -10, 0);
         popMatrix();
       } 

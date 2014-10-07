@@ -1,6 +1,6 @@
 class Renderer{
   ArrayList<PVector> vertexs;
-  float alphaValue = 100;
+  float alphaValue = 255;
 
   void calculateVertexs(){};
   void render(){};

@@ -43,17 +43,17 @@ class Image extends SceneElement{
 
     pushMatrix();
 
-    fill(255, 100);
+    fill(255);
+    // tint(255, 127);
 
-    if(hasStroke){
+    if(this.hasStroke){
       stroke(c);
+      console.log('stroke sendo chamado');
     }else{
-      console.log('no stroke sendo');
       noStroke();
     }
 
     smooth(8);
-    imageMode(CENTER);
 
     translate(position.x, position.y, 0);
     rotate(atan2(tangent.y, tangent.x));

@@ -50,7 +50,7 @@ int width,height;
 public void setup() 
 {
   try {
-    size(screen.width*0.8, screen.height*0.7, P3D);
+    size(screen.width*0.8, screen.height*0.7, P2D);
     width = screen.width*0.8;
     height = screen.height*0.7;
 
@@ -256,16 +256,16 @@ class Context{
 				o.c = color(0,0,0);
 				o.curveColor = color(200,200,200);
 			}
+			
+			o.draw(t);
 
 			if(this.isPlayed()){
-				o.getCurve().getRenderer().setAlpha(30);
+				// o.getCurve().getRenderer().setAlpha(30);
 				o.noStroke();
 			}else{
 				o.setStroke();
 				o.drawCurve();
 			}
-
-			o.draw(t);
 
 		}
 
@@ -1204,6 +1204,7 @@ class CurveCat
         translate(controlPoints.get(i).get(0), controlPoints.get(i).get(1), 10);
         
         sphere(5);
+        ellipse(0, 0, 5, 5);
         text("t: "+controlPoints.get(i).get(2), 10, -10, 0);
         popMatrix();
       } 
@@ -1395,17 +1396,17 @@ class Image extends SceneElement{
 
     pushMatrix();
 
-    fill(255, 100);
+    fill(255);
+    // tint(255, 127);
 
-    if(hasStroke){
+    if(this.hasStroke){
       stroke(c);
+      console.log('stroke sendo chamado');
     }else{
-      console.log('no stroke sendo');
       noStroke();
     }
 
     smooth(8);
-    imageMode(CENTER);
 
     translate(position.x, position.y, 0);
     rotate(atan2(tangent.y, tangent.x));
@@ -1699,7 +1700,7 @@ class Text extends Element{
 }
 class Renderer{
   ArrayList<PVector> vertexs;
-  float alphaValue = 100;
+  float alphaValue = 255;
 
   void calculateVertexs(){};
   void render(){};
@@ -1731,7 +1732,6 @@ class TimeRenderer extends Renderer{
 
   private float minDistance = 5;
   private color strokeColor = color(0);
-  private float controlPointAlpha = 200;
   private float curveWeight = 5;
 
   private ArrayList<PVector> vertexs;
@@ -2993,7 +2993,10 @@ class SizeEditingState extends State {
 
           translate(p.getX(), p.getY(), 10);
           sphere(10);
+          ellipse(0, 0, 10, 10);
           text("t: "+ ( (int) p.getT()), 10, 10);
+
+          text('Size: '+ (p.getSize()) , 10, 20);
           popMatrix();
       }
     }
