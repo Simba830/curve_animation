@@ -47,6 +47,7 @@ class Image extends SceneElement{
     // tint(255, 127);
 
     if(this.hasStroke){
+      strokeWeight(1);
       stroke(c);
       console.log('stroke sendo chamado');
     }else{
@@ -56,10 +57,16 @@ class Image extends SceneElement{
     smooth(8);
 
     translate(position.x, position.y, 0);
-    rotate(atan2(tangent.y, tangent.x));
-    translate(-myImage.width/2, -myImage.height/2,0);
 
-    image(myImage, 0 ,0, myImage.width * myScale, myImage.height * myScale );
+    if(this.followTangent)
+      rotate(atan2(tangent.y, tangent.x));
+
+
+    float new_width = myImage.width * myScale;
+    float new_height = myImage.height * myScale;
+
+    translate(-new_width/2, -new_height/2,0);
+    image(myImage, 0 ,0, new_width, new_height  );
 
     popMatrix();
   }

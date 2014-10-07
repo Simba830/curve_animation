@@ -179,7 +179,7 @@
 			"file": "src/Elements/Image.pde",
 			"settings":
 			{
-				"buffer_size": 2046,
+				"buffer_size": 2056,
 				"line_ending": "Windows"
 			}
 		},
@@ -187,15 +187,23 @@
 			"file": "src/Controllers/Context.pde",
 			"settings":
 			{
-				"buffer_size": 3592,
+				"buffer_size": 3967,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "src/curveAnimation.pde",
+			"file": "src/States/SizeEditingState.pde",
 			"settings":
 			{
-				"buffer_size": 1815,
+				"buffer_size": 2025,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "src/Elements/CurveCat.pde",
+			"settings":
+			{
+				"buffer_size": 23285,
 				"line_ending": "Windows"
 			}
 		},
@@ -203,7 +211,7 @@
 			"file": "web-export/index.html",
 			"settings":
 			{
-				"buffer_size": 4043,
+				"buffer_size": 4471,
 				"line_ending": "Windows"
 			}
 		},
@@ -211,7 +219,7 @@
 			"file": "src/Elements/SceneElement.pde",
 			"settings":
 			{
-				"buffer_size": 1948,
+				"buffer_size": 2059,
 				"line_ending": "Windows"
 			}
 		}
@@ -308,31 +316,33 @@
 		"/C/xampp/htdocs/curveAnimation/src",
 		"/C/xampp/htdocs/curveAnimation/src/Controllers",
 		"/C/xampp/htdocs/curveAnimation/src/Elements",
+		"/C/xampp/htdocs/curveAnimation/src/States",
 		"/C/xampp/htdocs/curveAnimation/web-export"
 	],
 	"file_history":
 	[
-		"/C/xampp/htdocs/curveAnimation/src/States/ImageState.pde",
+		"/C/xampp/htdocs/curveAnimation/src/States/EditingState.pde",
 		"/C/xampp/htdocs/curveAnimation/src/States/DrawningState.pde",
-		"/C/xampp/htdocs/curveAnimation/src/Elements/Image.pde",
+		"/C/xampp/htdocs/curveAnimation/src/Elements/CurveCat.pde",
+		"/C/xampp/htdocs/curveAnimation/src/States/SizeEditingState.pde",
+		"/C/xampp/htdocs/curveAnimation/src/Controllers/Context.pde",
 		"/C/xampp/htdocs/curveAnimation/web-export/index.html",
+		"/C/xampp/htdocs/curveAnimation/src/curveAnimation.pde",
+		"/C/xampp/htdocs/curveAnimation/src/Elements/curveRenderers/Renderer.pde",
+		"/C/xampp/htdocs/curveAnimation/src/Elements/curveRenderers/TimeRenderer.pde",
+		"/C/xampp/htdocs/curveAnimation/src/Elements/Picture.pde",
 		"/C/xampp/htdocs/curveAnimation/src/Elements/SceneElement.pde",
+		"/C/xampp/htdocs/curveAnimation/src/Controllers/StateContext.pde",
+		"/C/xampp/htdocs/curveAnimation/src/States/ImageState.pde",
+		"/C/xampp/htdocs/curveAnimation/src/Elements/Image.pde",
 		"/C/xampp/htdocs/curveAnimation/src/Elements/Square.pde",
 		"/C/xampp/htdocs/curveAnimation/src/States/SelectState.pde",
 		"/C/xampp/htdocs/curveAnimation/src/States/SquareState.pde",
 		"/C/xampp/htdocs/curveAnimation/src/Utils.pde",
 		"/C/xampp/htdocs/curveAnimation/src/States/CircleState.pde",
 		"/C/xampp/htdocs/curveAnimation/src/Elements/Circle.pde",
-		"/C/xampp/htdocs/curveAnimation/src/Controllers/StateContext.pde",
-		"/C/xampp/htdocs/curveAnimation/src/Controllers/Context.pde",
-		"/C/xampp/htdocs/curveAnimation/src/Elements/curveRenderers/TimeRenderer.pde",
 		"/C/xampp/htdocs/curveAnimation/src/Interpolators/Property.pde",
-		"/C/xampp/htdocs/curveAnimation/src/States/EditingState.pde",
-		"/C/xampp/htdocs/curveAnimation/src/States/SizeEditingState.pde",
-		"/C/xampp/htdocs/curveAnimation/src/Elements/CurveCat.pde",
-		"/C/xampp/htdocs/curveAnimation/src/Elements/curveRenderers/Renderer.pde",
 		"/C/xampp/htdocs/curveAnimation/src/Interpolators/Interpolator.pde",
-		"/C/xampp/htdocs/curveAnimation/src/curveAnimation.pde",
 		"/C/xampp/htdocs/curveAnimation/node_modules/grunt/CONTRIBUTING.md",
 		"/C/xampp/htdocs/curveAnimation/node_modules/grunt-contrib-concat/docs/concat-options.md",
 		"/C/xampp/htdocs/curveAnimation/curve.sublime-project",
@@ -436,6 +446,11 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"add",
+			"addPoint",
+			"alphaValue",
+			"set",
+			"stroke",
 			"pos.set",
 			"x",
 			"my_assert",
@@ -519,7 +534,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -528,15 +543,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2046,
+						"buffer_size": 2056,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								873,
-								873
+								1011,
+								1011
 							]
 						],
 						"settings":
@@ -546,10 +561,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 180.0,
+						"translation.y": 810.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
@@ -558,15 +573,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3592,
+						"buffer_size": 3967,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3118,
-								3118
+								2558,
+								2558
 							]
 						],
 						"settings":
@@ -575,27 +590,27 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2005.0,
+						"translation.y": 270.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "src/curveAnimation.pde",
+					"file": "src/States/SizeEditingState.pde",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1815,
+						"buffer_size": 2025,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								623,
-								623
+								1488,
+								1488
 							]
 						],
 						"settings":
@@ -605,27 +620,57 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": -0.0,
-						"translation.y": 495.0,
+						"translation.y": 720.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "web-export/index.html",
+					"file": "src/Elements/CurveCat.pde",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4043,
+						"buffer_size": 23285,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3248,
-								3248
+								1197,
+								1197
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Processing/Syntax/Processing.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 468.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "web-export/index.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4471,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2301,
+								2301
 							]
 						],
 						"settings":
@@ -634,27 +679,27 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2020.0,
+						"translation.y": 1395.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 5,
 					"file": "src/Elements/SceneElement.pde",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1948,
+						"buffer_size": 2059,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1624,
-								1632
+								869,
+								745
 							]
 						],
 						"settings":
@@ -663,10 +708,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1000.0,
+						"translation.y": 315.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 5,
 					"type": "text"
 				}
 			]

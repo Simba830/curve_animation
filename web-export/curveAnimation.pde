@@ -259,11 +259,9 @@ class Context{
 		for (int i = sceneElements.size() - 1; i >= 0 ; --i) {
 			SceneElement o = sceneElements.get(i);
 			if(o == selectedElement){
-				o.c = #428bca;
-				o.curveColor = color(0,0,0);
+				o.c = color(#428bca);
 			}else{
 				o.c = color(0,0,0);
-				o.curveColor = color(200,200,200);
 			}
 
 			o.draw(t);
@@ -348,6 +346,10 @@ class Context{
 		this.selectedElement.pos.clear();
 		this.selectedElement.pos.set(0, initialPosition);
 		this.curve.clear();
+	}
+
+	void toggleTangent(){
+		this.selectedElement.toggleTangent();
 	}
 }
 
@@ -1410,6 +1412,7 @@ class Image extends SceneElement{
     // tint(255, 127);
 
     if(this.hasStroke){
+      strokeWeight(1);
       stroke(c);
       console.log('stroke sendo chamado');
     }else{
@@ -1419,10 +1422,16 @@ class Image extends SceneElement{
     smooth(8);
 
     translate(position.x, position.y, 0);
-    rotate(atan2(tangent.y, tangent.x));
-    translate(-myImage.width/2, -myImage.height/2,0);
 
-    image(myImage, 0 ,0, myImage.width * myScale, myImage.height * myScale );
+    if(this.followTangent)
+      rotate(atan2(tangent.y, tangent.x));
+
+
+    float new_width = myImage.width * myScale;
+    float new_height = myImage.height * myScale;
+
+    translate(-new_width/2, -new_height/2,0);
+    image(myImage, 0 ,0, new_width, new_height  );
 
     popMatrix();
   }
@@ -1487,10 +1496,12 @@ class SceneElement
 	private SmoothInterpolator sizeInterpolator;
 	private boolean isStatic;
 	private boolean hasStroke;
+	private boolean followTangent;
 
 
 	SceneElement(PVector position)
 	{
+		this.followTangent = true;
 		this.hasStroke = true;
 		this.isStatic = true;
 		this.name = "Element";
@@ -1544,9 +1555,12 @@ class SceneElement
 		this.curve = newCurve;
 	}
 
-	void setInitialPosition(PVector p){
-		pos.set(0, p);
-		this.curve.setPoint(p, 1);
+	void setInitialPosition(PVector v){
+		pos.set(0, v);
+		Property p = new Property(v.x, v.y);
+		p.setSize(1);
+		p.setT(0);
+		this.curve.setPoint(p, 0);
 	}
 
 	PVector getInitialPosition(){
@@ -1578,6 +1592,10 @@ class SceneElement
 
 	void setStroke(){
 		this.hasStroke = true;
+	}
+
+	void toggleTangent(){
+		this.followTangent = !this.followTangent;
 	}
 }
 

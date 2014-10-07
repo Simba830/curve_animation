@@ -25,10 +25,12 @@ class SceneElement
 	private SmoothInterpolator sizeInterpolator;
 	private boolean isStatic;
 	private boolean hasStroke;
+	private boolean followTangent;
 
 
 	SceneElement(PVector position)
 	{
+		this.followTangent = true;
 		this.hasStroke = true;
 		this.isStatic = true;
 		this.name = "Element";
@@ -82,9 +84,12 @@ class SceneElement
 		this.curve = newCurve;
 	}
 
-	void setInitialPosition(PVector p){
-		pos.set(0, p);
-		this.curve.setPoint(p, 1);
+	void setInitialPosition(PVector v){
+		pos.set(0, v);
+		Property p = new Property(v.x, v.y);
+		p.setSize(1);
+		p.setT(0);
+		this.curve.setPoint(p, 0);
 	}
 
 	PVector getInitialPosition(){
@@ -116,5 +121,9 @@ class SceneElement
 
 	void setStroke(){
 		this.hasStroke = true;
+	}
+
+	void toggleTangent(){
+		this.followTangent = !this.followTangent;
 	}
 }
