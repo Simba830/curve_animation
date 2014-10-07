@@ -106,12 +106,45 @@ class Context{
 		sceneElements.add(e);
 	}
 
+	void drawScene(){
+		pushMatrix();
+		rectMode(CENTER);
+		translate(width/2, height/2);
+		fill(200);
+		stroke(200);
+
+		float myWidth = width/2;
+		float myHeight = height/2;
+
+		beginShape(QUAD_STRIP);
+
+		vertex(width/2, height/2);
+		vertex(myWidth*(3/4), myHeight*(3/4));
+		
+		vertex(width/2, -height/2);
+		vertex(myWidth*(3/4), -myHeight*(3/4));
+		
+		vertex(-width/2, -height/2);
+		vertex(-myWidth*(3/4), -myHeight*(3/4));
+		
+		vertex(-width/2, height/2);
+		vertex(-myWidth*(3/4), myHeight*(3/4));
+
+		vertex(width/2, height/2);
+		vertex(myWidth*(3/4), myHeight*(3/4));
+
+		endShape();
+
+		popMatrix();
+	}
+
 	// Desenha todos os elementos na tela
 	void draw(float t){
 		if(t == 0){
 			t = this.time;
 		}
 
+		drawScene();
 		for (int i = sceneElements.size() - 1; i >= 0 ; --i) {
 			SceneElement o = sceneElements.get(i);
 			if(o == selectedElement){
@@ -124,6 +157,7 @@ class Context{
 
 			if(this.isPlayed()){
 				o.noStroke();
+				drawScene();
 			}else{
 				o.setStroke();
 				o.drawCurve();

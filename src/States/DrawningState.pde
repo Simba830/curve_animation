@@ -78,6 +78,6 @@ class DrawningState extends State {
 
     public void draw()
     {
-    	
+      text('Time: '+t, width - 60, 20);
   	}
 }

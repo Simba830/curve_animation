@@ -20,7 +20,7 @@ class Image extends SceneElement{
       return;
     }
 
-    if(t >= pos.keyTime(pos.nKeys()-1)){
+    if(t > pos.keyTime(pos.nKeys()-1)){
       t = pos.keyTime(pos.nKeys()-1);
     }
 

@@ -250,12 +250,45 @@ class Context{
 		sceneElements.add(e);
 	}
 
+	void drawScene(){
+		pushMatrix();
+		rectMode(CENTER);
+		translate(width/2, height/2);
+		fill(200);
+		stroke(200);
+
+		float myWidth = width/2;
+		float myHeight = height/2;
+
+		beginShape(QUAD_STRIP);
+
+		vertex(width/2, height/2);
+		vertex(myWidth*(3/4), myHeight*(3/4));
+		
+		vertex(width/2, -height/2);
+		vertex(myWidth*(3/4), -myHeight*(3/4));
+		
+		vertex(-width/2, -height/2);
+		vertex(-myWidth*(3/4), -myHeight*(3/4));
+		
+		vertex(-width/2, height/2);
+		vertex(-myWidth*(3/4), myHeight*(3/4));
+
+		vertex(width/2, height/2);
+		vertex(myWidth*(3/4), myHeight*(3/4));
+
+		endShape();
+
+		popMatrix();
+	}
+
 	// Desenha todos os elementos na tela
 	void draw(float t){
 		if(t == 0){
 			t = this.time;
 		}
 
+		drawScene();
 		for (int i = sceneElements.size() - 1; i >= 0 ; --i) {
 			SceneElement o = sceneElements.get(i);
 			if(o == selectedElement){
@@ -268,6 +301,7 @@ class Context{
 
 			if(this.isPlayed()){
 				o.noStroke();
+				drawScene();
 			}else{
 				o.setStroke();
 				o.drawCurve();
@@ -490,7 +524,7 @@ public class StateContext {
             if(lastTime == 0){
                 context.stop();
             }else{
-                context.draw( (frameCount/5) % int(lastTime));
+                context.draw( (frameCount/2) % int(lastTime));
             }
 
 
@@ -1384,7 +1418,7 @@ class Image extends SceneElement{
       return;
     }
 
-    if(t >= pos.keyTime(pos.nKeys()-1)){
+    if(t > pos.keyTime(pos.nKeys()-1)){
       t = pos.keyTime(pos.nKeys()-1);
     }
 
@@ -2388,7 +2422,7 @@ class DrawningState extends State {
 
     public void draw()
     {
-    	
+      text('Time: '+t, width - 60, 20);
   	}
 }
 class EditingState extends State {
