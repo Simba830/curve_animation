@@ -60,7 +60,6 @@ public void setup()
     context = new Context();
     update();
     stateContext = new StateContext(context);
-    hint(ENABLE_DEPTH_SORT);
     hint(DISABLE_DEPTH_TEST)
     stateContext.setContext(context);
   } catch (Exception e) {
@@ -261,7 +260,6 @@ class Context{
 			if(this.isPlayed()){
 				o.getCurve().getRenderer().setAlpha(30);
 				o.noStroke();
-				console.log("Is played!");
 			}else{
 				o.setStroke();
 				o.drawCurve();
@@ -1397,12 +1395,12 @@ class Image extends SceneElement{
 
     pushMatrix();
 
-    fill(255);
+    fill(255, 100);
 
     if(hasStroke){
       stroke(c);
     }else{
-      console.log('no stroke sendo chamado!');
+      console.log('no stroke sendo');
       noStroke();
     }
 
@@ -1449,78 +1447,6 @@ class Image extends SceneElement{
                 float my_height = myImage.height;
     return mouse.x < position.x + my_height/2 && mouse.x > position.x - my_height/2 && mouse.y < position.y + my_width/2 && mouse.y > position.y - my_width/2;
   }
-}
-
-class Picture extends SceneElement{
-
-	float width, height;
-	boolean active;
-
-	Square(float _width, float _height)
-	{
-		super(context.mouse);
-		this.name = "Picture";
-		this.width = _width;
-		this.height = _height;
-		active = true;
-
-	}
-
-	void draw(float t)
-	{
-		if(pos.nKeys() < 1){
-			return;
-		}
-
-		if(t >= pos.keyTime(pos.nKeys()-1)){
-			t = pos.keyTime(pos.nKeys()-1);
-		}
-
-		PVector position;
-		if(!active){
-			position = pos.get(0);
-			PVector tangent = pos.getTangent(0);
-		}else{
-			position = pos.get(t);
-			PVector tangent = pos.getTangent(t);
-		}
-
-
-		pushMatrix();
-
-		rectMode(CENTER);
-
-		fill(c);
-		noStroke();
-		smooth(8);
-		translate(position.x, position.y, 0);
-		rotate(-atan2(tangent.x, tangent.y));
-		rect(0, 0, this.width, this.height);
-		
-		popMatrix();
-	}
-
-	void setWidth(float x){
-		this.width = x;
-	}
-
-	void setHeight(float x){
-		this.height = x;
-	}
-
-	float lastTime()
-	{
-		if(pos.nKeys() < 1)
-			return 0;
-
-		return pos.interp.time.get(pos.nKeys()-1);
-	}
-
-	boolean isOver(PVector mouse){
-                PVector position = pos.get(0);
-                float radious = this.width;
-		return (mouse.x - position.x)*(mouse.x - position.x) + (mouse.y - position.y)*(mouse.y - position.y) <= radious*radious;
-	}
 }
 
 class SceneElement

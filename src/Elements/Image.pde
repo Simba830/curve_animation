@@ -43,12 +43,12 @@ class Image extends SceneElement{
 
     pushMatrix();
 
-    fill(255);
+    fill(255, 100);
 
     if(hasStroke){
       stroke(c);
     }else{
-      console.log('no stroke sendo chamado!');
+      console.log('no stroke sendo');
       noStroke();
     }
 

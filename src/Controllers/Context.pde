@@ -116,7 +116,6 @@ class Context{
 			if(this.isPlayed()){
 				o.getCurve().getRenderer().setAlpha(30);
 				o.noStroke();
-				console.log("Is played!");
 			}else{
 				o.setStroke();
 				o.drawCurve();
