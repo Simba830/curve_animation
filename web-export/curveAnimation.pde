@@ -2391,13 +2391,14 @@ class DrawningState extends State {
       }
     }
     
-    public void mouseReleased(PVector mouse) 
+    public void mouseReleased() 
     {
         // super.mouseReleased();
     	  // Retorna o estado de poder desenhar para FALSE
         //canSketch = false;
 
         // context.refreshInterpolator();
+        stateContext.setStateName('select');
     }
     public void mouseDragged()
     {	
@@ -2428,8 +2429,9 @@ class DrawningState extends State {
       }
       ms = frameCount;
       t = t + elapsed;
-      
-      text('Time: '+t, width - 60, 20);
+
+      if(canSketch)
+        text('Time: '+t, width - 60, 20);
   	}
 }
 class EditingState extends State {
