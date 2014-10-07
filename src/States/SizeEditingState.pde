@@ -59,7 +59,7 @@ class SizeEditingState extends State {
       if(context.isPlayed())
         return;
 
-      for (int i = 0; i < controlPoints.size() - 1; ++i) {
+      for (int i = 0; i < controlPoints.size(); ++i) {
           p = controlPoints.get(i);
           pushMatrix();
 
