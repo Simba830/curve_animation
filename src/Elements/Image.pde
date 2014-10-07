@@ -41,21 +41,24 @@ class Image extends SceneElement{
       tangent = new PVector(0,0);
     }
 
-    // myImage = loadImage(myPath);
     pushMatrix();
 
-    // noFill();
     fill(255);
-    // noStroke();
+
+    if(hasStroke){
+      stroke(c);
+    }else{
+      console.log('no stroke sendo chamado!');
+      noStroke();
+    }
+
     smooth(8);
     imageMode(CENTER);
 
-    stroke(c);
     translate(position.x, position.y, 0);
     rotate(atan2(tangent.y, tangent.x));
     translate(-myImage.width/2, -myImage.height/2,0);
 
-    // rect(20,20,0,0);
     image(myImage, 0 ,0, myImage.width * myScale, myImage.height * myScale );
 
     popMatrix();

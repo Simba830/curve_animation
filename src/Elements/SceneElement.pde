@@ -24,10 +24,12 @@ class SceneElement
 	private float transparency;
 	private SmoothInterpolator sizeInterpolator;
 	private boolean isStatic;
+	private boolean hasStroke;
 
 
 	SceneElement(PVector position)
 	{
+		this.hasStroke = true;
 		this.isStatic = true;
 		this.name = "Element";
 		this.scale = 1.0;
@@ -52,10 +54,12 @@ class SceneElement
 	}
 	
 	void drawCurve(){
+		pushMatrix();
 		curve.strokeColor = curveColor;
 		noFill();
 		this.curve.draw();
 		stroke(0);
+		popMatrix();
 	}
 	void load(){
 
@@ -105,5 +109,13 @@ class SceneElement
 	float getRotation()
 	{
 		return this.rotation;
+	}
+
+	void noStroke(){
+		this.hasStroke = false;
+	}
+
+	void setStroke(){
+		this.hasStroke = true;
 	}
 }

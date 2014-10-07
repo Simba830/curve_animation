@@ -142,9 +142,9 @@ public class StateContext {
 
         }else{
             context.draw(0.0);
+            myState.draw();
         }
         
-        myState.draw();
     }
 
     void is(State testState){

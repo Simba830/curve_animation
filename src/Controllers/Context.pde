@@ -103,7 +103,8 @@ class Context{
 			t = this.time;
 		}
 
-		for (SceneElement o : sceneElements) {
+		for (int i = sceneElements.size() - 1; i >= 0 ; --i) {
+			SceneElement o = sceneElements.get(i);
 			if(o == selectedElement){
 				o.c = #428bca;
 				o.curveColor = color(0,0,0);
@@ -112,18 +113,24 @@ class Context{
 				o.curveColor = color(200,200,200);
 			}
 
-			o.draw(t);
-
 			if(this.isPlayed()){
 				o.getCurve().getRenderer().setAlpha(30);
-			}	
+				o.noStroke();
+				console.log("Is played!");
+			}else{
+				o.setStroke();
+				o.drawCurve();
+			}
 
-			o.drawCurve();
+			o.draw(t);
+
 		}
 
+		pushMatrix();
 		fill(0);
 		stroke(0);
 		text("Tempo: "+t, 20, height - 20);
+		popMatrix();
 	}
 
 	float lastTime(){

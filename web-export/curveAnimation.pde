@@ -248,7 +248,8 @@ class Context{
 			t = this.time;
 		}
 
-		for (SceneElement o : sceneElements) {
+		for (int i = sceneElements.size() - 1; i >= 0 ; --i) {
+			SceneElement o = sceneElements.get(i);
 			if(o == selectedElement){
 				o.c = #428bca;
 				o.curveColor = color(0,0,0);
@@ -257,18 +258,24 @@ class Context{
 				o.curveColor = color(200,200,200);
 			}
 
-			o.draw(t);
-
 			if(this.isPlayed()){
 				o.getCurve().getRenderer().setAlpha(30);
-			}	
+				o.noStroke();
+				console.log("Is played!");
+			}else{
+				o.setStroke();
+				o.drawCurve();
+			}
 
-			o.drawCurve();
+			o.draw(t);
+
 		}
 
+		pushMatrix();
 		fill(0);
 		stroke(0);
 		text("Tempo: "+t, 20, height - 20);
+		popMatrix();
 	}
 
 	float lastTime(){
@@ -481,9 +488,9 @@ public class StateContext {
 
         }else{
             context.draw(0.0);
+            myState.draw();
         }
         
-        myState.draw();
     }
 
     void is(State testState){
@@ -1388,21 +1395,24 @@ class Image extends SceneElement{
       tangent = new PVector(0,0);
     }
 
-    // myImage = loadImage(myPath);
     pushMatrix();
 
-    // noFill();
     fill(255);
-    // noStroke();
+
+    if(hasStroke){
+      stroke(c);
+    }else{
+      console.log('no stroke sendo chamado!');
+      noStroke();
+    }
+
     smooth(8);
     imageMode(CENTER);
 
-    stroke(c);
     translate(position.x, position.y, 0);
     rotate(atan2(tangent.y, tangent.x));
     translate(-myImage.width/2, -myImage.height/2,0);
 
-    // rect(20,20,0,0);
     image(myImage, 0 ,0, myImage.width * myScale, myImage.height * myScale );
 
     popMatrix();
@@ -1467,10 +1477,12 @@ class SceneElement
 	private float transparency;
 	private SmoothInterpolator sizeInterpolator;
 	private boolean isStatic;
+	private boolean hasStroke;
 
 
 	SceneElement(PVector position)
 	{
+		this.hasStroke = true;
 		this.isStatic = true;
 		this.name = "Element";
 		this.scale = 1.0;
@@ -1495,10 +1507,12 @@ class SceneElement
 	}
 	
 	void drawCurve(){
+		pushMatrix();
 		curve.strokeColor = curveColor;
 		noFill();
 		this.curve.draw();
 		stroke(0);
+		popMatrix();
 	}
 	void load(){
 
@@ -1548,6 +1562,14 @@ class SceneElement
 	float getRotation()
 	{
 		return this.rotation;
+	}
+
+	void noStroke(){
+		this.hasStroke = false;
+	}
+
+	void setStroke(){
+		this.hasStroke = true;
 	}
 }
 
