@@ -2422,6 +2422,13 @@ class DrawningState extends State {
 
     public void draw()
     {
+      float elapsed = 0;
+      if(frameCount != ms){
+        elapsed = frameCount - ms;
+      }
+      ms = frameCount;
+      t = t + elapsed;
+      
       text('Time: '+t, width - 60, 20);
   	}
 }
