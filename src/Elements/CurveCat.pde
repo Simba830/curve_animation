@@ -49,9 +49,10 @@ class CurveCat
   }
 
   void removeElement(int index){
-    saveCurve();
     if (controlPoints.size()>1)
       controlPoints.remove(index);
+    
+    saveCurve();
   }
 
   Segment getSegment(ArrayList<Property> pAux, int i)
