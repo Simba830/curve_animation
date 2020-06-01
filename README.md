@@ -1,6 +1,9 @@
 CurveAnimationApp
 ==============
 
-This is an WebApp to create Animations based on performance.
+This project provides a WebApp that allows the user to create 2D Animations through sketches also referred performance-based animations. It was part of a research in the Computer Graphics Lab at UFRJ, Brazil with the goal of exploring how to improve the process of creating 2D animations.
 
-A research in Computer Graphics Lab at UFRJ, Brazil.
+
+Due to the fact this project was developed 6 years ago, many comments/variables/commits may be in Portuguese instead of English.
+
+
