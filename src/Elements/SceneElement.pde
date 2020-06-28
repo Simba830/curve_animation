@@ -27,7 +27,6 @@ class SceneElement
 	private boolean hasStroke;
 	private boolean followTangent;
 
-
 	SceneElement(PVector position)
 	{
 		this.followTangent = true;
@@ -96,20 +95,21 @@ class SceneElement
 		return pos.get(0);
 	}
 
-	// Get e Set das Escalas
 	void setScale(float _scale)
 	{
 		this.scale = _scale;
 	}
+
 	float getScale()
 	{
 		return this.scale;
 	}
-	// Get e Set da Rotação
+
 	void setRotation(float _rotation)
 	{
 		this.rotation = _rotation;
 	}
+
 	float getRotation()
 	{
 		return this.rotation;

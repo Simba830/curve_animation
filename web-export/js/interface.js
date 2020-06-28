@@ -1,4 +1,4 @@
-var processing;
+let processing;
 
 function init(){
 	$.get("curveAnimation.pde", function(code) {
@@ -15,8 +15,8 @@ function init(){
 
 $(function(){
 	init();
-	var divInterface = $("#interface");
-	var canvas = $("#curveAnimation");
+	let canvas = $("#curveAnimation");
+	let divInterface = $("#interface");
 });
 
 $(".menu-control").click(function(){

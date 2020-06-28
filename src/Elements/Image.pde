@@ -49,7 +49,6 @@ class Image extends SceneElement{
     if(this.hasStroke){
       strokeWeight(1);
       stroke(c);
-      console.log('stroke sendo chamado');
     }else{
       noStroke();
     }

@@ -45,7 +45,7 @@ Context getContext(){
 stateContext getStateContext(){
   return stateContext;
 }
-// TODO Mudar isso para um interface só usando o mouse
+
 void keyPressed() 
 { 
   try {
