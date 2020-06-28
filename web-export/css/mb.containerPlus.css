@@ -147,7 +147,7 @@ footer, header, hgroup, menu, nav, section {
   vertical-align: baseline;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
-  /*text-rendering:optimizeLegibility;*/
+  text-rendering:optimizeLegibility;
 
   -webkit-user-select: none;
 
@@ -189,7 +189,6 @@ footer, header, hgroup, menu, nav, section {
   background: -o-linear-gradient(top, #ffffff 0%, #e5e5e5 100%); /* Opera 11.10+ */
   background: -ms-linear-gradient(top, #ffffff 0%, #e5e5e5 100%); /* IE10+ */
   background: linear-gradient(top, #ffffff 0%, #e5e5e5 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#e5e5e5', GradientType=0); /* IE6-9 */
   min-height: 100px;
   min-width: 100px;
   border-radius: 10px;
@@ -207,6 +206,7 @@ footer, header, hgroup, menu, nav, section {
 
 .mbc_container.dragging {
   box-shadow: 0 0 20px 3px rgba(0, 0, 0, 0.5);
+  opacity: 0.5;
 }
 
 .icon{
@@ -225,7 +225,8 @@ footer, header, hgroup, menu, nav, section {
   background: #3a3a3a;
   color:white;
   padding: 8px;
-  margin-bottom: 15px;
+  height: 40px;
+  margin-bottom: 10px;
 }
 
 
@@ -465,8 +466,8 @@ footer, header, hgroup, menu, nav, section {
   position: relative;
   padding-top: 20px;
   height: 100%;
-  padding-left: 20px;
-  padding-right: 20px;
+  display: flex;
+  flex-direction: column;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   overflow: auto;
