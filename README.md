@@ -8,7 +8,9 @@ This project provides a WebApp that allows the user to create 2D Animations thro
 Due to the fact this project was developed **6 years ago** and I was in a Portuguese speaking University, many comments/variables/commits may be in Portuguese instead of English.
 Additionally, many coding practices are considered outdated or were not in the best way possible due to lack of experience.
 
-This is a small image of how the application looked like:
+You can also checkout the live demo here: [View Demo](https://curveanimation.netlify.app/)
+
+This is a small image of how the application looks like:
 ![CurveAnimation Example](https://github.com/guiherzog/curveAnimation/blob/master/web-export/img/demo.png?raw=true)
 
 ## Development Instructions 
