@@ -25,10 +25,11 @@ module.exports = function(grunt) {
 	            livereload: false                        //reloads the browser
 	          }
 	        }
-		}
+		},
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.registerTask('default', ['watch']);
+	grunt.registerTask('build', ['concat']);
 }
