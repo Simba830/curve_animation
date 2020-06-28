@@ -1,7 +1,7 @@
 {
-  "name": "curveAnimation",
-  "version": "0.0.0",
-  "description": "Curve Animation software LCG",
+  "name": "curve-animation",
+  "version": "0.1.0",
+  "description": "A tool that allows users to create sketch-based 2D animations.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,8 +10,9 @@
     "type": "git",
     "url": "https://github.com/guiherzog/curveAnimation.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Guilherme Herzog <guilhermeherzog@gmail.com>",
+  "contributors": ["João Vitor Elias Carvalho <joaovec@gmail.com>"],
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/guiherzog/curveAnimation/issues"
   },
