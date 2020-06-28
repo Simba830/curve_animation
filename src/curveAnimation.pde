@@ -99,7 +99,8 @@ void draw()
   }
   
   fill(255,0,0);
-  text('FPS: '+frameRate, 20, 20);
+
+  text('FPS: '+(int)frameRate, 20, 20);
 }
 
 void update(){

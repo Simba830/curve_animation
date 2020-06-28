@@ -74,7 +74,7 @@ Context getContext(){
 stateContext getStateContext(){
   return stateContext;
 }
-// TODO Mudar isso para um interface só usando o mouse
+
 void keyPressed() 
 { 
   try {
@@ -292,13 +292,15 @@ class Context{
 		drawScene();
 		for (int i = sceneElements.size() - 1; i >= 0 ; --i) {
 			SceneElement o = sceneElements.get(i);
+			o.draw(t);
+
 			if(o == selectedElement){
-				o.c = color(#428bca);
+				o.c = color(#598381);
+				!this.isPlayed() && o.drawSelected(t);
 			}else{
 				o.c = color(0,0,0);
 			}
 
-			o.draw(t);
 
 			if(this.isPlayed()){
 				o.noStroke();
@@ -313,7 +315,7 @@ class Context{
 		pushMatrix();
 		fill(0);
 		stroke(0);
-		text("Tempo: "+t, 20, height - 20);
+		text("Time: " + t, 20, height - 20);
 		popMatrix();
 	}
 
@@ -1448,7 +1450,6 @@ class Image extends SceneElement{
     if(this.hasStroke){
       strokeWeight(1);
       stroke(c);
-      console.log('stroke sendo chamado');
     }else{
       noStroke();
     }
@@ -1532,7 +1533,6 @@ class SceneElement
 	private boolean hasStroke;
 	private boolean followTangent;
 
-
 	SceneElement(PVector position)
 	{
 		this.followTangent = true;
@@ -1555,8 +1555,13 @@ class SceneElement
 		this.curve.setTolerance(15);
 	}
 
-	void draw(float t){
+	void draw(float t) {
+	}
 
+	void drawSelected(float t){
+		SmoothPositionInterpolator initialPos = this.getInitialPosition();
+		fill(this.c);
+		ellipse(initialPos.x, initialPos.y, 30, 30);
 	}
 	
 	void drawCurve(){
@@ -1601,20 +1606,21 @@ class SceneElement
 		return pos.get(0);
 	}
 
-	// Get e Set das Escalas
 	void setScale(float _scale)
 	{
 		this.scale = _scale;
 	}
+
 	float getScale()
 	{
 		return this.scale;
 	}
-	// Get e Set da Rotação
+
 	void setRotation(float _rotation)
 	{
 		this.rotation = _rotation;
 	}
+
 	float getRotation()
 	{
 		return this.rotation;

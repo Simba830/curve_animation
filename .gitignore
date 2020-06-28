@@ -1,3 +1,6 @@
+# Processing Files
+web-export/*.pde
+
 # Logs
 logs
 *.log

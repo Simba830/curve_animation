@@ -49,8 +49,13 @@ class SceneElement
 		this.curve.setTolerance(15);
 	}
 
-	void draw(float t){
+	void draw(float t) {
+	}
 
+	void drawSelected(float t){
+		SmoothPositionInterpolator initialPos = this.getInitialPosition();
+		fill(this.c);
+		ellipse(initialPos.x, initialPos.y, 30, 30);
 	}
 	
 	void drawCurve(){
