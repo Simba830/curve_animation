@@ -315,7 +315,7 @@ class Context{
 		pushMatrix();
 		fill(0);
 		stroke(0);
-		text("Time: " + t, 20, height - 20);
+		t && text("Time: " + t, 20, height - 20);
 		popMatrix();
 	}
 

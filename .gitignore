@@ -1,5 +1,6 @@
 # Processing Files
 web-export/*.pde
+*.DS_Store
 
 # Logs
 logs
